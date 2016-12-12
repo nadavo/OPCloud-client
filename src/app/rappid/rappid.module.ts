@@ -6,6 +6,7 @@ import { RappidToolbarComponent } from './rappid-toolbar/rappid-toolbar.componen
 import { RappidStencilComponent } from './rappid-stencil/rappid-stencil.component';
 import { RappidPaperComponent } from './rappid-paper/rappid-paper.component';
 import { GraphService } from './services/graph.service';
+import { RappidInspectorComponent } from './rappid-inspector/rappid-inspector.component';
 
 @NgModule({
   imports: [
@@ -16,7 +17,8 @@ import { GraphService } from './services/graph.service';
     RappidMainComponent,
     RappidToolbarComponent,
     RappidStencilComponent,
-    RappidPaperComponent
+    RappidPaperComponent,
+    RappidInspectorComponent
   ],
   providers: [
     GraphService,

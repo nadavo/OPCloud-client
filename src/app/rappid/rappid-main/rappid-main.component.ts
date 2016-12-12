@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { GraphService } from '../services/graph.service';
-import { stencilConfig } from '../../config/stencil.config';
-import { inspectorConfig } from '../../config/inspector.config';
 import { haloConfig } from '../../config/halo.config';
 import { toolbarConfig } from '../../config/toolbar.config';
 import { opmShapes } from '../../config/opm-shapes.config';
@@ -17,9 +15,9 @@ const _ = require('lodash')
   template: `
     <div class="app-body rappid">
       <!--<opcloud-rappid-toolbar></opcloud-rappid-toolbar>-->
-      <opcloud-rappid-stencil [graph]="graph" [paper]="paper" [stencil]="stencil"></opcloud-rappid-stencil>
+      <opcloud-rappid-stencil [graph]="graph" [paper]="paper" [paperScroller]="paperScroller"></opcloud-rappid-stencil>
       <opcloud-rappid-paper [paper]="paper" [paperScroller]="paperScroller"></opcloud-rappid-paper>
-      <div class="inspector-container"></div>
+      <opcloud-rappid-inspector [cell]="cell"></opcloud-rappid-inspector>
       <div class="statusbar-container"></div>
     </div>
   `,
@@ -28,10 +26,10 @@ const _ = require('lodash')
 export class RappidMainComponent implements OnInit {
   graph;
   paper;
+  cell;
   commandManager;
   private snaplines;
   private paperScroller;
-  private stencil;
   private keyboard;
   private clipboard;
   private selection;
@@ -44,7 +42,6 @@ export class RappidMainComponent implements OnInit {
 
   ngOnInit() {
     this.initializePaper();
-    this.initializeStencil();
     this.initializeSelection();
     this.initializeHaloAndInspector();
     this.initializeNavigator();
@@ -55,9 +52,11 @@ export class RappidMainComponent implements OnInit {
 
   initializePaper() {
 
-    this.graph.on('add', function (cell, collection, opt) {
-      if (opt.stencil) this.createInspector(cell);
-    }, this);
+    this.graph.on('add', (cell, collection, opt) => {
+      if (opt.stencil) {
+        this.cell = cell;
+      }
+    });
 
     this.commandManager = new joint.dia.CommandManager({ graph: this.graph });
 
@@ -73,7 +72,6 @@ export class RappidMainComponent implements OnInit {
     paper.on('blank:mousewheel', _.partial(this.onMousewheel, null), this);
     paper.on('cell:mousewheel', this.onMousewheel, this);
 
-    this.snaplines = new joint.ui.Snaplines({ paper: paper });
 
     var paperScroller = this.paperScroller = new joint.ui.PaperScroller({
       paper: paper,
@@ -86,32 +84,7 @@ export class RappidMainComponent implements OnInit {
   }
 
 
-  // Create and populate stencil.
-  initializeStencil() {
 
-    var stencil = this.stencil = new joint.ui.Stencil({
-      paper: this.paperScroller,
-      snaplines: this.snaplines,
-      scaleClones: true,
-      width: 240,
-      groups: stencilConfig.groups,
-      dropAnimation: true,
-      groupsToggleButtons: true,
-      search: {
-        '*': ['type', 'attrs/text/text', 'attrs/.label/text'],
-        'org.Member': ['attrs/.rank/text', 'attrs/.name/text']
-      },
-      // Use default Grid Layout
-      layout: true,
-      // Remove tooltip definition from clone
-      dragStartClone: function (cell) {
-        return cell.clone().removeAttr('./data-tooltip');
-      }
-    });
-
-    /// $('.stencil-container').append(stencil.el);
-    // this.stencil.render().load(stencilConfig.shapes);
-  }
 
 
   initializeKeyboardShortcuts() {
@@ -223,14 +196,6 @@ export class RappidMainComponent implements OnInit {
   }
 
 
-  createInspector(cell) {
-
-    return joint.ui.Inspector.create('.inspector-container', _.extend({
-      cell: cell
-    }, inspectorConfig[cell.get('type')]));
-  }
-
-
   initializeHaloAndInspector() {
 
     this.paper.on('element:pointerup link:options', function (cellView) {
@@ -257,7 +222,7 @@ export class RappidMainComponent implements OnInit {
           this.selection.collection.add(cell, { silent: true });
         }
 
-        this.createInspector(cell);
+        this.cell = cell;
       }
     }, this);
   }
@@ -295,7 +260,7 @@ export class RappidMainComponent implements OnInit {
       'to-front:pointerclick': _.bind(this.selection.collection.invoke, this.selection.collection, 'toFront'),
       'to-back:pointerclick': _.bind(this.selection.collection.invoke, this.selection.collection, 'toBack'),
       'layout:pointerclick': _.bind(this.layoutDirectedGraph, this),
-      'snapline:change': _.bind(this.changeSnapLines, this),
+      // 'snapline:change': _.bind(this.changeSnapLines, this),
       'clear:pointerclick': _.bind(this.graph.clear, this.graph),
       'print:pointerclick': _.bind(this.paper.print, this.paper),
       'grid-size:change': _.bind(this.paper.setGridSize, this.paper)
@@ -308,13 +273,13 @@ export class RappidMainComponent implements OnInit {
 
   changeSnapLines(checked) {
 
-    if (checked) {
+    /*if (checked) {
       this.snaplines.startListening();
       this.stencil.options.snaplines = this.snaplines;
     } else {
       this.snaplines.stopListening();
       this.stencil.options.snaplines = null;
-    }
+    }*/
   }
 
 
