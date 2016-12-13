@@ -24,7 +24,7 @@ const _ = require('lodash')
   styleUrls: ['./rappid-main.component.css']
 })
 export class RappidMainComponent implements OnInit {
-  graph;
+  graph = null;
   paper;
   cell;
   commandManager;
