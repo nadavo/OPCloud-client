@@ -6,6 +6,9 @@ import { HttpModule } from '@angular/http';
 import { AppComponent } from './app.component';
 import { RappidModule } from './rappid/rappid.module';
 import { HeaderComponent } from './header/header.component';
+import { AngularFireModule } from 'angularfire2';
+import { firebaseConfig, firebaseAuthConfig } from './config/firbase.config';
+import { AuthService } from './services/auth.service';
 
 @NgModule({
   declarations: [
@@ -16,9 +19,10 @@ import { HeaderComponent } from './header/header.component';
     BrowserModule,
     FormsModule,
     HttpModule,
-    RappidModule
+    RappidModule,
+    AngularFireModule.initializeApp(firebaseConfig, firebaseAuthConfig)
   ],
-  providers: [],
+  providers: [AuthService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
