@@ -150,5 +150,5 @@ opmShapes.Process = opmShapes.Generic.extend({
   }, joint.shapes.basic.Generic.prototype.defaults)
 });
 
-
+joint.shapes.opm = opmShapes;
 

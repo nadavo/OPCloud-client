@@ -22,10 +22,16 @@
   </div>
 
   <div class="joint-theme-modern joint-toolbar-group" data-group="export">
-    <button class="joint-theme-modern joint-widget" id="btn-svg" data-tooltip="Open as SVG in a pop-up"
+    <button class="joint-theme-modern joint-widget" id="btn-save" data-tooltip=""
             data-tooltip-position="top" data-tooltip-position-selector=".toolbar-container" data-type="button"
-            data-name="svg">Export SVG
+            data-name="save" (click)="saveModel(modelNameInput)">Save Model
     </button>
+    <input #modelNameInput>
+    <button class="joint-theme-modern joint-widget" id="btn-load" data-tooltip=""
+            data-tooltip-position="top" data-tooltip-position-selector=".toolbar-container" data-type="button"
+            data-name="load" (click)="loadModel(modelNameInput)">Load Model
+    </button>
+
     <button class="joint-theme-modern joint-widget" id="btn-png" data-tooltip="Open as PNG in a pop-up"
             data-tooltip-position="top" data-tooltip-position-selector=".toolbar-container" data-type="button"
             data-name="png">Export PNG

@@ -6,6 +6,7 @@ import { HttpModule } from '@angular/http';
 import { AppComponent } from './app.component';
 import { RappidModule } from './rappid/rappid.module';
 import { HeaderComponent } from './header/header.component';
+import { ModelStorageService } from './services/model-storage.service';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,7 @@ import { HeaderComponent } from './header/header.component';
     HttpModule,
     RappidModule
   ],
-  providers: [],
+  providers: [ModelStorageService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
