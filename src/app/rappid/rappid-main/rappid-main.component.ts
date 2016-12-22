@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { GraphService } from '../services/graph.service';
 import { haloConfig } from '../../config/halo.config';
 import { toolbarConfig } from '../../config/toolbar.config';
 import { opmShapes } from '../../config/opm-shapes.config';
+import { MdDialog } from '@angular/material';
+import { ChooseLinkDialogComponent } from '../../dialogs/choose-link-dialog/choose-link-dialog.component';
 
 const joint = require('rappid');
 
@@ -13,7 +15,7 @@ const _ = require('lodash')
 @Component({
   selector: 'opcloud-rappid-main',
   template: `
-    <div class="app-body rappid">
+    <div class="app-body rappid" #rappidContainer>
       <!--<opcloud-rappid-toolbar></opcloud-rappid-toolbar>-->
       <opcloud-rappid-stencil [graph]="graph" [paper]="paper" [paperScroller]="paperScroller"></opcloud-rappid-stencil>
       <opcloud-rappid-paper [paper]="paper" [paperScroller]="paperScroller"></opcloud-rappid-paper>
@@ -36,7 +38,9 @@ export class RappidMainComponent implements OnInit {
   private navigator;
   private toolbar;
 
-  constructor(graphService:GraphService) {
+  @ViewChild('rappidContainer', { read: ViewContainerRef }) rappidContainer;
+
+  constructor(graphService:GraphService, private _dialog: MdDialog) {
     this.graph = graphService.getGraph();
   }
 
@@ -48,6 +52,28 @@ export class RappidMainComponent implements OnInit {
     this.initializeToolbar();
     this.initializeKeyboardShortcuts();
     this.initializeTooltips();
+    this.handleAddLink();
+  }
+
+  handleAddLink() {
+    this.graph.on('add', (cell) => {
+      if (cell.attributes.type === 'opm.Link') {
+        cell.on('change:target change:source', (link) => {
+          if (link.attributes.source.id && link.attributes.target.id) {
+            let dialogRef = this._dialog.open(ChooseLinkDialogComponent, {viewContainerRef: this.rappidContainer});
+            dialogRef.componentInstance.newLink = link;
+            dialogRef.componentInstance.linkSource = link.getSourceElement();
+            dialogRef.componentInstance.linkTarget = link.getTargetElement();
+
+            dialogRef.afterClosed().subscribe(result => {
+              if (!!result) {
+                console.log('chosen link: ', result);
+              }
+            });
+          }
+        });
+      }
+    });
   }
 
   initializePaper() {

@@ -10,13 +10,15 @@ import { ModelStorageService } from './services/model-storage.service';
 import { MaterialModule } from '@angular/material';
 import { SaveModelDialogComponent } from './dialogs/save-model-dialog/save-model-dialog.component';
 import { LoadModelDialogComponent } from './dialogs/load-model-dialog/load-model-dialog.component';
+import { ChooseLinkDialogComponent } from './dialogs/choose-link-dialog/choose-link-dialog.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HeaderComponent,
     SaveModelDialogComponent,
-    LoadModelDialogComponent
+    LoadModelDialogComponent,
+    ChooseLinkDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -27,7 +29,8 @@ import { LoadModelDialogComponent } from './dialogs/load-model-dialog/load-model
   ],
   entryComponents: [
     SaveModelDialogComponent,
-    LoadModelDialogComponent
+    LoadModelDialogComponent,
+    ChooseLinkDialogComponent
   ],
   providers: [ModelStorageService],
   bootstrap: [AppComponent]
