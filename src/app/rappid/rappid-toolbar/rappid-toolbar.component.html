@@ -1,4 +1,5 @@
 <div class="joint-theme-modern joint-toolbar">
+  <span>{{modelName}}</span>
   <div class="joint-theme-modern joint-toolbar-group" data-group="undo-redo">
     <button class="joint-theme-modern joint-widget"
             data-tooltip="Undo"
@@ -24,12 +25,15 @@
   <div class="joint-theme-modern joint-toolbar-group" data-group="export">
     <button class="joint-theme-modern joint-widget" id="btn-save" data-tooltip=""
             data-tooltip-position="top" data-tooltip-position-selector=".toolbar-container" data-type="button"
-            data-name="save" (click)="saveModel(modelNameInput)">Save Model
+            data-name="save" (click)="saveModel()">Save Model
     </button>
-    <input #modelNameInput>
+    <button class="joint-theme-modern joint-widget" id="btn-save" data-tooltip=""
+            data-tooltip-position="top" data-tooltip-position-selector=".toolbar-container" data-type="button"
+            data-name="save-as" (click)="saveModelAs()">Save As
+    </button>
     <button class="joint-theme-modern joint-widget" id="btn-load" data-tooltip=""
             data-tooltip-position="top" data-tooltip-position-selector=".toolbar-container" data-type="button"
-            data-name="load" (click)="loadModel(modelNameInput)">Load Model
+            data-name="load" (click)="loadModel()">Load Model
     </button>
 
     <button class="joint-theme-modern joint-widget" id="btn-png" data-tooltip="Open as PNG in a pop-up"

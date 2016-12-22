@@ -28,6 +28,10 @@ export class ModelStorageService {
     }
   }
 
+  getModels() {
+    return Object.keys(this.models);
+  }
+
 }
 
 export class ModelObject {
