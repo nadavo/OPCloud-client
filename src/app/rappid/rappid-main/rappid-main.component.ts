@@ -15,7 +15,7 @@ const _ = require('lodash')
 @Component({
   selector: 'opcloud-rappid-main',
   template: `
-    <div class="app-body rappid" #rappidContainer>
+    <div class="rappid-main rappid" #rappidContainer>
       <!--<opcloud-rappid-toolbar></opcloud-rappid-toolbar>-->
       <opcloud-rappid-stencil [graph]="graph" [paper]="paper" [paperScroller]="paperScroller"></opcloud-rappid-stencil>
       <opcloud-rappid-paper [paper]="paper" [paperScroller]="paperScroller"></opcloud-rappid-paper>

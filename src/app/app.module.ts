@@ -11,6 +11,7 @@ import { MaterialModule } from '@angular/material';
 import { SaveModelDialogComponent } from './dialogs/save-model-dialog/save-model-dialog.component';
 import { LoadModelDialogComponent } from './dialogs/load-model-dialog/load-model-dialog.component';
 import { ChooseLinkDialogComponent } from './dialogs/choose-link-dialog/choose-link-dialog.component';
+import { OplWidgetComponent } from './opl-widget/opl-widget.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { ChooseLinkDialogComponent } from './dialogs/choose-link-dialog/choose-l
     HeaderComponent,
     SaveModelDialogComponent,
     LoadModelDialogComponent,
-    ChooseLinkDialogComponent
+    ChooseLinkDialogComponent,
+    OplWidgetComponent
   ],
   imports: [
     BrowserModule,
