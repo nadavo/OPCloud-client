@@ -1,0 +1,6 @@
+.rappid-main {
+  position: relative;
+  height: -moz-calc(80% - 60px);
+  height: -webkit-calc(80% - 60px);
+  height: calc(80% - 60px);
+}
