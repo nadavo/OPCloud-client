@@ -1,4 +1,41 @@
-# Opcloud
+# Getting Started
+get Rappid: http://client.us3.list-manage.com/track/click?u=49d8e0b5c1f289d34b560ac5d&id=adf5283b74&e=2a75e0a105
+
+Unzip it in your projects folder. 
+Enter the Rappid project folder. 
+
+Run: 
+
+`npm i` (this will install all Rappid dependencies)
+
+`npm link` (this will create a link to this project, to use it from other projects)
+
+### Getting the new project:
+
+https://github.com/ObjectProcessMethodology/OPCloud-client
+
+click on Fork (This will add the project to your repository)
+
+Go to your Github repository https://github.com/<yourname>/OPCloud-client
+
+### Clone the project
+copy the displayed HTTPS key
+In the terminal in your projects folder, clone the project:
+
+`git clone <project HTTPS key>` (for example: git clone git@github.com:yourname/OPCloud-client.git)
+
+enter the project folder (OPCloud-client)
+Run:
+
+`npm link rappid`
+
+`npm i`
+
+If everything is ok, you should be able to run the project with Angular CLI:
+
+`ng serve`
+
+# OPCloud (Angular 2)
 
 This project was generated with [angular-cli](https://github.com/angular/angular-cli) version 1.0.0-beta.21.
 
