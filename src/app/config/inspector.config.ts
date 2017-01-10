@@ -1,7 +1,6 @@
 import { inspectorShapes } from './inspectorShapes';
 
 export const inspectorConfig = {
-
   //object parameters
   'opm.Object': {
     inputs: {

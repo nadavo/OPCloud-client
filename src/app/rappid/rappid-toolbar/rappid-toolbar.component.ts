@@ -20,6 +20,10 @@ export class RappidToolbarComponent implements OnInit {
     this.graph = this.graphService.getGraph();
   }
 
+  undo() {
+    console.log('Undoing');
+  }
+
   saveModel() {
     if (!this.modelName) {
       return this.saveModelAs();
