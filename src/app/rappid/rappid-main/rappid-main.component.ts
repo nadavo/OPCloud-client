@@ -3,6 +3,7 @@ import { GraphService } from '../services/graph.service';
 import { haloConfig } from '../../config/halo.config';
 import { toolbarConfig } from '../../config/toolbar.config';
 import { opmShapes } from '../../config/opm-shapes.config';
+import { opmRuleSet } from '../../config/opm-validator.config';
 import { MdDialog } from '@angular/material';
 import { ChooseLinkDialogComponent } from '../../dialogs/choose-link-dialog/choose-link-dialog.component';
 
@@ -37,6 +38,7 @@ export class RappidMainComponent implements OnInit {
   private selection;
   private navigator;
   private toolbar;
+  private validator;
 
   @ViewChild('rappidContainer', { read: ViewContainerRef }) rappidContainer;
 
@@ -46,6 +48,7 @@ export class RappidMainComponent implements OnInit {
 
   ngOnInit() {
     this.initializePaper();
+    this.initializeValidator();
     this.initializeSelection();
     this.initializeHaloAndInspector();
     this.initializeNavigator();
@@ -110,8 +113,10 @@ export class RappidMainComponent implements OnInit {
   }
 
 
-
-
+  initializeValidator() {
+    this.validator = new joint.dia.Validator({commandManager: this.commandManager});
+    opmRuleSet(this.validator, this.graph);
+  }
 
   initializeKeyboardShortcuts() {
 
@@ -255,8 +260,7 @@ export class RappidMainComponent implements OnInit {
 
 
   initializeNavigator() {
-
-    var navigator = this.navigator = new joint.ui.Navigator({
+    this.navigator = new joint.ui.Navigator({
       width: 240,
       height: 115,
       paperScroller: this.paperScroller,
