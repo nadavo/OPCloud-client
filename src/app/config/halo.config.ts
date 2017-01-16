@@ -28,19 +28,6 @@ export const haloConfig = {
       }
     },
     {
-      name: 'clone',
-      position: 'se',
-      events: { pointerdown: 'startCloning', pointermove: 'doClone', pointerup: 'stopCloning' },
-      attrs: {
-        '.handle': {
-          'data-tooltip-class-name': 'small',
-          'data-tooltip': 'Click and drag to clone the object',
-          'data-tooltip-position': 'left',
-          'data-tooltip-padding': 15
-        }
-      }
-    },
-    {
       name: 'unlink',
       position: 'w',
       events: { pointerdown: 'unlinkElement' },
@@ -78,6 +65,19 @@ export const haloConfig = {
           'data-tooltip-padding': 15
         }
       }
-    }
+    },
+    /*{
+      name: 'add_state',
+      position: 's',
+      events: { pointerdown: 'add_state' },
+      attrs: {
+        '.handle': {
+          'data-tooltip-class-name': 'small',
+          'data-tooltip': 'Click to add state to the object',
+          'data-tooltip-position': 'left',
+          'data-tooltip-padding': 15
+        }
+      }
+    },*/
   ]
 };

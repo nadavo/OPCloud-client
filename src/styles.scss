@@ -1,7 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
-@import "~rappid/build/rappid.min.css";
-@import "../OPCloud/css/theme-picker.css";
-@import "../OPCloud/css/style.css";
+@import '../OPCloud-dev/build/rappid.css';
+@import '../OPCloud-dev/OPCloud/css/style.css';
+@import '../OPCloud-dev/OPCloud/css/theme-picker.css';
+@import '../OPCloud-dev/OPCloud/css/halo.css';
+@import '../OPCloud-dev/OPCloud/css/OPCloud.css';
 @import '~@angular/material/core/theming/all-theme';
 
 @include md-core();
