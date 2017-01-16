@@ -1,14 +1,12 @@
 import { Injectable } from '@angular/core';
-import { AngularFire, AuthProviders } from 'angularfire2/index';
+import { AngularFire, AuthProviders, FirebaseAuth } from 'angularfire2/index';
 
 @Injectable()
 export class AuthService {
   user;
   pending = true;
-  email;
-  password;
 
-  constructor(private af: AngularFire) {
+  constructor(private af: AngularFire, public auth: FirebaseAuth) {
     af.auth.subscribe(user => {
       this.pending = false;
       if(user) {
@@ -18,7 +16,6 @@ export class AuthService {
       else {
         // user not logged in
         this.user = null;
-        this.login(this.email, this.password);
       }
     });
   }
@@ -34,6 +31,10 @@ export class AuthService {
 
   isAuthenticated() {
     return !!this.user;
+  }
+
+  getUser() {
+    return this.user;
   }
 
 }
