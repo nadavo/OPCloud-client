@@ -9,12 +9,13 @@ import { AuthService } from './services/auth.service';
       <opcloud-rappid></opcloud-rappid>
       <opcloud-opl-widget></opcloud-opl-widget>
     </div>
+    <opcloud-auth></opcloud-auth>
   `,
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
   title = 'app works!';
-  constructor(private authService: AuthService) {
+  constructor() {
 
   }
 }

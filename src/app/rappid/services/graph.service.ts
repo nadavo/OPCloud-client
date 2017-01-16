@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { ModelStorageService, ModelObject } from '../../services/model-storage.service';
+import { ModelObject } from '../../services/storage/model-object.class';
+import { ModelStorageInterface } from '../../services/storage/model-storage.interface';
 const joint = require('rappid');
 
 
@@ -7,13 +8,15 @@ const joint = require('rappid');
 export class GraphService {
   graph;
   modelObject;
+  modelStorage;
 
-  constructor(private modelStorage: ModelStorageService) {
+  constructor(modelStorage: ModelStorageInterface) {
+    this.modelStorage = modelStorage;
     this.graph = new joint.dia.Graph;
     this.modelObject = new ModelObject('myModel', null);
   }
-  
-  getGraph(name?:string) {
+
+  getGraph(name?: string) {
     return name ? this.loadModel(name) : this.graph;
   }
 
@@ -23,8 +26,10 @@ export class GraphService {
   }
 
   loadModel(name) {
-    this.modelObject = this.modelStorage.get(name);
-    this.graph.fromJSON(this.modelObject.modelData);
+    this.modelStorage.get(name).then((res) => {
+      this.modelObject = res;
+        this.graph.fromJSON(this.modelObject.modelData);
+    });
   }
 
 }
