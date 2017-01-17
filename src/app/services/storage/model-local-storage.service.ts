@@ -1,12 +1,15 @@
 import { Injectable } from '@angular/core';
+import { ModelStorageInterface } from './model-storage.interface';
+import { ModelObject } from './model-object.class';
 
 const modelStorageName = 'OPCloud_Models';
 
 @Injectable()
-export class ModelStorageService {
+export class ModelLocalStorageService extends ModelStorageInterface {
   models;
 
   constructor() {
+    super();
     this.models = JSON.parse(localStorage.getItem(modelStorageName)) || {};
   }
 
@@ -20,6 +23,7 @@ export class ModelStorageService {
 
   save(modelObject: ModelObject) {
     this.models[modelObject.name] = modelObject.modelData;
+
     try {
       localStorage.setItem(modelStorageName, JSON.stringify(this.models));
       console.log(`model ${modelObject.name} was saved in localStorage`);
@@ -34,18 +38,3 @@ export class ModelStorageService {
 
 }
 
-export class ModelObject {
-  name: string;
-  modelData: any;
-
-  constructor(name: string, modelData: any) {
-    this.name = name;
-    this.modelData = modelData;
-  }
-
-  saveModel(newName, newModel) {
-    this.name = newName;
-    this.modelData = newModel;
-  }
-
-}

@@ -5,14 +5,17 @@
             data-tooltip="Undo"
             data-tooltip-position="top"
             data-tooltip-position-selector=".toolbar-container"
-            data-type="undo" data-name="undo">
+            data-type="undo"
+            data-name="undo"
+            (click)="undo()">
     </button>
     <button class="joint-theme-modern joint-widget"
             data-tooltip="Redo"
             data-tooltip-position="top"
             data-tooltip-position-selector=".toolbar-container"
             data-type="redo"
-            data-name="redo">
+            data-name="redo"
+            (click)="redo()">
     </button>
   </div>
 
@@ -27,7 +30,7 @@
             data-tooltip-position="top" data-tooltip-position-selector=".toolbar-container" data-type="button"
             data-name="save" (click)="saveModel()">Save Model
     </button>
-    <button class="joint-theme-modern joint-widget" id="btn-save" data-tooltip=""
+    <button class="joint-theme-modern joint-widget" id="btn-save-as" data-tooltip=""
             data-tooltip-position="top" data-tooltip-position-selector=".toolbar-container" data-type="button"
             data-name="save-as" (click)="saveModelAs()">Save As
     </button>

@@ -1,6 +1,6 @@
 import { Component, OnInit, Optional } from '@angular/core';
 import { MdDialogRef } from '@angular/material';
-import { ModelStorageService } from '../../services/model-storage.service';
+import { ModelStorageInterface } from '../../services/storage/model-storage.interface';
 
 @Component({
   selector: 'app-load-model-dialog',
@@ -12,8 +12,13 @@ import { ModelStorageService } from '../../services/model-storage.service';
       </label>
     </p>
     <ul>
-      <li *ngFor="let model of models" (click)="select(model)" [ngClass]="model === selected ? 'selected' : ''">{{model}}</li>
+      <li *ngFor="let model of models | async" 
+          (click)="select(model)" 
+          [ngClass]="model === selected ? 'selected' : ''">
+            {{model}}
+      </li>
     </ul>
+    <hr>
     <p> 
       <button md-button (click)="dialogRef.close(selected)">LOAD</button> 
       <button md-button (click)="dialogRef.close()">CANCEL</button> 
@@ -24,15 +29,15 @@ import { ModelStorageService } from '../../services/model-storage.service';
 export class LoadModelDialogComponent implements OnInit {
   models;
   selected;
+  items;
 
   constructor(
     @Optional() public dialogRef: MdDialogRef<LoadModelDialogComponent>,
-    private modelStorageService: ModelStorageService) {
-
-    this.models = modelStorageService.getModels();
+    private modelStorageService: ModelStorageInterface) {
   }
 
   ngOnInit() {
+    this.models = this.modelStorageService.getModels();
   }
 
   select(model) {
