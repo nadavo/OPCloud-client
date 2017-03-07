@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../services/auth.service';
-import { Observable } from 'rxjs';
-import { FirebaseAuth } from 'angularfire2';
 
 @Component({
   selector: 'opcloud-auth',

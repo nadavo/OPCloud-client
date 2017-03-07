@@ -3,7 +3,7 @@ import { MdDialogRef } from '@angular/material';
 
 @Component({
   selector: 'app-choose-link-dialog',
-  templateUrl: `
+  template: `
     <div>
       <p>
         Source type: {{ linkSource.attributes.type }}

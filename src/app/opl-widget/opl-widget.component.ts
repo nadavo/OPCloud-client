@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { GraphService } from '../rappid/services/graph.service';
+import { GraphService } from '../rappid-components/services/graph.service';
 
 @Component({
   selector: 'opcloud-opl-widget',

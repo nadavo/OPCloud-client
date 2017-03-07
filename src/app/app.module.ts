@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
-import { RappidModule } from './rappid/rappid.module';
+import { RappidModule } from './rappid-components/rappid.module';
 import { HeaderComponent } from './header/header.component';
 import { ModelLocalStorageService } from './services/storage/model-local-storage.service';
 import { MaterialModule } from '@angular/material';

@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { AngularFire, AuthProviders, FirebaseAuth } from 'angularfire2/index';
+import { AngularFire, AngularFireAuth } from 'angularfire2';
 
 @Injectable()
 export class AuthService {
   user;
   pending = true;
 
-  constructor(private af: AngularFire, public auth: FirebaseAuth) {
+  constructor(private af: AngularFire, public auth: AngularFireAuth) {
     af.auth.subscribe(user => {
       this.pending = false;
       if(user) {

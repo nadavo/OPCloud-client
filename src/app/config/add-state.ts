@@ -4,6 +4,8 @@ export function addState (evt, x, y) {
 
   var options = this.options;
 
+  console.log(this)
+
   this.startBatch();
 
 

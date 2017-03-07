@@ -3,7 +3,7 @@ import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
-  templateUrl: `
+  template: `
     <div id="app" class="joint-theme-modern joint-app">
       <opcloud-header></opcloud-header>
       <opcloud-rappid></opcloud-rappid>
