@@ -3,17 +3,16 @@ import { GraphService } from '../services/graph.service';
 import { haloConfig } from '../../config/halo.config';
 import { toolbarConfig } from '../../config/toolbar.config';
 import { opmShapes } from '../../config/opm-shapes.config';
+import { opmRuleSet } from '../../config/opm-validator';
 import { MdDialog } from '@angular/material';
 import { ChooseLinkDialogComponent } from '../../dialogs/choose-link-dialog/choose-link-dialog.component';
-import { opmRuleSet } from '../../config/opm-validator';
-import { addState } from '../../config/add-state';
-import { CommandManagerService } from '../services/command-manager.service';
+import {linkTypeSelection} from '../../link-operating/linkTypeSelection'
 
 const joint = require('rappid');
 
-const $ = require('jquery');
+const $ = require('jquery')
 // window.jQuery = $;
-const _ = require('lodash');
+const _ = require('lodash')
 
 @Component({
   selector: 'opcloud-rappid-main',
@@ -23,7 +22,7 @@ const _ = require('lodash');
       <opcloud-rappid-stencil [graph]="graph" [paper]="paper" [paperScroller]="paperScroller"></opcloud-rappid-stencil>
       <opcloud-rappid-paper [paper]="paper" [paperScroller]="paperScroller"></opcloud-rappid-paper>
       <opcloud-rappid-inspector [cell]="cell"></opcloud-rappid-inspector>
-      <opcloud-rappid-navigator [paperScroller]="paperScroller"></opcloud-rappid-navigator>
+      <div class="statusbar-container"></div>
     </div>
   `,
   styleUrls: ['./rappid-main.component.css']
@@ -38,30 +37,26 @@ export class RappidMainComponent implements OnInit {
   private keyboard;
   private clipboard;
   private selection;
+  private validator;
   private navigator;
   private toolbar;
 
   @ViewChild('rappidContainer', { read: ViewContainerRef }) rappidContainer;
-  private validator;
-  private RuleSet;
 
-  constructor(graphService: GraphService,
-              commandManagerService: CommandManagerService,
-              private _dialog: MdDialog) {
+  constructor(graphService:GraphService, private _dialog: MdDialog) {
     this.graph = graphService.getGraph();
-    this.commandManager = commandManagerService.commandManager;
   }
 
   ngOnInit() {
-    joint.setTheme('modern');
     this.initializePaper();
-    this.initializeValidator();
     this.initializeSelection();
     this.initializeHaloAndInspector();
+    this.initializeValidator();
+    this.initializeNavigator();
     this.initializeToolbar();
     this.initializeKeyboardShortcuts();
     this.initializeTooltips();
-    // this.handleAddLink();
+    this.handleAddLink();
   }
 
   handleAddLink() {
@@ -69,13 +64,18 @@ export class RappidMainComponent implements OnInit {
       if (cell.attributes.type === 'opm.Link') {
         cell.on('change:target change:source', (link) => {
           if (link.attributes.source.id && link.attributes.target.id) {
-            let dialogRef = this._dialog.open(ChooseLinkDialogComponent, { viewContainerRef: this.rappidContainer });
+            let dialogRef = this._dialog.open(ChooseLinkDialogComponent, {viewContainerRef: this.rappidContainer});
             dialogRef.componentInstance.newLink = link;
             dialogRef.componentInstance.linkSource = link.getSourceElement();
             dialogRef.componentInstance.linkTarget = link.getTargetElement();
+            dialogRef.componentInstance.opmLinks = linkTypeSelection.generateLinkWithOpl(link);
 
             dialogRef.afterClosed().subscribe(result => {
               if (!!result) {
+                console.log('a: ', link.attributes.attrs[".marker-target"].d);
+                link.attributes.attrs.fill = 'red';
+                link.attributes.attrs[".marker-target"].d = 'M 10 10 m -5 0 a 5 5 0 1 0 10 0 a 5 5 0 1 0 -10 0';
+                console.log('a: ', link.attributes.attrs[".marker-target"].d);
                 console.log('chosen link: ', result);
               }
             });
@@ -93,7 +93,7 @@ export class RappidMainComponent implements OnInit {
       }
     });
 
-    // this.commandManager = new joint.dia.CommandManager({ graph: this.graph });
+    this.commandManager = new joint.dia.CommandManager({ graph: this.graph });
 
     var paper = this.paper = new joint.dia.Paper({
       width: 1000,
@@ -117,6 +117,9 @@ export class RappidMainComponent implements OnInit {
     /// $('.paper-container').append(paperScroller.el);
     paperScroller.render().center();
   }
+
+
+
 
 
   initializeKeyboardShortcuts() {
@@ -245,25 +248,10 @@ export class RappidMainComponent implements OnInit {
             allowOrthogonalResize: cell.get('allowOrthogonalResize') !== false
           }).render();
 
-          const halo = new joint.ui.Halo({
+          new joint.ui.Halo({
             cellView: cellView,
-            type: 'surrounding',
             handles: haloConfig.handles
           }).render();
-
-          if (cell.attributes.type === 'opm.Object') {
-            halo.addHandle({
-              name: 'add_state', position: 's', icon: null, attrs: {
-                '.handle': {
-                  'data-tooltip-class-name': 'small',
-                  'data-tooltip': 'Click to add state to the object',
-                  'data-tooltip-position': 'left',
-                  'data-tooltip-padding': 15
-                }
-              }
-            });
-            halo.on('action:add_state:pointerdown', addState);
-          }
 
           this.selection.collection.reset([]);
           this.selection.collection.add(cell, { silent: true });
@@ -275,10 +263,25 @@ export class RappidMainComponent implements OnInit {
   }
 
   initializeValidator() {
-    this.validator = new joint.dia.Validator({ commandManager: this.commandManager });
-    this.RuleSet = opmRuleSet;
-    this.RuleSet(this.validator, this.graph);
+
+    this.validator = new joint.dia.Validator({commandManager: this.commandManager});
+    opmRuleSet(this.validator, this.graph);
+
+  };
+
+  initializeNavigator() {
+
+    var navigator = this.navigator = new joint.ui.Navigator({
+      width: 240,
+      height: 115,
+      paperScroller: this.paperScroller,
+      zoom: false
+    });
+
+    // $('.navigator-container').append(navigator.el);
+    // navigator.render();
   }
+
 
   initializeToolbar() {
 
@@ -295,8 +298,8 @@ export class RappidMainComponent implements OnInit {
       'svg:pointerclick': _.bind(this.openAsSVG, this),
       'png:pointerclick': _.bind(this.openAsPNG, this),
       'fullscreen:pointerclick': _.bind(joint.util.toggleFullScreen, joint.util, document.body),
-      // 'load-model:pointerclick': _.bind(this.loadModel, this),
-      // 'save-model:pointerclick': _.bind(this.saveModel, this),
+      'to-front:pointerclick': _.bind(this.selection.collection.invoke, this.selection.collection, 'toFront'),
+      'to-back:pointerclick': _.bind(this.selection.collection.invoke, this.selection.collection, 'toBack'),
       'layout:pointerclick': _.bind(this.layoutDirectedGraph, this),
       // 'snapline:change': _.bind(this.changeSnapLines, this),
       'clear:pointerclick': _.bind(this.graph.clear, this.graph),

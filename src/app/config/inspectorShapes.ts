@@ -1,36 +1,7 @@
-import { opmStyle } from './opmStyle';
-
-
-//options is a variable containing different options types for select-boxes that describe the different elements of
-// the diagram
-export const inspectorShapesOptions = {
-  shadowStyle: [
-    { content: 'Physical', value: { name: 'dropShadow', args: { dx: 6, dy: 6, blur: 0, color: 'grey' } } },
-    { content: 'Informatical', value: { name: 'dropShadow', args: { dx: 0, dy: 0, blur: 0, color: 'grey' } } },
-  ],
-  //dashed (Environmental) or not (Systemic) stroke
-  strokeStyle: [
-    { value: '0', content: 'Systemic' },
-    { value: '10,5', content: 'Environmental' }
-  ]
-
-};
+import { selectOptions } from './selectOptions';
+import {CommonFunctions} from "../common/commonFunctions";
 
 export const inspectorShapes = {
-
-
-  options: {
-    //with (Physical) or without (Informatical) shadow
-    shadowStyle: [
-      { content: 'Physical', value: { name: 'dropShadow', args: { dx: 6, dy: 6, blur: 0, color: 'grey' } } },
-      { content: 'Informatical', value: { name: 'dropShadow', args: { dx: 0, dy: 0, blur: 0, color: 'grey' } } },
-    ],
-    //dashed (Environmental) or not (Systemic) stroke
-    strokeStyle: [
-      { value: '0', content: 'Systemic' },
-      { value: '10,5', content: 'Environmental' }
-    ],
-  },
 
   //From this point defined different variables that build the attributes of the elements of the diagram.
 
@@ -44,11 +15,11 @@ export const inspectorShapes = {
    stroke-width: The width of the element's stroke. Picked from a range bar (0-30). Appears in styling group.Ordered eighth.
    */
   shapeDefinition: {
-    'filter': CreateSelection('select-box', 'Essence', 'presentation', 1),
-    'stroke-dasharray': CreateSelection('select', 'Affiliation', 'presentation', 2),
-    fill: CreateColorsObject('Shape fill', 6),
-    stroke: CreateColorsObject('Outline', 7),
-    'stroke-width': CreateRangeObject(0, 30, 'Outline thickness', 8)
+    'filter': CommonFunctions.createSelection('select-box', selectOptions.shadowStyle, 'Essence', 'presentation', 1),
+    'stroke-dasharray': CommonFunctions.createSelection('select', selectOptions.strokeStyle, 'Affiliation', 'presentation', 2),
+    fill: CommonFunctions.createColorsObject('Shape fill', 6),
+    stroke: CommonFunctions.createColorsObject('Outline', 7),
+    'stroke-width': CommonFunctions.createRangeObject(0, 30, 'Outline thickness', 8)
   },
 
   /*Definition of the element's text - content, color and size.
@@ -57,84 +28,15 @@ export const inspectorShapes = {
    font-size: The size of the text shown on the element. Picked from a range bar. Appears in styling group.Ordered fifth.
    */
   textDefinition: {
-    text: CreateTextContentObject('Text', 3),
-    fill: CreateColorsObject('Text fill', 4),
-    'font-size': CreateRangeObject(10, 80, 'Font size', 5)
+    text: CommonFunctions.createTextContentObject('Text', 3),
+    fill: CommonFunctions.createColorsObject('Text fill', 4),
+    'font-size': CommonFunctions.createRangeObject(10, 80, 'Font size', 5)
   },
 
   //From this point defined  the groups that all the inspector parameters are grouped by.
   groupsDefinition: {
-    presentation: createGroup('Presentation', 1),
-    text: createGroup('Text', 2),
-    styling: createGroup('Styling', 3, true)
+    presentation: CommonFunctions.createGroup('Presentation', 1),
+    text: CommonFunctions.createGroup('Text', 2),
+    styling: CommonFunctions.createGroup('Styling', 3, true)
   }
 };
-
-//Function CreateSelection. Gets selection type (select or select-box), selection label, in which inspector group it
-// should be and the index. The function defines options object for selection according to the label. The function
-// return selection object.
-function CreateSelection(selectionType, selectionLabel, selectionGroup, selectionIndex)
-{
-  var selectionOptions = (selectionLabel === 'Essence')? inspectorShapesOptions.shadowStyle : inspectorShapesOptions.strokeStyle;
-
-  var selectionObject = {
-    type: selectionType,
-    label: selectionLabel,
-    options: selectionOptions,
-    group: selectionGroup,
-    index: selectionIndex
-  }
-  return selectionObject;
-}
-
-//Function CreateColorsObject. Gets label and index and generate a color-plate object in Styling group
-function CreateColorsObject (colorsLabel, colorsIndex)
-{
-  var colorsObject = {
-    type: 'color-palette',
-    options: opmStyle.inspectorFont.colorPalette,
-    label: colorsLabel,
-    group: 'styling',
-    index: colorsIndex
-  };
-  return colorsObject;
-}
-
-// Function CreateRangeObject gets minimum and maximum values (default 10 and 40), label and index and generates a range object.
-function CreateRangeObject(minValue = 10, maxValue = 40, rangeLabel, rangeIndex)
-{
-  var rangeObject = {
-    type: 'range',
-    min: minValue,
-    max: maxValue,
-    step: 1,
-    unit: 'px',
-    label: rangeLabel,
-    group: 'styling',
-    index: rangeIndex
-  };
-  return rangeObject;
-}
-
-//Function CreateTextContentObject gets text label and index and generates a text box object.
-function CreateTextContentObject(textLabel, textIndex)
-{
-  var textContentObject = {
-    type: 'content-editable',
-    label: textLabel,
-    group: 'text',
-    index: textIndex
-  };
-  return textContentObject;
-}
-
-//Function createGroup. Get the name of the group, its index and if it should be collapsed and generates a group object
-function createGroup(labelName, indexNumber, isClosed = false)
-{
-  var groupObject = {
-    label: labelName,
-    index: indexNumber,
-    closed: isClosed
-  };
-  return groupObject;
-}

@@ -10,10 +10,6 @@ export function opmRuleSet(validator, graph) {
         if (null === link.getTargetElement()) {
           return next('A link must connect to a target element!');
         }
-        else if (link.getSourceElement().attributes.type === 'opm.Object' &&
-          link.getSourceElement().attributes.type === link.getTargetElement().attributes.type) {
-          return next('Objects cannot be linked together!');
-        }
         else {
 
           // OPL is updated in the OPL widget
