@@ -17,7 +17,7 @@ const _ = require('lodash')
 @Component({
   selector: 'opcloud-rappid-main',
   template: `
-    <div class="rappid-main rappid" #rappidContainer>
+    <div class="rappid-main" #rappidContainer>
       <!--<opcloud-rappid-toolbar></opcloud-rappid-toolbar>-->
       <opcloud-rappid-stencil [graph]="graph" [paper]="paper" [paperScroller]="paperScroller"></opcloud-rappid-stencil>
       <opcloud-rappid-paper [paper]="paper" [paperScroller]="paperScroller"></opcloud-rappid-paper>
@@ -72,10 +72,6 @@ export class RappidMainComponent implements OnInit {
 
             dialogRef.afterClosed().subscribe(result => {
               if (!!result) {
-                console.log('a: ', link.attributes.attrs[".marker-target"].d);
-                link.attributes.attrs.fill = 'red';
-                link.attributes.attrs[".marker-target"].d = 'M 10 10 m -5 0 a 5 5 0 1 0 10 0 a 5 5 0 1 0 -10 0';
-                console.log('a: ', link.attributes.attrs[".marker-target"].d);
                 console.log('chosen link: ', result);
               }
             });

@@ -9,7 +9,7 @@ const _ = require('lodash')
 const joint = require('rappid');
 const g = joint.g;
 import './joint-shapes.config.ts';
-
+import { basicDefinitions } from './basicDefinitions';
 export const opmShapes = {
 
   //OPM Links definitions
@@ -69,90 +69,9 @@ export const opmShapes = {
     }, joint.dia.Link.prototype.defaults)
   }),
 
-  //OPM generic shape building block
-  Generic: joint.dia.Element.extend({
-
-    defaults: _.defaultsDeep({
-
-      type: 'opm.Generic',
-      attrs: {
-        '.': { fill: '#ffffff', stroke: 'none' }
-      }
-
-    }, joint.dia.Element.prototype.defaults)
-  }),
-  Object: null,
-  Process: null
+  Object: joint.dia.Element.extend(basicDefinitions.defineShape('rect')),
+  Process: joint.dia.Element.extend(basicDefinitions.defineShape('ellipse'))
 };
-
-//OPM shapes definitions
-opmShapes.Object = opmShapes.Generic.extend({
-
-  markup: '<g class="rotatable"><g class="scalable"><rect/></g><text/></g>',
-
-  defaults: _.defaultsDeep({
-
-    type: 'opm.Object',
-    size: { width: 100, height: 50 },
-    attrs: {
-      'rect': {
-        width: 100,
-        height: 60,
-        fill: '#DCDCDC',
-        stroke: '#006400',
-        'stroke-width': 2,
-        filter: { name: 'dropShadow', args: { dx: 6, dy: 6, blur: 0, color: 'grey' } }
-      },
-      'text': {
-        fill: 'black',
-        text: 'Object',
-        'font-size': 14,
-        'ref-x': .5,
-        'ref-y': .5,
-        'text-anchor': 'middle',
-        'y-alignment': 'middle',
-        'font-family': 'Arial, helvetica, sans-serif',
-        'font-weight': 600
-      }
-    }
-
-  }, joint.shapes.basic.Generic.prototype.defaults)
-});
-
-opmShapes.Process = opmShapes.Generic.extend({
-
-  markup: '<g class="rotatable"><g class="scalable"><ellipse/></g><text/></g>',
-
-  defaults: _.defaultsDeep({
-
-    type: 'opm.Process',
-    size: { width: 100, height: 50 },
-    attrs: {
-      'ellipse': {
-        fill: '#DCDCDC',
-        stroke: '#00008B',
-        'stroke-width': 2,
-        rx: 30,
-        ry: 20,
-        cx: 30,
-        cy: 20,
-        filter: { name: 'dropShadow', args: { dx: 6, dy: 6, blur: 0, color: 'grey' } }
-      },
-      'text': {
-        fill: 'black',
-        text: 'Process',
-        'font-size': 14,
-        'ref-x': .5,
-        'ref-y': .5,
-        'text-anchor': 'middle',
-        'y-alignment': 'middle',
-        'font-family': 'Arial, helvetica, sans-serif',
-        'font-weight': 600
-      }
-
-    }
-  }, joint.shapes.basic.Generic.prototype.defaults)
-});
 
 joint.shapes.opm = opmShapes;
 
