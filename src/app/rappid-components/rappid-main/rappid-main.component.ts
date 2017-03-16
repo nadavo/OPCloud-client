@@ -7,6 +7,7 @@ import { opmRuleSet } from '../../config/opm-validator';
 import { MdDialog } from '@angular/material';
 import { ChooseLinkDialogComponent } from '../../dialogs/choose-link-dialog/choose-link-dialog.component';
 import {linkTypeSelection} from '../../link-operating/linkTypeSelection'
+import { linkDrawing } from './linkDrawing'
 
 const joint = require('rappid');
 
@@ -73,6 +74,7 @@ export class RappidMainComponent implements OnInit {
             dialogRef.afterClosed().subscribe(result => {
               if (!!result) {
                 console.log('chosen link: ', result);
+                linkDrawing.drawLink(link, result.name);
               }
             });
           }
