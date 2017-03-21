@@ -8,22 +8,24 @@ import { MdDialog } from '@angular/material';
 import { ChooseLinkDialogComponent } from '../../dialogs/choose-link-dialog/choose-link-dialog.component';
 import {linkTypeSelection} from '../../link-operating/linkTypeSelection'
 import { linkDrawing } from './linkDrawing'
+import { addState } from '../../config/add-state';
+import { CommandManagerService } from '../services/command-manager.service';
 
 const joint = require('rappid');
 
-const $ = require('jquery')
+const $ = require('jquery');
 // window.jQuery = $;
-const _ = require('lodash')
+const _ = require('lodash');
 
 @Component({
   selector: 'opcloud-rappid-main',
   template: `
-    <div class="rappid-main" #rappidContainer>
+    <div class="rappid-main rappid" #rappidContainer>
       <!--<opcloud-rappid-toolbar></opcloud-rappid-toolbar>-->
       <opcloud-rappid-stencil [graph]="graph" [paper]="paper" [paperScroller]="paperScroller"></opcloud-rappid-stencil>
       <opcloud-rappid-paper [paper]="paper" [paperScroller]="paperScroller"></opcloud-rappid-paper>
       <opcloud-rappid-inspector [cell]="cell"></opcloud-rappid-inspector>
-      <div class="statusbar-container"></div>
+      <opcloud-rappid-navigator [paperScroller]="paperScroller"></opcloud-rappid-navigator>
     </div>
   `,
   styleUrls: ['./rappid-main.component.css']
@@ -41,14 +43,19 @@ export class RappidMainComponent implements OnInit {
   private validator;
   private navigator;
   private toolbar;
+  private RuleSet;
 
   @ViewChild('rappidContainer', { read: ViewContainerRef }) rappidContainer;
 
-  constructor(graphService:GraphService, private _dialog: MdDialog) {
+  constructor(graphService:GraphService,
+              commandManagerService: CommandManagerService,
+              private _dialog: MdDialog) {
     this.graph = graphService.getGraph();
+    this.commandManager = commandManagerService.commandManager;
   }
 
   ngOnInit() {
+    joint.setTheme('modern');
     this.initializePaper();
     this.initializeSelection();
     this.initializeHaloAndInspector();
@@ -246,10 +253,25 @@ export class RappidMainComponent implements OnInit {
             allowOrthogonalResize: cell.get('allowOrthogonalResize') !== false
           }).render();
 
-          new joint.ui.Halo({
+          const halo = new joint.ui.Halo({
             cellView: cellView,
+            type: 'surrounding',
             handles: haloConfig.handles
           }).render();
+
+          if (cell.attributes.type === 'opm.Object') {
+            halo.addHandle({
+              name: 'add_state', position: 's', icon: null, attrs: {
+                '.handle': {
+                  'data-tooltip-class-name': 'small',
+                  'data-tooltip': 'Click to add state to the object',
+                  'data-tooltip-position': 'left',
+                  'data-tooltip-padding': 15
+                }
+              }
+            });
+            halo.on('action:add_state:pointerdown', addState);
+          }
 
           this.selection.collection.reset([]);
           this.selection.collection.add(cell, { silent: true });
@@ -263,9 +285,9 @@ export class RappidMainComponent implements OnInit {
   initializeValidator() {
 
     this.validator = new joint.dia.Validator({commandManager: this.commandManager});
-    opmRuleSet(this.validator, this.graph);
-
-  };
+    this.RuleSet = opmRuleSet;
+    this.RuleSet(this.validator, this.graph);
+  }
 
   initializeNavigator() {
 

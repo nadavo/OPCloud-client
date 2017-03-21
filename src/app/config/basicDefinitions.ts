@@ -57,5 +57,28 @@ export const basicDefinitions = {
         labels: [{ position: 0.5, attrs: { text: { text: '' } } }]
       }, joint.dia.Link.prototype.defaults)
     };
+  },
+
+  defineState() {
+    return {
+      markup: '<g class="rotatable"><g class="scalable"><rect id="outer" width="80" height="40"/></g><text/></g>',
+      defaults: _.defaultsDeep({
+        type: 'opm.StateNorm',
+        position: { x: 250, y: 200 },
+        size: { width: 100, height: 50 },
+        attrs: {
+          rect: {
+            fill: '#DCDCDC',
+            stroke: '#006400',
+            'stroke-width': 2,
+          },
+          text: {
+            text: 'BooB',
+            fill: 'black', 'font-weight': 600
+          }
+        }
+      }, joint.shapes.basic.Rect.prototype.defaults)
+    };
+
   }
 };

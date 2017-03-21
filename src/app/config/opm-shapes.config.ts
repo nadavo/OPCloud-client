@@ -11,7 +11,8 @@ export const opmShapes = {
   //OPM Links definitions
   Link: joint.dia.Link.extend(basicDefinitions.defineLink('Link')),
   Object: joint.dia.Element.extend(basicDefinitions.defineShape('rect')),
-  Process: joint.dia.Element.extend(basicDefinitions.defineShape('ellipse'))
+  Process: joint.dia.Element.extend(basicDefinitions.defineShape('ellipse')),
+  StateNorm: joint.shapes.basic.Rect.extend(basicDefinitions.defineState())
 };
 
 joint.shapes.opm = opmShapes;
