@@ -101,6 +101,7 @@ export class RappidMainComponent implements OnInit {
     this.commandManager = new joint.dia.CommandManager({ graph: this.graph });
 
     var paper = this.paper = new joint.dia.Paper({
+      linkConnectionPoint: joint.util.shapePerimeterConnectionPoint,
       width: 1000,
       height: 1000,
       gridSize: 10,
