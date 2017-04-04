@@ -8,14 +8,14 @@ export const basicDefinitions = {
   createShape(shapeName){
     return {
       fill: '#DCDCDC',
-      stroke: (shapeName == 'ellipse') ? '#00008B' : '#006400',
+      stroke: (shapeName == 'rect') ? '#006400' : ((shapeName == 'ellipse') ? '#00008B' : '#808000'),
       'stroke-width': 2,
-      filter: {name: 'dropShadow', args: {dx: 6, dy: 6, blur: 0, color: 'grey'}},
-      width: (shapeName == 'rect') ? 100 : null,
-      height: (shapeName == 'rect') ? 60 : null,
-      rx: (shapeName == 'ellipse') ? 30 : null,
-      ry: (shapeName == 'ellipse') ? 20 : null,
-      cx: (shapeName == 'ellipse') ? 30 : null,
+      filter: (shapeName == 'state') ? null : {name: 'dropShadow', args: {dx: 6, dy: 6, blur: 0, color: 'grey'}},
+      width: 100,
+      height: 50,
+      rx: (shapeName == 'rect') ? null : 20,
+      ry: (shapeName == 'rect') ? null : 20,
+      cx: (shapeName == 'ellipse') ? 20 : null,
       cy: (shapeName == 'ellipse') ? 20 : null
     };
   },
@@ -59,25 +59,15 @@ export const basicDefinitions = {
     };
   },
 
-  defineState() {
+  defineState(x=0, y=0) {
     return {
-      markup: '<g class="rotatable"><g class="scalable"><rect id="outer" width="80" height="40"/></g><text/></g>',
-      defaults: _.defaultsDeep({
         type: 'opm.StateNorm',
-        position: { x: 250, y: 200 },
-        size: { width: 100, height: 50 },
+        position: { x: x - 20, y: y - 50 },
+        size: { width: 50, height: 25 },
         attrs: {
-          rect: {
-            fill: '#DCDCDC',
-            stroke: '#006400',
-            'stroke-width': 2,
-          },
-          text: {
-            text: 'BooB',
-            fill: 'black', 'font-weight': 600
-          }
+          rect: this.createShape('state'),
+          text: { text: 'state', fill: 'black'}
         }
-      }, joint.shapes.basic.Rect.prototype.defaults)
     };
 
   }

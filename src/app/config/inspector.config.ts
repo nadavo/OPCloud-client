@@ -1,28 +1,15 @@
 import { inspectorShapes } from './inspectorShapes';
 import { inspectorLinks } from './inspectorLinks';
+import {CommonFunctions} from "../common/commonFunctions";
 
 export const inspectorConfig = {
 
   //object parameters
-  'opm.Object': {
-    inputs: {
-      attrs: {
-        rect: inspectorShapes.shapeDefinition,
-        text: inspectorShapes.textDefinition
-      }
-    },
-    groups: inspectorShapes.groupsDefinition
-  },
+  'opm.Object': CommonFunctions.CreateInspectorShapesPart('rect', inspectorShapes.shapeDefinition, inspectorShapes.textDefinition, inspectorShapes.groupsDefinition),
   //process parameters
-  'opm.Process': {
-    inputs: {
-      attrs: {
-        'ellipse': inspectorShapes.shapeDefinition,
-        text: inspectorShapes.textDefinition
-      }
-    },
-    groups: inspectorShapes.groupsDefinition
-  },
+  'opm.Process': CommonFunctions.CreateInspectorShapesPart('ellipse', inspectorShapes.shapeDefinition, inspectorShapes.textDefinition, inspectorShapes.groupsDefinition),
+  //state parameters
+  'opm.StateNorm': CommonFunctions.CreateInspectorShapesPart('rect', inspectorShapes.shapeDefinition, inspectorShapes.textDefinition, inspectorShapes.groupsDefinition),
   //link parameters
   'opm.Link': {
     inputs: {

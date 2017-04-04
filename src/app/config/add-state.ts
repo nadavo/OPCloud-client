@@ -1,31 +1,22 @@
+import {basicDefinitions} from "./basicDefinitions";
 const joint = require('rappid');
 
 export function addState (evt, x, y) {
 
-  var options = this.options;
-
-  console.log(this)
+  var options = this.options;   //makes the state stay in the bounds of the object
 
   this.startBatch();
 
 
-  var fatherObject = this.options.cellView.model;
+  var fatherObject = options.cellView.model;
 
-  var defaultState = new joint.shapes.opm.StateNorm({
-    /*type: 'opm.StateNorm',*/
-    position: { x: x - 20, y: y - 50 },
-    size: { width: 50, height: 25 },
-    attrs: {
-      rect: { fill: '#DCDCDC', rx: 20, ry: 20, 'stroke-width': 2, stroke: '#808000' },
-      text: { text: 'State', fill: 'black' }
-    }
-  });
-
+  var defaultState = new joint.shapes.opm.StateNorm(basicDefinitions.defineState(x,y));
 
   fatherObject.embed(defaultState);
 
   options.graph.addCells([fatherObject, defaultState]);
 
+  //Function is triggered when changing the position of the state. It is not allowed to move it out of the object.
   options.graph.on('change:position', function (cell) {
 
     var parentId = cell.get('parent');
@@ -44,10 +35,7 @@ export function addState (evt, x, y) {
       // the parent area.
       return;
     }
-
     // Revert the child position.
     cell.set('position', cell.previous('position'));
   });
-
-
 }

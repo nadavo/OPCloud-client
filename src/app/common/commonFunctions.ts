@@ -58,5 +58,20 @@ export const CommonFunctions = {
       group: 'text',
       index: textIndex,
     };
+  },
+
+  //Function CreateInspectorPart gets shapeName and needed definitions and generates suitable fields in the inspector.
+  //Fits for object, process and state (doesn't fit for link)
+  CreateInspectorShapesPart(shapeName, shapeDefinition, textDefinition, groupsDefinition) {
+    var inspectorPart = {
+      inputs: {
+        attrs: {
+          [shapeName]: shapeDefinition,
+          text: textDefinition
+        }
+      },
+      groups: groupsDefinition
+    }
+    return inspectorPart;
   }
 };
