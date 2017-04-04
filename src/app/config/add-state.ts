@@ -5,7 +5,7 @@ export function addState (evt, x, y) {
 
   var options = this.options;   //makes the state stay in the bounds of the object
 
-  this.startBatch();
+  //this.startBatch();
 
 
   var fatherObject = options.cellView.model;
