@@ -10,13 +10,13 @@ export const basicDefinitions = {
       fill: '#DCDCDC',
       stroke: (shapeName == 'rect') ? '#006400' : ((shapeName == 'ellipse') ? '#00008B' : '#808000'),
       'stroke-width': 2,
-      filter: (shapeName == 'state') ? null : {name: 'dropShadow', args: {dx: 6, dy: 6, blur: 0, color: 'grey'}},
+      filter: (shapeName == 'state') ? null : {name: 'dropShadow', args: {dx: 3, dy: 3, blur: 0, color: 'grey'}},
       width: 100,
       height: 50,
-      rx: (shapeName == 'rect') ? null : 20,
-      ry: (shapeName == 'rect') ? null : 20,
-      cx: (shapeName == 'ellipse') ? 20 : null,
-      cy: (shapeName == 'ellipse') ? 20 : null
+      rx: (shapeName == 'rect') ? null : 40,
+      ry: (shapeName == 'rect') ? null : 40,
+      cx: (shapeName == 'rect') ? null : 40,
+      cy: (shapeName == 'rect') ? null : 40
     };
   },
 
@@ -49,7 +49,7 @@ export const basicDefinitions = {
     return shape;
   },
 
-    defineLink(linkName){
+  defineLink(linkName){
     return {
       defaults: _.defaultsDeep({
         type: 'opm.Link',
@@ -61,14 +61,13 @@ export const basicDefinitions = {
 
   defineState(x=0, y=0) {
     return {
-        type: 'opm.StateNorm',
-        position: { x: x - 20, y: y - 50 },
-        size: { width: 50, height: 25 },
-        attrs: {
+      type: 'opm.StateNorm',
+        position: { x: x - 20, y: y - 50},
+        size: { width: 50, height: 25},
+          attrs: {
           rect: this.createShape('state'),
           text: { text: 'state', fill: 'black'}
         }
     };
-
   }
 };

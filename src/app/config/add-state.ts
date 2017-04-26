@@ -3,7 +3,7 @@ const joint = require('rappid');
 
 export function addState (evt, x, y) {
 
-  var options = this.options;   //makes the state stay in the bounds of the object
+  var options = this.options;
 
   //this.startBatch();
 
@@ -12,12 +12,12 @@ export function addState (evt, x, y) {
 
   var defaultState = new joint.shapes.opm.StateNorm(basicDefinitions.defineState(x,y));
 
-  fatherObject.embed(defaultState);
+  fatherObject.embed(defaultState);     //makes the state stay in the bounds of the object
 
   options.graph.addCells([fatherObject, defaultState]);
 
-  //Function is triggered when changing the position of the state. It is not allowed to move it out of the object.
-  options.graph.on('change:position', function (cell) {
+  //Function is triggered when changing the position or the size of the state. It is not allowed to move it out of the object.
+  options.graph.on('change:position  change:size', function (cell) {
 
     var parentId = cell.get('parent');
     if (!parentId) return;
@@ -37,5 +37,6 @@ export function addState (evt, x, y) {
     }
     // Revert the child position.
     cell.set('position', cell.previous('position'));
+    cell.set('size', cell.previous('size'));
   });
 }

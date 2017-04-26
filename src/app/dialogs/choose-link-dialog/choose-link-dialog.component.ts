@@ -19,7 +19,7 @@ import { MdDialogRef } from '@angular/material';
       </ul>
       
       <p> 
-      <button md-button (click)="dialogRef.close(selected)">SAVE</button> 
+      <button md-button (click)="dialogRef.close(selected); changeLink(selected)">SAVE</button> 
       <button md-button (click)="dialogRef.close()">CANCEL</button> 
     </p>
     </div>
@@ -44,4 +44,7 @@ export class ChooseLinkDialogComponent implements OnInit {
     this.selected = link;
   }
 
+  changeLink(selected){
+    this.newLink.attributes.name = selected.name;
+  }
 }

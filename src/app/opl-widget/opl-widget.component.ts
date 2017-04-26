@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { GraphService } from '../rappid-components/services/graph.service';
+import {linkTypeSelection} from '../link-operating/linkTypeSelection';
 
 @Component({
   selector: 'opcloud-opl-widget',
@@ -12,6 +13,8 @@ import { GraphService } from '../rappid-components/services/graph.service';
 })
 export class OplWidgetComponent implements OnInit {
   private graph;
+  private sentence;
+  private thingName;
 
   constructor(private graphService: GraphService) {
     this.graph = graphService.getGraph();
@@ -28,11 +31,15 @@ export class OplWidgetComponent implements OnInit {
           const source = cell.getSourceElement();
           const target = cell.getTargetElement();
           if (!source || !target) return;
-          return `${cell.getSourceElement().attributes.type} 
-                    is connected to ${cell.getTargetElement().attributes.type}`;
+          this.sentence = linkTypeSelection.generateOPL(source, target, cell.attributes.name);
+          return this.sentence;
+        case 'opm.Object':
+          this.thingName = cell.attributes.attrs.text.text;
+          return `${this.thingName} is an object`;
+        case 'opm.Process':
+          this.thingName = cell.attributes.attrs.text.text;
+          return `${this.thingName} is a process`;
       }
-
-      return cell.attributes.type;
     });
   }
 
