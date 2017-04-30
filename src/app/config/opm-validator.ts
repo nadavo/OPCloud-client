@@ -14,7 +14,7 @@ export function opmRuleSet(validator, graph) {
           link.attributes.target.type = null;
           return next('A state cannot be connected to his object!');
         }
-        if ((link.getSourceElement().attributes.type == 'basic.Rect') && (link.getTargetElement().attributes.type == 'basic.Rect')) {
+        if ((link.getSourceElement().attributes.type == 'opm.StateNorm') && (link.getTargetElement().attributes.type == 'opm.StateNorm')) {
           link.attributes.target.type = null;
           return next('A link cannot connect between two states!');
         }

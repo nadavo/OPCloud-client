@@ -67,7 +67,6 @@ export function addState (evt, x, y) {
   //Function is triggered when changing the position of a state. It is not allowed to exceed the object.
   options.graph.on('change:position', function(cell, newPosition, opt) {
     if (opt.skipParentHandler) return;
-    console.log('aaaa4');
 
     if (cell.get('embeds') && cell.get('embeds').length) {
       // If we're manipulating a parent element, let's store
