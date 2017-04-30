@@ -6,13 +6,17 @@ export function opmRuleSet(validator, graph) {
     function (err, command, next) {
       if (command.data.type === 'opm.Link') {
         const link = graph.getCell(command.data.id);
-        //console.log(link.getSourceElement());
         if ((null === link.getTargetElement())) {
-          console.log('in if');
+          link.attributes.target.type = null;
           return next('A link must connect to a target element!');
         }
         else if(link.getTargetElement().id == link.getSourceElement().get('parent')){
+          link.attributes.target.type = null;
           return next('A state cannot be connected to his object!');
+        }
+        if ((link.getSourceElement().attributes.type == 'basic.Rect') && (link.getTargetElement().attributes.type == 'basic.Rect')) {
+          link.attributes.target.type = null;
+          return next('A link cannot connect between two states!');
         }
       }
       return next();

@@ -71,7 +71,7 @@ export class RappidMainComponent implements OnInit {
     this.graph.on('add', (cell) => {
       if (cell.attributes.type === 'opm.Link') {
         cell.on('change:target change:source', (link) => {
-          if (link.attributes.source.id && link.attributes.target.id) {
+          if (link.attributes.source.id && link.attributes.target.id && (link.attributes.target.type != null)) {
             let dialogRef = this._dialog.open(ChooseLinkDialogComponent, {viewContainerRef: this.rappidContainer});
             dialogRef.componentInstance.newLink = link;
             dialogRef.componentInstance.linkSource = link.getSourceElement();

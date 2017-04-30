@@ -67,6 +67,7 @@ export function addState (evt, x, y) {
   //Function is triggered when changing the position of a state. It is not allowed to exceed the object.
   options.graph.on('change:position', function(cell, newPosition, opt) {
     if (opt.skipParentHandler) return;
+    console.log('aaaa4');
 
     if (cell.get('embeds') && cell.get('embeds').length) {
       // If we're manipulating a parent element, let's store
@@ -75,7 +76,6 @@ export function addState (evt, x, y) {
       // its children.
       cell.set('originalPosition', cell.get('position'));
     }
-
     var parentId = cell.get('parent'); //The id of the object
     if (!parentId) return;
 
@@ -86,31 +86,26 @@ export function addState (evt, x, y) {
     if (!parent.get('originalPosition')) parent.set('originalPosition', parent.get('position'));
     if (!parent.get('originalSize')) parent.set('originalSize', parent.get('size'));
 
-    var originalPosition = parent.get('originalPosition');
-    var originalSize = parent.get('originalSize');
-
-    var newX = originalPosition.x;
-    var newY = originalPosition.y;
-    var newCornerX = originalPosition.x + originalSize.width;
-    var newCornerY = originalPosition.y + originalSize.height;
+    var leftSideX = parent.get('originalPosition').x;
+    var topSideY = parent.get('originalPosition').y;
+    var rightSideX = parent.get('originalPosition').x + parent.get('originalSize').width;
+    var bottomSideY = parent.get('originalPosition').y + parent.get('originalSize').height;
 
     //For each state in the object, if its position exceeds the object, then the object gets bigger to contain that state
     _.each(parent.getEmbeddedCells(), function(child) {
-
       var childBbox = child.getBBox();
-
-      if (childBbox.x < newX) { newX = childBbox.x; }
-      if (childBbox.y < newY) { newY = childBbox.y; }
-      if (childBbox.corner().x > newCornerX) { newCornerX = childBbox.corner().x; }
-      if (childBbox.corner().y > newCornerY) { newCornerY = childBbox.corner().y; }
+      //Updating the new size of the object to have margins of at least 15p so that the state will not touch the object
+      if (childBbox.x <= (leftSideX+15)) { leftSideX = childBbox.x-15; }
+      if (childBbox.y <= (topSideY+15)) { topSideY = childBbox.y-15; }
+      if (childBbox.corner().x >= rightSideX-15) { rightSideX = childBbox.corner().x+15; }
+      if (childBbox.corner().y >= bottomSideY-15) { bottomSideY = childBbox.corner().y+15;}
     });
 
     // Note that we also pass a flag so that we know we shouldn't adjust the
     // `originalPosition` and `originalSize` in our handlers as a reaction
     // on the following `set()` call.
     parent.set({
-      position: { x: newX, y: newY },
-      size: { width: newCornerX - newX, height: newCornerY - newY }
-    }, { skipParentHandler: true });
-  });
+      position: { x: leftSideX, y: topSideY },
+      size: { width: rightSideX - leftSideX, height: bottomSideY - topSideY }});
+  }, { skipParentHandler: true });
 }
