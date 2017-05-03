@@ -246,7 +246,6 @@ export class RappidMainComponent implements OnInit {
       if (!this.selection.collection.contains(cell)) {
 
         if (cell.isElement()) {
-
           new joint.ui.FreeTransform({
             cellView: cellView,
             allowRotation: false,

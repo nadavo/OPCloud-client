@@ -13,6 +13,7 @@ export const basicDefinitions = {
       filter: (shapeName == 'state') ? null : {name: 'dropShadow', args: {dx: 3, dy: 3, blur: 0, color: 'grey'}},
       width: 100,
       height: 50,
+      margin: 15,
       rx: (shapeName == 'ellipse') ? 40 : (shapeName == 'state') ? 20 : null,
       ry: (shapeName == 'ellipse') ? 40 : (shapeName == 'state') ? 20 : null,
       cx: (shapeName == 'ellipse') ? 40 : null,
