@@ -25,42 +25,25 @@ function updateObject(fatherCell){
 export function addState (evt, x, y) {
 
   var options = this.options;
-
   //this.startBatch();
-
-
   var fatherObject = options.cellView.model;
-
   var defaultState = new joint.shapes.opm.StateNorm(basicDefinitions.defineState(x,y));
-
   fatherObject.embed(defaultState);     //makes the state stay in the bounds of the object
-
   options.graph.addCells([fatherObject, defaultState]);
-
 
   options.graph.on('change:position change:size', function(cell) {
     cell.set('originalSize', cell.get('size'));
     cell.set('originalPosition', cell.get('position'));
+
     var parentId = cell.get('parent');
-    if (!parentId) return;
-
-    var parent = options.graph.getCell(parentId);
-    if (!parent.get('originalPosition')) parent.set('originalPosition', parent.get('position'));
-    if (!parent.get('originalSize')) parent.set('originalSize', parent.get('size'));
-    updateObject(parent);
-  });
-
-  //Function is triggered when changing the size of an object. It is not allowed to resize it so that one of the
-  //contained states will exceed the object
-  options.graph.on('change:position change:size', function(cell) {
-    //Occures only if the object contains atleast one state
-    if (cell.get('embeds') && cell.get('embeds').length) {
-      //Store object's original size to a special property so that we can shrink it back when changing state's position
-      cell.set('originalSize', cell.get('size'));
-      cell.set('originalPosition', cell.get('position'));
+    if (parentId){
+      var parent = options.graph.getCell(parentId);
+      if (!parent.get('originalPosition')) parent.set('originalPosition', parent.get('position'));
+      if (!parent.get('originalSize')) parent.set('originalSize', parent.get('size'));
+      updateObject(parent);
     }
-    else
-      return;
-    updateObject(cell);
-   });
+    else if (cell.get('embeds') && cell.get('embeds').length){
+      updateObject(cell);
+    }
+  });
 }
