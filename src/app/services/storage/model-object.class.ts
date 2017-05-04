@@ -7,7 +7,8 @@ export class ModelObject {
     this.modelData = modelData;
   }
 
-  saveModel(newName, newModel) {
+  saveModelParam(newName, newModel) {
+    debugger;
     this.name = newName;
     this.modelData = newModel;
   }

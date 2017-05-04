@@ -10,6 +10,9 @@ import {linkTypeSelection} from '../../link-operating/linkTypeSelection'
 import { linkDrawing } from './linkDrawing'
 import { addState } from '../../config/add-state';
 import { CommandManagerService } from '../services/command-manager.service';
+import { AngularFireModule } from 'angularfire2';
+import { firebaseConfig, firebaseAuthConfig } from '../../config/firbase.config';
+import * as firebase from "firebase";
 
 const joint = require('rappid');
 
@@ -47,7 +50,7 @@ export class RappidMainComponent implements OnInit {
 
   @ViewChild('rappidContainer', { read: ViewContainerRef }) rappidContainer;
 
-  constructor(graphService:GraphService,
+  constructor(private graphService:GraphService,
               commandManagerService: CommandManagerService,
               private _dialog: MdDialog) {
     this.graph = graphService.getGraph();
@@ -56,6 +59,7 @@ export class RappidMainComponent implements OnInit {
 
   ngOnInit() {
     joint.setTheme('modern');
+    // this.initializeDatabase();
     this.initializePaper();
     this.initializeSelection();
     this.initializeHaloAndInspector();
@@ -66,6 +70,21 @@ export class RappidMainComponent implements OnInit {
     this.initializeTooltips();
     this.handleAddLink();
   }
+
+/*  initializeDatabase() {
+    // this.graph = new joint.dia.Graph;
+    this.graph.fireDB = firebase.database();
+    this.graph.modelName = localStorage.getItem("globalName");
+    console.log("Model Name is: " + this.graph.modelName);
+    this.graph.OPL = "";
+    this.graph.myChangeLock = false;
+    this.graph.updateModel = function (modelName, modelToSync) {
+      this.myChangeLock = true;
+      this.fireDB.ref('/models/' + modelName).set(modelToSync);
+      console.log("updateModel() --- Graph Model updated on DB!");
+    }
+
+  }*/
 
   handleAddLink() {
     this.graph.on('add', (cell) => {
