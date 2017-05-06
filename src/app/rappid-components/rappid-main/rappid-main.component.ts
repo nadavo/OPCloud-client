@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewContainerRef,ComponentFactoryResolver,ComponentRef,Input } from '@angular/core';
 import { GraphService } from '../services/graph.service';
 import { haloConfig } from '../../config/halo.config';
 import { toolbarConfig } from '../../config/toolbar.config';
@@ -10,6 +10,9 @@ import {linkTypeSelection} from '../../link-operating/linkTypeSelection'
 import { linkDrawing } from './linkDrawing'
 import { addState } from '../../config/add-state';
 import { CommandManagerService } from '../services/command-manager.service';
+// popup imports 
+import {DialogComponent} from "../../dialogs/choose-link-dialog/Dialog.component";
+import {DialogDirective} from "../../dialogs/choose-link-dialog/DialogDirective.directive";
 
 const joint = require('rappid');
 
@@ -28,7 +31,9 @@ const _ = require('lodash');
       <opcloud-rappid-navigator [paperScroller]="paperScroller"></opcloud-rappid-navigator>
     </div>
   `,
-  styleUrls: ['./rappid-main.component.css']
+  styleUrls: ['./rappid-main.component.css'],
+  //add DialogComponent 
+  entryComponents: [DialogComponent]
 })
 export class RappidMainComponent implements OnInit {
   graph = null;
@@ -67,6 +72,7 @@ export class RappidMainComponent implements OnInit {
     this.handleAddLink();
   }
 
+//Check Changes  
   handleAddLink() {
     this.graph.on('add', (cell) => {
       if (cell.attributes.type === 'opm.Link') {
@@ -75,7 +81,7 @@ export class RappidMainComponent implements OnInit {
             var relevantLinks = linkTypeSelection.generateLinkWithOpl(link);
             console.log('opm links: ', relevantLinks);
             if (relevantLinks.length > 0){
-              let dialogRef = this._dialog.open(ChooseLinkDialogComponent, {viewContainerRef: this.rappidContainer});
+             /* let dialogRef = this._dialog.open(ChooseLinkDialogComponent, {viewContainerRef: this.rappidContainer});
               dialogRef.componentInstance.newLink = link;
               dialogRef.componentInstance.linkSource = link.getSourceElement();
               dialogRef.componentInstance.linkTarget = link.getTargetElement();
@@ -85,7 +91,9 @@ export class RappidMainComponent implements OnInit {
                   console.log('chosen link: ', result);
                   linkDrawing.drawLink(link, result.name);
                 }
-              });
+              });*/
+            // Create Dialog Component 
+              this.createDialog(DialogComponent,link);
             }
           }
         });
@@ -398,4 +406,33 @@ export class RappidMainComponent implements OnInit {
 
     this.paperScroller.centerContent();
   }
+
+/*
+* popup Links Dialog 
+* Input (DialogComponent , link)
+* set linkSource/Target data from link object
+* Return Dialog Component View  
+* 
+* */
+  createDialog(dialogComponent: { new(): DialogComponent},link): ComponentRef<DialogComponent> {
+
+    this.viewContainer.clear();
+
+    let dialogComponentFactory =
+      this.componentFactoryResolver.resolveComponentFactory(dialogComponent);
+
+
+    let dialogComponentRef = this.viewContainer.createComponent(dialogComponentFactory);
+    dialogComponentRef.instance.linkSource=link.getSourceElement() ;
+    dialogComponentRef.instance.linkTarget=link.getTargetElement();
+    dialogComponentRef.instance.opmLinks=linkTypeSelection.generateLinkWithOpl(link);
+
+
+
+    dialogComponentRef.instance.close.subscribe(() => {
+      dialogComponentRef.destroy();
+    });
+    return dialogComponentRef;
+  }
+
 }
