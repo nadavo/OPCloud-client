@@ -18,6 +18,11 @@ import { AuthService } from './services/auth.service';
 import { AuthComponent } from './auth/auth.component';
 import { ModelStorageInterface } from './services/storage/model-storage.interface';
 import { ModelFbStorageService } from './services/storage/model-fb-storage.service';
+// popup Links 
+import {DialogComponent} from './dialogs/choose-link-dialog/Dialog.component';
+import {DialogDirective} from './dialogs/choose-link-dialog/DialogDirective.directive';
+// Run {npm install ng2draggable}  add Draggable option for div’s
+import { Draggable } from 'ng2draggable/draggable.directive';
 
 @NgModule({
   declarations: [
@@ -27,7 +32,11 @@ import { ModelFbStorageService } from './services/storage/model-fb-storage.servi
     LoadModelDialogComponent,
     ChooseLinkDialogComponent,
     OplWidgetComponent,
-    AuthComponent
+    AuthComponent,
+    //popup Links 
+    DialogComponent,
+    DialogDirective,
+    Draggable
   ],
   imports: [
     BrowserModule,
@@ -44,7 +53,9 @@ import { ModelFbStorageService } from './services/storage/model-fb-storage.servi
   entryComponents: [
     SaveModelDialogComponent,
     LoadModelDialogComponent,
-    ChooseLinkDialogComponent
+    ChooseLinkDialogComponent,
+    //popup Component
+    DialogComponent,
   ],
   bootstrap: [AppComponent]
 })
