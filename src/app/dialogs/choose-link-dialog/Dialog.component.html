@@ -1,0 +1,24 @@
+<div  [ng2-draggable]="true" class="dialog" >
+  <header  ><div class="title" > OPM LINKS DIALOG BOX</div><div  class="exit-button" (click)="onClickedExit()">x</div></header>
+  <div style="background-color: #4b4a67;;margin-top: -20px">
+
+    <p style="color: white;height: 30px;text-align: center;">
+      Choose Link From <label style="color: yellow">{{ linkSource.attributes.type }}</label> To <label style="color: yellow">{{ linkTarget.attributes.type }}</label>
+    </p>
+
+  </div>
+
+
+  <md-list style="overflow-y: scroll;height: 300px;">
+    <md-list-item style="border-bottom:groove" *ngFor="let link of opmLinks"  ng-class="{selected: isSelected(link)}" >
+      <div  style="padding-right:40px ;cursor: pointer;" md-list-avatar class='icon {{link.name}}' (click)="onClickedExit(link)">
+      </div>
+
+      <div style="cursor: pointer;"  (click)="onClickedExit(link)"><label style="font-size: medium;cursor: pointer;margin-right: 0;" > {{link.opl}}
+
+      </label><label style="color:red;font-size: small;font-style: oblique"> {{link.name}}</label></div>
+
+    </md-list-item>
+  </md-list>
+
+</div>

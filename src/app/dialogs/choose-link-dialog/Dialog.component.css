@@ -1,0 +1,64 @@
+.icon { background: url('icon.png') no-repeat top left; width: 50px; height: 24px;  }
+.icon.Bidrectional-Relation { background-position: 0 0; width: 73px; }
+.icon.unidirectional-relation { background-position: 0 -34px; width: 73px; }
+.icon.exception { background-position: 0 -68px; }
+.icon.Agent{ background-position: 0 -98px; }
+.icon.Consumption { background-position: 0 -130px; width: 73px; }
+.icon.Exhibition-Characterization { background-position: 0 -160px; }
+.icon.Aggregation-Participation { background-position: 0 -195px; }
+.icon.Effect { background-position: 0 -228px; width: 73px; }
+.icon.Generalization-Specialization { background-position: 0 -200px; }
+.icon.instrument-condition { background-position: 0 -306px; }
+.icon.instrument-event { background-position: 0 -340px; }
+.icon.Instrument { background-position: 0 -364px; }
+.icon.Invocation { background-position: 0 -408px; }
+.icon.Result { background-position: 0 -432px; width: 73px; }
+.icon.Classification-Instantiation { background-position: 0 -476px; }
+
+
+.dialog {
+  width: 450px;
+  height: 400px;
+  border: 5px black;
+  border-radius: 5px;
+  background-color: white;
+  margin-left: 50%;
+  margin-top: -480px;
+  box-shadow: 0 0 20px #000
+
+}
+.dialog header {
+  border-bottom: 1px solid black;
+  font-size: 15px;
+  padding: 5px;
+  display: flex;
+  background-color: #4b4a67;
+  cursor:all-scroll;
+  color: white;
+}
+.dialog header .title {
+  flex-grow: 1;
+  cursor: default;
+  text-align: center;
+}
+.dialog header .exit-button {
+  cursor: pointer;
+  text-align: center;
+  margin-right: -18px;
+  margin-top: -15px;
+  background-color: orange;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  border: double;
+  border-color: white;
+
+}
+
+.dialog header .exit-button:hover {
+  cursor: pointer;
+  background: orangered;
+}
+
+
+
