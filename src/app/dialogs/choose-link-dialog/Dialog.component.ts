@@ -18,7 +18,8 @@ export class DialogComponent {
   onClickedExit(link) {
     this.close.emit('event');
     this.selected = link;
-    console.log(this.selected);
+    this.newLink.attributes.name = this.selected.name;
+    console.log('chaneged: ', this.selected);
   }
   select(link) {
     this.selected = link;
@@ -26,5 +27,4 @@ export class DialogComponent {
   }
   constructor(){
   }
-
 }

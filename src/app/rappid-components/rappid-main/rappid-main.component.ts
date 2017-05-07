@@ -10,7 +10,7 @@ import {linkTypeSelection} from '../../link-operating/linkTypeSelection'
 import { linkDrawing } from './linkDrawing'
 import { addState } from '../../config/add-state';
 import { CommandManagerService } from '../services/command-manager.service';
-// popup imports 
+// popup imports
 import {DialogComponent} from "../../dialogs/choose-link-dialog/Dialog.component";
 import {DialogDirective} from "../../dialogs/choose-link-dialog/DialogDirective.directive";
 
@@ -32,7 +32,7 @@ const _ = require('lodash');
     </div>
   `,
   styleUrls: ['./rappid-main.component.css'],
-  //add DialogComponent 
+  //add DialogComponent
   entryComponents: [DialogComponent]
 })
 export class RappidMainComponent implements OnInit {
@@ -54,7 +54,8 @@ export class RappidMainComponent implements OnInit {
 
   constructor(graphService:GraphService,
               commandManagerService: CommandManagerService,
-              private _dialog: MdDialog) {
+              private _dialog: MdDialog,private viewContainer: ViewContainerRef,
+              private componentFactoryResolver: ComponentFactoryResolver) {
     this.graph = graphService.getGraph();
     this.commandManager = commandManagerService.commandManager;
   }
@@ -72,14 +73,13 @@ export class RappidMainComponent implements OnInit {
     this.handleAddLink();
   }
 
-//Check Changes  
+//Check Changes
   handleAddLink() {
     this.graph.on('add', (cell) => {
       if (cell.attributes.type === 'opm.Link') {
         cell.on('change:target change:source', (link) => {
           if (link.attributes.source.id && link.attributes.target.id) {
             var relevantLinks = linkTypeSelection.generateLinkWithOpl(link);
-            console.log('opm links: ', relevantLinks);
             if (relevantLinks.length > 0){
              /* let dialogRef = this._dialog.open(ChooseLinkDialogComponent, {viewContainerRef: this.rappidContainer});
               dialogRef.componentInstance.newLink = link;
@@ -92,7 +92,7 @@ export class RappidMainComponent implements OnInit {
                   linkDrawing.drawLink(link, result.name);
                 }
               });*/
-            // Create Dialog Component 
+            // Create Dialog Component
               this.createDialog(DialogComponent,link);
             }
           }
@@ -408,11 +408,11 @@ export class RappidMainComponent implements OnInit {
   }
 
 /*
-* popup Links Dialog 
+* popup Links Dialog
 * Input (DialogComponent , link)
 * set linkSource/Target data from link object
-* Return Dialog Component View  
-* 
+* Return Dialog Component View
+*
 * */
   createDialog(dialogComponent: { new(): DialogComponent},link): ComponentRef<DialogComponent> {
 
@@ -423,11 +423,10 @@ export class RappidMainComponent implements OnInit {
 
 
     let dialogComponentRef = this.viewContainer.createComponent(dialogComponentFactory);
+    dialogComponentRef.instance.newLink = link;
     dialogComponentRef.instance.linkSource=link.getSourceElement() ;
     dialogComponentRef.instance.linkTarget=link.getTargetElement();
     dialogComponentRef.instance.opmLinks=linkTypeSelection.generateLinkWithOpl(link);
-
-
 
     dialogComponentRef.instance.close.subscribe(() => {
       dialogComponentRef.destroy();
