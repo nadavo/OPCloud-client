@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewContainerRef,ComponentFactoryResolver,ComponentRef,Input } from '@angular/core';
 import { GraphService } from '../services/graph.service';
 import { haloConfig } from '../../config/halo.config';
 import { toolbarConfig } from '../../config/toolbar.config';
@@ -10,9 +10,9 @@ import {linkTypeSelection} from '../../link-operating/linkTypeSelection'
 import { linkDrawing } from './linkDrawing'
 import { addState } from '../../config/add-state';
 import { CommandManagerService } from '../services/command-manager.service';
-import { AngularFireModule } from 'angularfire2';
-import { firebaseConfig, firebaseAuthConfig } from '../../config/firbase.config';
-import * as firebase from "firebase";
+// popup imports
+import {DialogComponent} from "../../dialogs/choose-link-dialog/Dialog.component";
+import {DialogDirective} from "../../dialogs/choose-link-dialog/DialogDirective.directive";
 
 const joint = require('rappid');
 
@@ -31,7 +31,9 @@ const _ = require('lodash');
       <opcloud-rappid-navigator [paperScroller]="paperScroller"></opcloud-rappid-navigator>
     </div>
   `,
-  styleUrls: ['./rappid-main.component.css']
+  styleUrls: ['./rappid-main.component.css'],
+  //add DialogComponent
+  entryComponents: [DialogComponent]
 })
 export class RappidMainComponent implements OnInit {
   graph = null;
@@ -52,7 +54,8 @@ export class RappidMainComponent implements OnInit {
 
   constructor(private graphService:GraphService,
               commandManagerService: CommandManagerService,
-              private _dialog: MdDialog) {
+              private _dialog: MdDialog,private viewContainer: ViewContainerRef,
+              private componentFactoryResolver: ComponentFactoryResolver) {
     this.graph = graphService.getGraph();
     this.commandManager = commandManagerService.commandManager;
   }
@@ -71,38 +74,28 @@ export class RappidMainComponent implements OnInit {
     this.handleAddLink();
   }
 
-/*  initializeDatabase() {
-    // this.graph = new joint.dia.Graph;
-    this.graph.fireDB = firebase.database();
-    this.graph.modelName = localStorage.getItem("globalName");
-    console.log("Model Name is: " + this.graph.modelName);
-    this.graph.OPL = "";
-    this.graph.myChangeLock = false;
-    this.graph.updateModel = function (modelName, modelToSync) {
-      this.myChangeLock = true;
-      this.fireDB.ref('/models/' + modelName).set(modelToSync);
-      console.log("updateModel() --- Graph Model updated on DB!");
-    }
-
-  }*/
-
+//Check Changes
   handleAddLink() {
     this.graph.on('add', (cell) => {
       if (cell.attributes.type === 'opm.Link') {
         cell.on('change:target change:source', (link) => {
-          if (link.attributes.source.id && link.attributes.target.id && (link.attributes.target.type != null)) {
-            let dialogRef = this._dialog.open(ChooseLinkDialogComponent, {viewContainerRef: this.rappidContainer});
-            dialogRef.componentInstance.newLink = link;
-            dialogRef.componentInstance.linkSource = link.getSourceElement();
-            dialogRef.componentInstance.linkTarget = link.getTargetElement();
-            dialogRef.componentInstance.opmLinks = linkTypeSelection.generateLinkWithOpl(link);
-
-            dialogRef.afterClosed().subscribe(result => {
-              if (!!result) {
-                console.log('chosen link: ', result);
-                linkDrawing.drawLink(link, result.name);
-              }
-            });
+          if (link.attributes.source.id && link.attributes.target.id) {
+            var relevantLinks = linkTypeSelection.generateLinkWithOpl(link);
+            if (relevantLinks.length > 0){
+             /* let dialogRef = this._dialog.open(ChooseLinkDialogComponent, {viewContainerRef: this.rappidContainer});
+              dialogRef.componentInstance.newLink = link;
+              dialogRef.componentInstance.linkSource = link.getSourceElement();
+              dialogRef.componentInstance.linkTarget = link.getTargetElement();
+              dialogRef.componentInstance.opmLinks = relevantLinks;
+              dialogRef.afterClosed().subscribe(result => {
+                if (!!result) {
+                  console.log('chosen link: ', result);
+                  linkDrawing.drawLink(link, result.name);
+                }
+              });*/
+            // Create Dialog Component
+              this.createDialog(DialogComponent,link);
+            }
           }
         });
       }
@@ -265,7 +258,6 @@ export class RappidMainComponent implements OnInit {
       if (!this.selection.collection.contains(cell)) {
 
         if (cell.isElement()) {
-
           new joint.ui.FreeTransform({
             cellView: cellView,
             allowRotation: false,
@@ -415,4 +407,32 @@ export class RappidMainComponent implements OnInit {
 
     this.paperScroller.centerContent();
   }
+
+/*
+* popup Links Dialog
+* Input (DialogComponent , link)
+* set linkSource/Target data from link object
+* Return Dialog Component View
+*
+* */
+  createDialog(dialogComponent: { new(): DialogComponent},link): ComponentRef<DialogComponent> {
+
+    this.viewContainer.clear();
+
+    let dialogComponentFactory =
+      this.componentFactoryResolver.resolveComponentFactory(dialogComponent);
+
+
+    let dialogComponentRef = this.viewContainer.createComponent(dialogComponentFactory);
+    dialogComponentRef.instance.newLink = link;
+    dialogComponentRef.instance.linkSource=link.getSourceElement() ;
+    dialogComponentRef.instance.linkTarget=link.getTargetElement();
+    dialogComponentRef.instance.opmLinks=linkTypeSelection.generateLinkWithOpl(link);
+
+    dialogComponentRef.instance.close.subscribe(() => {
+      dialogComponentRef.destroy();
+    });
+    return dialogComponentRef;
+  }
+
 }

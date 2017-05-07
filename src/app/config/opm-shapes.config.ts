@@ -9,10 +9,10 @@ const joint = require('rappid');
 import { basicDefinitions } from './basicDefinitions';
 export const opmShapes = {
   //OPM Links definitions
-  Link: joint.dia.Link.extend(basicDefinitions.defineLink('Link')),
+  Link: joint.dia.Link.extend(basicDefinitions.defineLink()),
   Object: joint.dia.Element.extend(basicDefinitions.defineShape('rect')),
   Process: joint.dia.Element.extend(basicDefinitions.defineShape('ellipse')),
-  StateNorm: joint.shapes.basic.Rect.extend(basicDefinitions.defineState())
+  StateNorm: joint.dia.Element.extend(basicDefinitions.defineState())
 };
 
 joint.shapes.opm = opmShapes;

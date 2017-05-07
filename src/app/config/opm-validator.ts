@@ -7,20 +7,18 @@ export function opmRuleSet(validator, graph) {
       if (command.data.type === 'opm.Link') {
         const link = graph.getCell(command.data.id);
         if ((null === link.getTargetElement())) {
-          link.attributes.target.type = null;
           return next('A link must connect to a target element!');
         }
         else if(link.getTargetElement().id == link.getSourceElement().get('parent')){
-          link.attributes.target.type = null;
           return next('A state cannot be connected to his object!');
         }
         if ((link.getSourceElement().attributes.type == 'opm.StateNorm') && (link.getTargetElement().attributes.type == 'opm.StateNorm')) {
-          link.attributes.target.type = null;
           return next('A link cannot connect between two states!');
         }
       }
       return next();
     },
+
     function (err, command, next) {
       const errorMessage = new joint.ui.FlashMessage({
         title: 'Validation Error!',

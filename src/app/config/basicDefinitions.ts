@@ -5,6 +5,9 @@ const g = joint.g;
 
 export const basicDefinitions = {
 
+  stateWidth: 50,
+  stateHeight: 25,
+
   createShape(shapeName){
     return {
       fill: '#DCDCDC',
@@ -22,7 +25,7 @@ export const basicDefinitions = {
 
   createText(shapeName){
     return {
-      text: (shapeName == 'rect') ? 'Object' : 'Process',
+      text: (shapeName == 'rect') ? 'Object' : (shapeName == 'ellipse') ? 'Process' : 'state',
       fill: 'black',
       'font-size': 14,
       'ref-x': .5,
@@ -30,12 +33,12 @@ export const basicDefinitions = {
       'text-anchor': 'middle',
       'y-alignment': 'middle',
       'font-family': 'Arial, helvetica, sans-serif',
-      'font-weight': 600
+      'font-weight': (shapeName == 'state') ? 300 : 600
     }
   },
 
   defineShape(shapeName){
-    var shape = {
+    return {
       markup: `<g class="rotatable"><g class="scalable"><${shapeName}/></g><text/></g>`,
       defaults: _.defaultsDeep({
         type: (shapeName == 'rect') ? 'opm.Object' : 'opm.Process',
@@ -46,10 +49,9 @@ export const basicDefinitions = {
         }
       }, joint.shapes.basic.Generic.prototype.defaults)
     };
-    return shape;
   },
 
-  defineLink(linkName){
+  defineLink(){
     return {
       defaults: _.defaultsDeep({
         type: 'opm.Link',
@@ -59,15 +61,17 @@ export const basicDefinitions = {
     };
   },
 
-  defineState(x=0, y=0) {
+  defineState() {
     return {
+      markup: '<g class="rotatable"><g class="scalable"><rect/></g><text/></g>',
+      defaults: _.defaultsDeep({
       type: 'opm.StateNorm',
-        position: { x: x - 20, y: y - 50},
-        size: { width: 50, height: 25},
+        size: { width: this.stateWidth, height: this.stateHeight},
           attrs: {
           rect: this.createShape('state'),
-          text: { text: 'state', fill: 'black'}
+          text: this.createText('state')
         }
+      }, joint.shapes.basic.Generic.prototype.defaults)
     };
   }
 };
