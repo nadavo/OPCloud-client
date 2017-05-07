@@ -13,8 +13,7 @@ import {ModelObject} from "../../services/storage/model-object.class";
 })
 export class RappidToolbarComponent implements OnInit {
   graph;
-  modelObject;
-  modelName;
+  // modelName;
   private commandManager;
 
   constructor(private graphService: GraphService,
@@ -39,14 +38,14 @@ export class RappidToolbarComponent implements OnInit {
 
   saveModel() {
     debugger;
-    if (this.modelName === null) {
+    if (this.graphService.modelObject.name === null) {
       return this.saveModelAs();
     }
-    return this.graphService.saveGraph(this.modelName);
+    return this.graphService.saveGraph(this.graphService.modelObject.name);
   }
 
   saveModelAs() {
-    debugger;
+    // debugger;
     // let dialogRef = this._dialog.open(SaveModelDialogComponent);
     // dialogRef.afterClosed().subscribe(result => {
     let result = prompt("Save Model As:", "Enter a Model Name");
@@ -63,7 +62,7 @@ export class RappidToolbarComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (!!result) {
         this.graphService.loadGraph(result);
-        this.modelName = result;
+        this.graphService.modelObject.name = result;
       }
     });
   }

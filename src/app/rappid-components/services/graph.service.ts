@@ -12,13 +12,14 @@ export class GraphService {
   private JSON;
   private JSON_string;
   private modelToSync;
-  private OPL;
-  private modelName;
+  // private OPL;
+  // private modelName;
 
 
   constructor(modelStorage: ModelStorageInterface) {
     this.modelStorage = modelStorage;
     this.graph = new joint.dia.Graph;
+    this.JSON = this.graph.toJSON();
     // this.initializeDatabase();
     // TODO: change:position emits on mousemove, find a better event - when drag stopped
     this.graph.on(`add 
@@ -29,7 +30,7 @@ export class GraphService {
                   change:angle`,
       () => this.updateJSON());
      this.modelObject = new ModelObject(null, null);
-    // this.modelName = this.modelObject.name;
+
   }
 
   getGraph(name?: string) {
@@ -40,13 +41,15 @@ export class GraphService {
   saveGraph(modelName) {
     debugger;
     console.log('inside saveModel func')
-    this.modelObject.saveModelParam(modelName, this.graph.toJSON());
+    // TODO: work on this.graph.modelObject - might be JSON
+    this.modelObject.saveModelParam(modelName, this.JSON);
     this.modelStorage.save(this.modelObject);
   }
 
   loadGraph(name) {
     this.modelStorage.get(name).then((res) => {
       this.modelObject = res;
+
       this.graph.fromJSON(this.modelObject.modelData);
     });
   }
@@ -54,18 +57,24 @@ export class GraphService {
   updateJSON() {
     this.JSON = this.graph.toJSON();
     this.JSON_string = JSON.stringify(this.JSON);
-    this.modelToSync = { graph: this.JSON_string, opl: this.OPL };
-    console.log(this.modelName)
-    if (this.modelName !== null) {
+    // TODO: should add OPL sync to the DB
+    // this.modelToSync = { graph: this.JSON_string };
+    console.log(this.modelObject.name)
+    if (this.modelObject.name !== null) {
        // update DB
-      console.log(this.modelName)
+      console.log(this.modelObject.name)
       console.log('go to FB');
-      // this.modelStorage.save(this.modelToSync);
+      this.modelStorage.save(this.modelObject);
     }
     else {
-      localStorage.setItem(this.modelName, this.modelToSync);
+      console.log('saving in local storage')
+      localStorage.setItem(this.modelObject.name, this.modelToSync);
     }
   }
+
+//   this.fireDB.ref('/models/' + this.modelName).on('value', function (snapshot) {
+//   getModel(snapshot.val());
+// });
 
    /*
    _.bind(this.graph.updateModel, this.graph);
