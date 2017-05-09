@@ -1,26 +1,22 @@
 import { Injectable } from '@angular/core';
-import { ModelObject } from '../../services/storage/model-object.class';
 import { ModelStorageInterface } from '../../services/storage/model-storage.interface';
+import { database } from 'firebase';
 const joint = require('rappid');
 
 
 @Injectable()
 export class GraphService {
   graph;
-  modelObject;
-  modelStorage;
-  private JSON;
-  private JSON_string;
-  private modelToSync;
-  // private OPL;
-  // private modelName;
-
+  modelName;
+  private database;
+  private myChangeLock;
+  private modelRef;
+  private modelRefOn;
 
   constructor(modelStorage: ModelStorageInterface) {
-    this.modelStorage = modelStorage;
+    this.database = database();
     this.graph = new joint.dia.Graph;
-    this.JSON = this.graph.toJSON();
-    // this.initializeDatabase();
+
     // TODO: change:position emits on mousemove, find a better event - when drag stopped
     this.graph.on(`add 
                   remove 
@@ -28,9 +24,16 @@ export class GraphService {
                   change:attrs 
                   change:size 
                   change:angle`,
-      () => this.updateJSON());
-     this.modelObject = new ModelObject(null, null);
+      () => {
+        this.updateJSON()
+      });
 
+  }
+
+  getModelList() {
+    this.database.ref('/models').once('value').then(snapshot => {
+      return Object.keys(snapshot.val());
+    })
   }
 
   getGraph(name?: string) {
@@ -38,67 +41,49 @@ export class GraphService {
     return name ? this.loadGraph(name) : this.graph;
   }
 
-  saveGraph(modelName) {
-    debugger;
+  saveGraph(name) {
+
     console.log('inside saveModel func')
     // TODO: work on this.graph.modelObject - might be JSON
-    this.modelObject.saveModelParam(modelName, this.JSON);
-    this.modelStorage.save(this.modelObject);
+    this.database.ref('models/' + name).set(this.graph.toJson());
+    this.modelRef.off();
+    this.loadGraph(name)
   }
 
-  loadGraph(name) {
-    this.modelStorage.get(name).then((res) => {
-      this.modelObject = res;
-
-      this.graph.fromJSON(this.modelObject.modelData);
-    });
+  loadGraph(name?) {
+    if (!!name) {
+      this.modelName = name;
+      this.modelRef = this.database.ref('models/' + name);
+      this.modelRefOn = this.modelRef.on('value', (snapshot) => {
+        this.getModel(snapshot.val());
+      });
+    }
   }
 
   updateJSON() {
-    this.JSON = this.graph.toJSON();
-    this.JSON_string = JSON.stringify(this.JSON);
+    const graphJSON = this.graph.toJSON();
     // TODO: should add OPL sync to the DB
-    // this.modelToSync = { graph: this.JSON_string };
-    console.log(this.modelObject.name)
-    if (this.modelObject.name !== null) {
-       // update DB
-      console.log(this.modelObject.name)
+    console.log(this.modelName)
+    if (this.modelName !== null) {
+      // update DB
+      console.log(this.modelName)
       console.log('go to FB');
-      this.modelStorage.save(this.modelObject);
+      this.myChangeLock = true;
+      this.database.ref('/models/' + this.modelName).update(graphJSON);
+
     }
     else {
       console.log('saving in local storage')
-      localStorage.setItem(this.modelObject.name, this.modelToSync);
     }
   }
 
-//   this.fireDB.ref('/models/' + this.modelName).on('value', function (snapshot) {
-//   getModel(snapshot.val());
-// });
+  getModel(model) {
+    if (this.myChangeLock) {
+      this.myChangeLock = false;
+      return;
+    }
 
-   /*
-   _.bind(this.graph.updateModel, this.graph);
-   this.graph.listen = function () {
-   function getModel(model) {
-   if (app.graph.myChangeLock) {
-   //console.log('my change');
-   app.graph.myChangeLock = false;
-   return;
-   }
-   app.graph.JSON_string = model.graph;
-   app.graph.JSON = JSON.parse(app.graph.JSON_string);
-   app.graph.fromJSON(JSON.parse(app.graph.JSON_string));
-   app.graph.OPL = model.opl;
-   document.getElementById("opl").innerHTML = app.graph.OPL;
-   };
-   if (this.modelName !== 'undefined') {
-   this.fireDB.ref('/models/' + this.modelName).on('value', function (snapshot) {
-   getModel(snapshot.val());
-   });
-   }
-   };
-   _.bind(this.graph.listen, this.graph);
-   this.graph.listen();
-   }*/
+    this.graph.fromJSON(model);
+  };
 
 }
