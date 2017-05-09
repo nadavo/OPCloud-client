@@ -37,9 +37,17 @@ export class RappidToolbarComponent implements OnInit {
   }
 
   saveModel() {
+    debugger;
+    if (this.graphService.modelObject.name === null) {
+      return this.saveModelAs();
+    }
+    return this.graphService.saveGraph(this.graphService.modelObject.name);
   }
 
   saveModelAs() {
+    // debugger;
+    // let dialogRef = this._dialog.open(SaveModelDialogComponent);
+    // dialogRef.afterClosed().subscribe(result => {
     let result = prompt("Save Model As:", "Enter a Model Name");
     if (result === "Enter a Model Name" || result === null) {
       console.log("Model not saved");
@@ -54,6 +62,7 @@ export class RappidToolbarComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (!!result) {
         this.graphService.loadGraph(result);
+        this.graphService.modelObject.name = result;
       }
     });
   }
