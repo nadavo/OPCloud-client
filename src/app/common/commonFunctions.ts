@@ -1,6 +1,29 @@
 import { opmStyle } from '../config/opmStyle';
+export const _ = require('lodash');
+export const paddingObject = 10;
 
 export const CommonFunctions = {
+
+//Function updateObjectSize Update the size of the object so that no embedded cell will exceed the father border with
+//padding of 10p.
+  updateObjectSize(fatherCell){
+    var leftSideX = fatherCell.get('originalPosition').x;
+    var topSideY = fatherCell.get('originalPosition').y;
+    var rightSideX = fatherCell.get('originalPosition').x + fatherCell.get('originalSize').width;
+    var bottomSideY = fatherCell.get('originalPosition').y + fatherCell.get('originalSize').height;
+
+    _.each(fatherCell.getEmbeddedCells(), function(child) {
+      var childBbox = child.getBBox();
+      //Updating the new size of the object to have margins of at least paddingObject so that the state will not touch the object
+      if (childBbox.x <= (leftSideX+paddingObject)) { leftSideX = childBbox.x-paddingObject; }
+      if (childBbox.y <= (topSideY+paddingObject)) { topSideY = childBbox.y-paddingObject; }
+      if (childBbox.corner().x >= rightSideX-paddingObject) { rightSideX = childBbox.corner().x+paddingObject; }
+      if (childBbox.corner().y >= bottomSideY-paddingObject) { bottomSideY = childBbox.corner().y+paddingObject; }
+    });
+    fatherCell.set({
+      position: { x: leftSideX, y: topSideY },
+      size: { width: rightSideX - leftSideX, height: bottomSideY - topSideY }});
+  },
 
 //Function createGroup. Get the name of the group, its index and if it should be collapsed and generates a group object
   createGroup(labelName, indexNumber, isClosed = false) {
