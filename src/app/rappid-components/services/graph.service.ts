@@ -12,12 +12,14 @@ export class GraphService {
   private JSON;
   private JSON_string;
   private modelToSync;
-  private OPL;
-  private modelName;
+  // private OPL;
+  // private modelName;
+
 
   constructor(modelStorage: ModelStorageInterface) {
     this.modelStorage = modelStorage;
     this.graph = new joint.dia.Graph;
+    this.JSON = this.graph.toJSON();
     // this.initializeDatabase();
     // TODO: change:position emits on mousemove, find a better event - when drag stopped
     this.graph.on(`add 
@@ -25,25 +27,29 @@ export class GraphService {
                   change:position 
                   change:attrs 
                   change:size 
-                  change:angle 
-                  change:target 
-                  change:source`,
+                  change:angle`,
       () => this.updateJSON());
-    this.modelObject = new ModelObject('myModel', null);
+     this.modelObject = new ModelObject(null, null);
+
   }
 
   getGraph(name?: string) {
-    return name ? this.loadModel(name) : this.graph;
+
+    return name ? this.loadGraph(name) : this.graph;
   }
 
-  saveModel(modelName) {
-    this.modelObject.saveModel(modelName, this.graph.toJSON());
+  saveGraph(modelName) {
+    debugger;
+    console.log('inside saveModel func')
+    // TODO: work on this.graph.modelObject - might be JSON
+    this.modelObject.saveModelParam(modelName, this.JSON);
     this.modelStorage.save(this.modelObject);
   }
 
-  loadModel(name) {
+  loadGraph(name) {
     this.modelStorage.get(name).then((res) => {
       this.modelObject = res;
+
       this.graph.fromJSON(this.modelObject.modelData);
     });
   }
@@ -51,24 +57,26 @@ export class GraphService {
   updateJSON() {
     this.JSON = this.graph.toJSON();
     this.JSON_string = JSON.stringify(this.JSON);
-    this.modelToSync = { graph: this.JSON_string, opl: this.OPL };
-    if (this.modelName !== 'undefined') {
-      // update DB
-      // this.updateModel(this.modelName, this.modelToSync);
+    // TODO: should add OPL sync to the DB
+    // this.modelToSync = { graph: this.JSON_string };
+    console.log(this.modelObject.name)
+    if (this.modelObject.name !== null) {
+       // update DB
+      console.log(this.modelObject.name)
+      console.log('go to FB');
+      this.modelStorage.save(this.modelObject);
+    }
+    else {
+      console.log('saving in local storage')
+      localStorage.setItem(this.modelObject.name, this.modelToSync);
     }
   }
 
-  /*initializeDatabase() {
-   this.graph.fireDB = firebase.database();
-   this.graph.modelName = localStorage.getItem("globalName");
-   console.log("Model Name is: " + this.graph.modelName);
-   this.graph.OPL = "";
-   this.graph.myChangeLock = false;
-   this.graph.updateModel = function (modelName, modelToSync) {
-   this.myChangeLock = true;
-   this.fireDB.ref('/models/' + modelName).set(modelToSync);
-   //console.log("updateModel() --- Graph Model updated on DB!");
-   };
+//   this.fireDB.ref('/models/' + this.modelName).on('value', function (snapshot) {
+//   getModel(snapshot.val());
+// });
+
+   /*
    _.bind(this.graph.updateModel, this.graph);
    this.graph.listen = function () {
    function getModel(model) {

@@ -4,6 +4,7 @@ import { SaveModelDialogComponent } from '../../dialogs/save-model-dialog/save-m
 import { MdDialog } from '@angular/material';
 import { LoadModelDialogComponent } from '../../dialogs/load-model-dialog/load-model-dialog.component';
 import { CommandManagerService } from '../services/command-manager.service';
+import {ModelObject} from "../../services/storage/model-object.class";
 
 @Component({
   selector: 'opcloud-rappid-toolbar',
@@ -12,7 +13,7 @@ import { CommandManagerService } from '../services/command-manager.service';
 })
 export class RappidToolbarComponent implements OnInit {
   graph;
-  modelName: string;
+  // modelName;
   private commandManager;
 
   constructor(private graphService: GraphService,
@@ -36,21 +37,23 @@ export class RappidToolbarComponent implements OnInit {
   }
 
   saveModel() {
-    if (!this.modelName) {
+    debugger;
+    if (this.graphService.modelObject.name === null) {
       return this.saveModelAs();
     }
-
-    this.graphService.saveModel(this.modelName);
+    return this.graphService.saveGraph(this.graphService.modelObject.name);
   }
 
   saveModelAs() {
-    let dialogRef = this._dialog.open(SaveModelDialogComponent);
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (!!result) {
-        this.modelName = result;
-      }
-    });
+    // debugger;
+    // let dialogRef = this._dialog.open(SaveModelDialogComponent);
+    // dialogRef.afterClosed().subscribe(result => {
+    let result = prompt("Save Model As:", "Enter a Model Name");
+    if (result === "Enter a Model Name" || result === null) {
+      console.log("Model not saved");
+      return;
+    }
+    this.graphService.saveGraph(result);
   }
 
   loadModel() {
@@ -58,8 +61,8 @@ export class RappidToolbarComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (!!result) {
-        this.graphService.loadModel(result);
-        this.modelName = result;
+        this.graphService.loadGraph(result);
+        this.graphService.modelObject.name = result;
       }
     });
   }

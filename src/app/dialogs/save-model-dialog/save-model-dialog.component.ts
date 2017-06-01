@@ -12,9 +12,9 @@ import { ModelStorageInterface } from '../../services/storage/model-storage.inte
         <input #modelNameInput>
       </label>
     </p>
-    <p *ngIf="modelExists(modelNameInput.value)">
-      A model with this name exists. Override?
-    </p>
+    <!--<p *ngIf="modelExists(modelNameInput.value)">-->
+      <!--A model with this name exists. Override?-->
+    <!--</p>-->
     <p> 
       <button md-button (click)="dialogRef.close(modelNameInput.value)">SAVE</button> 
       <button md-button (click)="dialogRef.close()">CANCEL</button> 
@@ -36,7 +36,8 @@ export class SaveModelDialogComponent implements OnInit {
   }
 
   modelExists(modelName) {
-    return this.models.indexOf(modelName) !== -1;
+    debugger;
+    return (this.models.indexOf(modelName) !== -1);
   }
 
 }

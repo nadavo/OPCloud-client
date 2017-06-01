@@ -52,7 +52,7 @@ export class RappidMainComponent implements OnInit {
 
   @ViewChild('rappidContainer', { read: ViewContainerRef }) rappidContainer;
 
-  constructor(graphService:GraphService,
+  constructor(private graphService:GraphService,
               commandManagerService: CommandManagerService,
               private _dialog: MdDialog,private viewContainer: ViewContainerRef,
               private componentFactoryResolver: ComponentFactoryResolver) {
@@ -62,6 +62,7 @@ export class RappidMainComponent implements OnInit {
 
   ngOnInit() {
     joint.setTheme('modern');
+    // this.initializeDatabase();
     this.initializePaper();
     this.initializeSelection();
     this.initializeHaloAndInspector();
