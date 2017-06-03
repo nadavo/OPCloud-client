@@ -40,7 +40,7 @@ export function addState () {
       columns: fatherObject.get('embeds').length,
       columnWidth: defaultState.getBBox().width * 1.2,
       rowHeight: defaultState.height,
-      marginY: (fatherObject.getBBox().y + fatherObject.getBBox().height) - common.paddingObject * 3,
+      marginY: (fatherObject.getBBox().y + fatherObject.getBBox().height) - common.paddingObject * 3.5,
       marginX: (fatherObject.getBBox().x + fatherObject.getBBox().width * 0.5) - 0.5 * basicDefinitions.stateWidth * fatherObject.get('embeds').length
     });
   }

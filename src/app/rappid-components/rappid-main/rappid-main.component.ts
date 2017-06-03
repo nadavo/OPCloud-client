@@ -9,6 +9,7 @@ import { ChooseLinkDialogComponent } from '../../dialogs/choose-link-dialog/choo
 import {linkTypeSelection} from '../../link-operating/linkTypeSelection'
 import { linkDrawing } from './linkDrawing'
 import { addState } from '../../config/add-state';
+import { arrangeStates } from '../../config/arrangeStates';
 import { CommandManagerService } from '../services/command-manager.service';
 // popup imports
 import {DialogComponent} from "../../dialogs/choose-link-dialog/Dialog.component";
@@ -282,7 +283,18 @@ export class RappidMainComponent implements OnInit {
                 }
               }
             });
-            halo.on('action:add_state:pointerdown', addState);
+            halo.on('action:add_state:pointerup', addState);
+            halo.addHandle({
+              name: 'arrange', position: 'sw', icon: null, attrs: {
+                '.handle': {
+                  'data-tooltip-class-name': 'small',
+                  'data-tooltip': 'Click to arrange the states inside the object',
+                  'data-tooltip-position': 'right',
+                  'data-tooltip-padding': 15
+                }
+              }
+            });
+            halo.on('action:arrange:pointerup', arrangeStates);
           }
 
           this.selection.collection.reset([]);
