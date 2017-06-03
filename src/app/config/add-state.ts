@@ -2,7 +2,7 @@ import {basicDefinitions} from "./basicDefinitions";
 import * as common from "../common/commonFunctions";
 import {gridLayout} from "./gridLayout"
 const joint = require('rappid');
-var objectChangedSize = false;
+let objectChangedSize = false;
 
 function saveValues(cell, parent){
   cell.set('originalSize', cell.get('size'));
@@ -23,8 +23,8 @@ export function addState () {
   let embeddedStates = fatherObject.getEmbeddedCells();
 
   //Placing the new state. By default it is outside the object.
-  var xNewState = fatherObject.getBBox().center().x - basicDefinitions.stateWidth/2;
-  var yNewState = fatherObject.getBBox().y + fatherObject.getBBox().height - basicDefinitions.stateHeight - common.paddingObject;
+  let xNewState = fatherObject.getBBox().center().x - basicDefinitions.stateWidth/2;
+  let yNewState = fatherObject.getBBox().y + fatherObject.getBBox().height - basicDefinitions.stateHeight - common.paddingObject;
   if (fatherObject.get('embeds') && fatherObject.get('embeds').length){
     common._.each(fatherObject.getEmbeddedCells(), function(child) {
       if (!fatherObject.getBBox().containsPoint(child.getBBox().origin()) ||
@@ -40,15 +40,15 @@ export function addState () {
       columns: fatherObject.get('embeds').length,
       columnWidth: defaultState.getBBox().width * 1.2,
       rowHeight: defaultState.height,
-      marginY: (fatherObject.getBBox().y + fatherObject.getBBox().height) - paddingObject * 3,
+      marginY: (fatherObject.getBBox().y + fatherObject.getBBox().height) - common.paddingObject * 3,
       marginX: (fatherObject.getBBox().x + fatherObject.getBBox().width * 0.5) - 0.5 * basicDefinitions.stateWidth * fatherObject.get('embeds').length
     });
   }
 
   //https://resources.jointjs.com/docs/jointjs/v1.1/joint.html#dia.Element.events
   options.graph.on('change:position', function(cell) {
-    var parentId = cell.get('parent');
-    var parent = options.graph.getCell(parentId);
+    let parentId = cell.get('parent');
+    let parent = options.graph.getCell(parentId);
     saveValues(cell, parent);
     if (parentId){        //State case
       common.CommonFunctions.updateObjectSize(parent);
@@ -62,8 +62,8 @@ export function addState () {
   });
 
   options.graph.on('change:size', function(cell) {
-    var parentId = cell.get('parent');
-    var parent = options.graph.getCell(parentId);
+    let parentId = cell.get('parent');
+    let parent = options.graph.getCell(parentId);
     saveValues(cell, parent);
     if (parentId){        //State case
       common.CommonFunctions.updateObjectSize(parent);
