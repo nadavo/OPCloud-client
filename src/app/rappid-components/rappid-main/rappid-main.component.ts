@@ -10,6 +10,8 @@ import {linkTypeSelection} from '../../link-operating/linkTypeSelection'
 import { linkDrawing } from './linkDrawing'
 import { addState } from '../../config/add-state';
 import { CommandManagerService } from '../services/command-manager.service';
+import * as common from "../../common/commonFunctions";
+
 // popup imports
 import {DialogComponent} from "../../dialogs/choose-link-dialog/Dialog.component";
 import {DialogDirective} from "../../dialogs/choose-link-dialog/DialogDirective.directive";
@@ -72,6 +74,7 @@ export class RappidMainComponent implements OnInit {
     this.initializeKeyboardShortcuts();
     this.initializeTooltips();
     this.handleAddLink();
+    this.initializeWrapping();
   }
 
 //Check Changes
@@ -135,10 +138,6 @@ export class RappidMainComponent implements OnInit {
     /// $('.paper-container').append(paperScroller.el);
     paperScroller.render().center();
   }
-
-
-
-
 
   initializeKeyboardShortcuts() {
 
@@ -210,7 +209,6 @@ export class RappidMainComponent implements OnInit {
     }, this);
   }
 
-
   initializeSelection() {
 
     this.clipboard = new joint.ui.Clipboard();
@@ -248,9 +246,63 @@ export class RappidMainComponent implements OnInit {
     }, this);
   }
 
+ updateCell(cell, x, y, cornerX, cornerY){
+   cell.set({
+     position: { x: x, y: y },
+     size: { width: cornerX - x, height: cornerY - y }
+   });
+ }
+
+  wrapText(text, width, fontSize){
+    var text = text.replace(/(\n\s*\n)|\n/g, "$1 ");  //remove line seperators
+    var newText = joint.util.breakText(text, {width: (width-common.paddingObject*2)}, {'font-size': fontSize}); //break the text
+    return newText;
+  }
+
+  updateDimensions(cell, textBox){
+    var gapFromOriginalY = textBox.height + common.paddingObject * 2 - cell.get('originalSize').height;
+    var gapFromOriginalX = textBox.width + common.paddingObject * 2 - cell.get('originalSize').width;
+    if ((gapFromOriginalY > -1) || (gapFromOriginalX > -1)) {
+      var newY = cell.get('originalPosition').y - gapFromOriginalY / 2;
+      var newCornerY = newY + Math.max(cell.get('originalSize').height, (textBox.height + (common.paddingObject * 2)));
+      var newX = cell.get('originalPosition').x - gapFromOriginalX / 2;
+      var newCornerX = newX + Math.max(cell.get('originalSize').width, (textBox.width + (common.paddingObject * 2)));
+      if(((newCornerY-newY)/(newCornerX-newX))>(9/16)){
+        var widthNew = (newCornerY-newY)*16/9;
+        newCornerX = newX + widthNew;
+      }
+      else if(((newCornerY-newY)/(newCornerX-newX))<(9/16)) {
+        var heightNew = (newCornerX-newX)*9/16;
+        newCornerY = newY + heightNew;
+      }
+      this.updateCell(cell, newX, newY, newCornerX, newCornerY);
+      var newText = this.wrapText(cell.attributes.attrs.text.text, cell.get('size').width, cell.attributes.attrs.text['font-size']);
+      cell.set('previousText', newText);
+      //If needed wrapping
+      if(newText != cell.attributes.attrs.text.text){ cell.attr({text: {text: newText}});  }
+    }
+  }
+
+  initializeWrapping(){
+    this.graph.on('change:attrs', _.bind(function (cell, attrs){
+      if (!cell.get('originalSize')) cell.set('originalSize', cell.get('size')); //store original/default size
+      if (!cell.get('originalPosition')) cell.set('originalPosition', cell.get('position')); //store original/default size
+      var view = this.paper.findViewByModel(cell),
+        text = view.$("text"), //get shape element
+        bboxText = text[0].getClientRects()[0]; //text box dimensions
+      var currentText = cell.attributes.attrs.text.text;
+      if(!cell.get('previousText') || (currentText != cell.get('previousText'))){
+        var newText = this.wrapText(currentText, cell.get('size').width, cell.attributes.attrs.text['font-size']);
+        cell.set('previousText', newText);
+        //If needed wrapping
+        if(newText != currentText){ cell.attr({text: {text: newText}});  }
+        else { this.updateDimensions(cell, bboxText); }
+      }
+      else { this.updateDimensions(cell, bboxText); }
+    }, this))
+  }
 
   initializeHaloAndInspector() {
-
     this.paper.on('element:pointerup link:options', function (cellView) {
 
       var cell = cellView.model;
