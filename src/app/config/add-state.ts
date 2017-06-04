@@ -1,6 +1,16 @@
 import {basicDefinitions} from "./basicDefinitions";
 import * as common from "../common/commonFunctions";
 const joint = require('rappid');
+var objectChangedSize = false;
+
+function saveValues(cell, parent){
+  cell.set('originalSize', cell.get('size'));
+  cell.set('originalPosition', cell.get('position'));
+  if (parent){
+    if (!parent.get('originalPosition')) parent.set('originalPosition', parent.get('position'));
+    if (!parent.get('originalSize')) parent.set('originalSize', parent.get('size'));
+  }
+}
 
 export function addState () {
 
@@ -25,18 +35,30 @@ export function addState () {
     });
   }
 
-  options.graph.on('change:position change:size', function(cell) {
-    cell.set('originalSize', cell.get('size'));
-    cell.set('originalPosition', cell.get('position'));
-
+  options.graph.on('change:position', function(cell) {
     var parentId = cell.get('parent');
-    if (parentId){
-      var parent = options.graph.getCell(parentId);
-      if (!parent.get('originalPosition')) parent.set('originalPosition', parent.get('position'));
-      if (!parent.get('originalSize')) parent.set('originalSize', parent.get('size'));
+    var parent = options.graph.getCell(parentId);
+    saveValues(cell, parent);
+    if (parentId){        //State case
       common.CommonFunctions.updateObjectSize(parent);
     }
-    else if (cell.get('embeds') && cell.get('embeds').length){
+    else if (cell.get('embeds') && cell.get('embeds').length){  //Object case
+      if(objectChangedSize) {
+        common.CommonFunctions.updateObjectSize(cell);
+        objectChangedSize = false;
+      }
+    }
+  });
+
+  options.graph.on('change:size', function(cell) {
+    var parentId = cell.get('parent');
+    var parent = options.graph.getCell(parentId);
+    saveValues(cell, parent);
+    if (parentId){        //State case
+      common.CommonFunctions.updateObjectSize(parent);
+    }
+    else if (cell.get('embeds') && cell.get('embeds').length){  //Object case
+      objectChangedSize = true;
       common.CommonFunctions.updateObjectSize(cell);
     }
   });
