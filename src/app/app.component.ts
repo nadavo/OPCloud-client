@@ -7,7 +7,7 @@ import { AuthService } from './services/auth.service';
     <div id="app" class="joint-theme-modern joint-app">
       <opcloud-header></opcloud-header>
       <opcloud-rappid></opcloud-rappid>
-      <opcloud-opl-widget></opcloud-opl-widget>
+
     </div>
     <opcloud-auth></opcloud-auth>
   `,
@@ -19,3 +19,4 @@ export class AppComponent {
 
   }
 }
+//<opcloud-opl-widget></opcloud-opl-widget>

@@ -21,6 +21,8 @@ export class RappidPaperComponent implements AfterViewInit{
     this.paperContainer.element.nativeElement.appendChild(this.paperScroller.el);
   }
 
+
+
   initPaperScroller() {
     /*this.paperScroller = new joint.ui.PaperScroller({
       paper: this.paper,

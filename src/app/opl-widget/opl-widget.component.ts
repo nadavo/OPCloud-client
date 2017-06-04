@@ -1,12 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { GraphService } from '../rappid-components/services/graph.service';
-import {linkTypeSelection} from '../link-operating/linkTypeSelection';
+import { linkTypeSelection } from '../link-operating/linkTypeSelection';
+
+
 
 @Component({
   selector: 'opcloud-opl-widget',
   template: `
     <div class="opl-container">
-      <p *ngFor="let sentence of getOpl()">{{ sentence }}</p>
+      <p *ngFor="let sentence of getOpl()" [innerHTML]="sentence">
+      
+      </p>
     </div>
   `,
   styleUrls: ['./opl-widget.component.css']
@@ -14,10 +18,12 @@ import {linkTypeSelection} from '../link-operating/linkTypeSelection';
 export class OplWidgetComponent implements OnInit {
   private graph;
   private sentence;
-  private thingName;
+  private objectName;
+  private processName;
 
   constructor(private graphService: GraphService) {
     this.graph = graphService.getGraph();
+
   }
 
   ngOnInit() {
@@ -28,20 +34,35 @@ export class OplWidgetComponent implements OnInit {
       switch (cell.attributes.type) {
         // TODO: add cases
         case 'opm.Link':
+          if(!cell.attributes.name) return;
+
           const source = cell.getSourceElement();
           const target = cell.getTargetElement();
+
           if (!source || !target) return;
-          this.sentence = linkTypeSelection.generateOPL(source, target, cell.attributes.name);
+
+          this.sentence=linkTypeSelection.generateOPL(source, target, cell.attributes.name);
+
           return this.sentence;
+
+
         case 'opm.Object':
-          this.thingName = cell.attributes.attrs.text.text;
-          return `${this.thingName} is an object`;
+          this.objectName=cell.attributes.attrs.text.text;
+
+          return `<b class="object">${this.objectName}</b> <span>is an object</span><b>.</b>`;
+
+
         case 'opm.Process':
-          this.thingName = cell.attributes.attrs.text.text;
-          return `${this.thingName} is a process`;
+          this.processName=cell.attributes.attrs.text.text;
+          return `<b class="process" >${this.processName}</b> is a process<b>.</b>`;
+
+
       }
+
     });
   }
+
+
 
 
 }
