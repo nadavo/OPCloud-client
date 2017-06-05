@@ -6,7 +6,7 @@ import { opmShapes } from '../../config/opm-shapes.config';
 import { opmRuleSet } from '../../config/opm-validator';
 import { MdDialog } from '@angular/material';
 import { ChooseLinkDialogComponent } from '../../dialogs/choose-link-dialog/choose-link-dialog.component';
-import {linkTypeSelection} from '../../link-operating/linkTypeSelection'
+import { linkTypeSelection} from '../../link-operating/linkTypeSelection'
 import { linkDrawing } from './linkDrawing'
 import { addState } from '../../config/add-state';
 import { CommandManagerService } from '../services/command-manager.service';
@@ -15,6 +15,7 @@ import * as common from "../../common/commonFunctions";
 // popup imports
 import {DialogComponent} from "../../dialogs/choose-link-dialog/Dialog.component";
 import {DialogDirective} from "../../dialogs/choose-link-dialog/DialogDirective.directive";
+import {OplDialogComponent} from "../../dialogs/opl-dialog/opl-dialog.component";
 
 const joint = require('rappid');
 
@@ -32,11 +33,14 @@ const _ = require('lodash');
       <opcloud-rappid-inspector [cell]="cell"></opcloud-rappid-inspector>
       <opcloud-rappid-navigator [paperScroller]="paperScroller"></opcloud-rappid-navigator>
     </div>
+
+    <opcloud-rappid-opl [graph]="graph" [paper]="paper"></opcloud-rappid-opl>
   `,
   styleUrls: ['./rappid-main.component.css'],
   //add DialogComponent
   entryComponents: [DialogComponent]
 })
+
 export class RappidMainComponent implements OnInit {
   graph = null;
   paper;
@@ -51,6 +55,7 @@ export class RappidMainComponent implements OnInit {
   private navigator;
   private toolbar;
   private RuleSet;
+
 
   @ViewChild('rappidContainer', { read: ViewContainerRef }) rappidContainer;
 
@@ -75,35 +80,174 @@ export class RappidMainComponent implements OnInit {
     this.initializeTooltips();
     this.handleAddLink();
     this.initializeWrapping();
+ //   this.linkHoverEvent();
   }
 
-//Check Changes
+
+  //Function getElementEssence(cell) receives a cell from graph and gets its essence ('Physica' or 'Informatical').
+  getElementEssence(cell){
+    if(cell.attributes.type==='opm.Object') var essence=cell.attributes.attrs.rect.filter.args;
+    if(cell.attributes.type==='opm.Process') var essence=cell.attributes.attrs.ellipse.filter.args;
+    if(essence.dx>0) return 'physical';
+    if(essence.dx==0) return 'informatical';
+  }
+
+  //Function getElementAffiliation(cell) receives a cell and gets its affliation ('Environmental' or 'Informatical').
+  getElementAffiliation(cell){
+
+    if(cell.attributes.type==='opm.Object'){
+      if(cell.attributes.attrs.rect["stroke-dasharray"]== '10,5') return 'environmental';
+      else return 'systemic';
+    }
+    if(cell.attributes.type==='opm.Process'){
+      if(cell.attributes.attrs.ellipse["stroke-dasharray"]== '10,5') return 'environmental';
+      else return 'systemic';
+    }
+
+  }
+
+  //update OPL for a link when link is added or changed
+  updateLinkOPL(cell){
+    var src=cell.getSourceElement();
+    var tgt=cell.getTargetElement();
+    cell.attributes.opl=linkTypeSelection.generateOPL(src,tgt,cell.attributes.name);
+  }
+  //update OPL for an Object when object is added or changed
+  updateObjectOPL(cell){
+    var essence=this.getElementEssence(cell);
+    var affiliation=this.getElementAffiliation(cell);
+    var objectName=cell.attributes.attrs.text.text;
+
+    cell.attributes.opl=`<b class="object">${objectName}</b> is <i>${affiliation}</i> and <i>${essence}</i><b>.</b>`;
+
+  }
+  //update OPL for a Process when process is added or changed
+  updateProcessOPL(cell){
+    var essence=this.getElementEssence(cell);
+    var affiliation=this.getElementAffiliation(cell);
+    var processName=cell.attributes.attrs.text.text;
+
+    cell.attributes.opl=`<b class="process">${processName}</b> is <i>${affiliation}</i> and <i>${essence}</i><b>.</b>`;
+
+  }
+
+  /*
+   * popup Links Dialog
+   * Input (DialogComponent , link)
+   * set linkSource/Target data from link object
+   * Return Dialog Component View
+   *
+   * */
+  createDialog(dialogComponent: { new(): DialogComponent},link): ComponentRef<DialogComponent> {
+
+    this.viewContainer.clear();
+
+    let dialogComponentFactory =
+      this.componentFactoryResolver.resolveComponentFactory(dialogComponent);
+
+
+    let dialogComponentRef = this.viewContainer.createComponent(dialogComponentFactory);
+    dialogComponentRef.instance.newLink = link;
+    dialogComponentRef.instance.linkSource=link.getSourceElement() ;
+    dialogComponentRef.instance.linkTarget=link.getTargetElement();
+    dialogComponentRef.instance.opmLinks=linkTypeSelection.generateLinkWithOpl(link);
+
+    dialogComponentRef.instance.close.subscribe(result => {
+      dialogComponentRef.destroy();
+      link.attributes.opl=result.opl;
+    });
+
+
+    return dialogComponentRef;
+  }
+
+  //Opl popup when user hovers on a link
+  createOplDialog(OplDialogComponent: { new(): OplDialogComponent},linkView): ComponentRef<OplDialogComponent> {
+
+    this.viewContainer.clear();
+
+    let OplDialogComponentFactory =
+      this.componentFactoryResolver.resolveComponentFactory(OplDialogComponent);
+
+    let OplDialogComponentRef = this.viewContainer.createComponent(OplDialogComponentFactory);
+    OplDialogComponentRef.instance.link = linkView.model;
+    return OplDialogComponentRef;
+  }
+/*
+  linkHoverEvent(){
+    var oplDialog;
+    this.paper.on('cell:mouseover', (cellView,evt)=>{
+      this.createOplDialog(OplDialogComponent, cellView);
+      console.log("mouse on link");
+      cellView.highlight();
+    });
+    this.paper.on('link:mouseleave', (cellView,evt)=>{
+      oplDialog.close();
+      console.log("mouse leave link");
+    });
+  }
+*/
+//Check Changes. This function has been modified to update opl for each cell once graph is changed
   handleAddLink() {
     this.graph.on('add', (cell) => {
+
       if (cell.attributes.type === 'opm.Link') {
+        cell.attributes.name='';
         cell.on('change:target change:source', (link) => {
           if (link.attributes.source.id && link.attributes.target.id) {
+
             var relevantLinks = linkTypeSelection.generateLinkWithOpl(link);
             if (relevantLinks.length > 0){
-             /* let dialogRef = this._dialog.open(ChooseLinkDialogComponent, {viewContainerRef: this.rappidContainer});
-              dialogRef.componentInstance.newLink = link;
-              dialogRef.componentInstance.linkSource = link.getSourceElement();
-              dialogRef.componentInstance.linkTarget = link.getTargetElement();
-              dialogRef.componentInstance.opmLinks = relevantLinks;
-              dialogRef.afterClosed().subscribe(result => {
-                if (!!result) {
-                  console.log('chosen link: ', result);
-                  linkDrawing.drawLink(link, result.name);
-                }
-              });*/
-            // Create Dialog Component
+
               this.createDialog(DialogComponent,link);
             }
           }
         });
       }
+
+      if (cell.attributes.type === 'opm.Object') {
+        this.updateObjectOPL(cell);
+      }
+
+      if (cell.attributes.type === 'opm.Process') {
+        this.updateProcessOPL(cell);
+      }
+
+      if (cell.attributes.type === 'opm.StateNorm'){
+
+      }
+    });
+
+    this.graph.on('change', (cell) => {
+      console.log(cell);
+
+      if (cell.attributes.type === 'opm.Object') {
+        this.updateObjectOPL(cell);
+      }
+
+      if (cell.attributes.type === 'opm.Process') {
+        this.updateProcessOPL(cell)
+      }
+
+      if (cell.attributes.type != 'opm.Link'){
+        var pt;
+        var outboundLinks=this.graph.getConnectedLinks(cell,{ outbound: true });
+        for ( pt in outboundLinks){
+          this.updateLinkOPL(outboundLinks[pt]);
+        }
+        var inboundLinks=this.graph.getConnectedLinks(cell,{ inbound: true});
+        for (pt in inboundLinks){
+          this.updateLinkOPL(inboundLinks[pt]);
+        }
+      }
+
+      if (cell.attributes.type === 'opm.Link' && cell.attributes.opl!=null){
+        this.updateLinkOPL(cell);
+      }
     });
   }
+
+
 
   initializePaper() {
 
@@ -122,8 +266,9 @@ export class RappidMainComponent implements OnInit {
       gridSize: 10,
       drawGrid: true,
       model: this.graph,
-      defaultLink: new opmShapes.Link
+      defaultLink: new opmShapes.Link,
     });
+
 
     paper.on('blank:mousewheel', _.partial(this.onMousewheel, null), this);
     paper.on('cell:mousewheel', this.onMousewheel, this);
@@ -137,6 +282,8 @@ export class RappidMainComponent implements OnInit {
 
     /// $('.paper-container').append(paperScroller.el);
     paperScroller.render().center();
+
+
   }
 
   initializeKeyboardShortcuts() {
@@ -322,6 +469,7 @@ export class RappidMainComponent implements OnInit {
       if (!this.selection.collection.contains(cell)) {
 
         if (cell.isElement()) {
+
           new joint.ui.FreeTransform({
             cellView: cellView,
             allowRotation: false,
@@ -472,31 +620,7 @@ export class RappidMainComponent implements OnInit {
     this.paperScroller.centerContent();
   }
 
-/*
-* popup Links Dialog
-* Input (DialogComponent , link)
-* set linkSource/Target data from link object
-* Return Dialog Component View
-*
-* */
-  createDialog(dialogComponent: { new(): DialogComponent},link): ComponentRef<DialogComponent> {
-
-    this.viewContainer.clear();
-
-    let dialogComponentFactory =
-      this.componentFactoryResolver.resolveComponentFactory(dialogComponent);
 
 
-    let dialogComponentRef = this.viewContainer.createComponent(dialogComponentFactory);
-    dialogComponentRef.instance.newLink = link;
-    dialogComponentRef.instance.linkSource=link.getSourceElement() ;
-    dialogComponentRef.instance.linkTarget=link.getTargetElement();
-    dialogComponentRef.instance.opmLinks=linkTypeSelection.generateLinkWithOpl(link);
-
-    dialogComponentRef.instance.close.subscribe(() => {
-      dialogComponentRef.destroy();
-    });
-    return dialogComponentRef;
-  }
 
 }

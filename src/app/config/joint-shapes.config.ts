@@ -23,7 +23,7 @@ jointShapes.CircularModel = joint.shapes.devs.Model.extend({
               'font-size': 11,
               fill: '#61549C',
               'font-weight': 800
-            }
+            },
           },
           position: {
             name: 'ellipse',

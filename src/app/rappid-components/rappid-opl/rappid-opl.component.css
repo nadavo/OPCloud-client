@@ -1,0 +1,26 @@
+.opl-container {
+  border: 2px gray solid;
+  height: 20%;
+  padding: 20px;
+  overflow: auto;
+}
+
+p {
+  margin: 5px 0;
+}
+
+
+:host >>> .object { color: #006400; }
+:host >>> .process { color: #00008B; }
+
+.highlighted {
+  fill: #FF0000;
+  stroke-width: 3px;
+  stroke: #FF0000;
+}
+
+.highlighted ellipse{
+  fill: #FF0000;
+  stroke-width: 3px;
+  stroke: #FF0000;
+}
