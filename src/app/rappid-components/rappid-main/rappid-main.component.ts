@@ -432,6 +432,7 @@ export class RappidMainComponent implements OnInit {
 
   initializeWrapping(){
     this.graph.on('change:attrs', _.bind(function (cell, attrs){
+      console.log(cell.attributes.attrs);
       if (cell.previousAttributes().attrs.text && attrs.text) {
         if (cell.previousAttributes().attrs.text.text != attrs.text.text) { //test if label changed
           if (!cell.get('originalSize')) cell.set('originalSize', cell.get('size')); //store original/default size
