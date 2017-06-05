@@ -432,21 +432,24 @@ export class RappidMainComponent implements OnInit {
 
   initializeWrapping(){
     this.graph.on('change:attrs', _.bind(function (cell, attrs){
-      if (!cell.get('originalSize')) cell.set('originalSize', cell.get('size')); //store original/default size
-      if (!cell.get('originalPosition')) cell.set('originalPosition', cell.get('position')); //store original/default size
-      var view = this.paper.findViewByModel(cell),
-        text = view.$("text"), //get shape element
-        bboxText = text[0].getClientRects()[0]; //text box dimensions
-      var currentText = cell.attributes.attrs.text.text;
-      console.log('currentText: ', currentText);
-      if(!cell.get('previousText') || (currentText != cell.get('previousText'))){
-        var newText = this.wrapText(currentText, cell.get('size').width, cell.attributes.attrs.text['font-size']);
-        cell.set('previousText', newText);
-        //If needed wrapping
-        if(newText != currentText){ cell.attr({text: {text: newText}});  }
-        else { this.updateDimensions(cell, bboxText); }
+      if (cell.previousAttributes().attrs.text && attrs.text) {
+        if (cell.previousAttributes().attrs.text.text != attrs.text.text) { //test if label changed
+          if (!cell.get('originalSize')) cell.set('originalSize', cell.get('size')); //store original/default size
+          if (!cell.get('originalPosition')) cell.set('originalPosition', cell.get('position')); //store original/default size
+          var view = this.paper.findViewByModel(cell),
+            text = view.$("text"), //get shape element
+            bboxText = text[0].getClientRects()[0]; //text box dimensions
+          var currentText = cell.attributes.attrs.text.text;
+          if (!cell.get('previousText') || (currentText != cell.get('previousText'))) {
+            var newText = this.wrapText(currentText, cell.get('size').width, cell.attributes.attrs.text['font-size']);
+            cell.set('previousText', newText);
+            //If needed wrapping
+            if (newText != currentText) { cell.attr({text: {text: newText}});}
+            else {this.updateDimensions(cell, bboxText);}
+          }
+          else {this.updateDimensions(cell, bboxText);}
+        }
       }
-      else { this.updateDimensions(cell, bboxText); }
     }, this))
 
     this.graph.on('change:size', _.bind(function (cell, attrs){

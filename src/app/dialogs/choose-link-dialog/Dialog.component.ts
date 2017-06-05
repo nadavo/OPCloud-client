@@ -19,12 +19,23 @@ export class DialogComponent {
     this.close.emit('event');
     this.selected = link;
     this.newLink.attributes.name = this.selected.name;
-    console.log('chaneged: ', this.selected);
+    console.log('link: ', link);
+    console.log('linkSource: ', this.linkSource.attributes.attrs.text.text);
+    console.log('linkTarget: ', this.linkTarget.attributes.attrs.text.text);
+    createCode(link.name, this.linkSource.attributes.attrs.text.text, this.linkTarget.attributes.attrs.text.text);
   }
   select(link) {
     this.selected = link;
 
   }
   constructor(){
+  }
+}
+
+function createCode(linkType, source, target){
+  if(linkType  == 'Aggregation-Participation'){
+    console.log('class ' + source + '{');
+    console.log('    ' + target + ': number;');
+    console.log('}');
   }
 }
