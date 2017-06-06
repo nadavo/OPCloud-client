@@ -14,6 +14,7 @@ export const basicDefinitions = {
   createShape(shapeName){
     return {
       fill: '#DCDCDC',
+      magnet : true,
       stroke: (shapeName == 'rect') ? '#006400' : ((shapeName == 'ellipse') ? '#00008B' : '#808000'),
       'stroke-width': 2,
       filter: (shapeName == 'state') ? null : {name: 'dropShadow', args: {dx: 3, dy: 3, blur: 0, color: 'grey'}},

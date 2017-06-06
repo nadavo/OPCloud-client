@@ -7,7 +7,7 @@ import { opmRuleSet } from '../../config/opm-validator';
 import { MdDialog } from '@angular/material';
 import { ChooseLinkDialogComponent } from '../../dialogs/choose-link-dialog/choose-link-dialog.component';
 import { linkTypeSelection} from '../../link-operating/linkTypeSelection'
-import { linkDrawing } from './linkDrawing'
+import { linkDrawing } from '../../link-operating/linkDrawing'
 import { addState } from '../../config/add-state';
 import { CommandManagerService } from '../services/command-manager.service';
 import { textWrapping } from "./textWrapping";
@@ -195,11 +195,11 @@ export class RappidMainComponent implements OnInit {
         cell.attributes.name='';
         cell.on('change:target change:source', (link) => {
           if (link.attributes.source.id && link.attributes.target.id) {
-
-            var relevantLinks = linkTypeSelection.generateLinkWithOpl(link);
-            if (relevantLinks.length > 0){
-
-              this.createDialog(DialogComponent,link);
+            if(link.attributes.source.id != link.attributes.target.id){
+              var relevantLinks = linkTypeSelection.generateLinkWithOpl(link);
+              if (relevantLinks.length > 0) {
+                this.createDialog(DialogComponent, link);
+              }
             }
           }
         });
@@ -219,7 +219,6 @@ export class RappidMainComponent implements OnInit {
     });
 
     this.graph.on('change', (cell) => {
-      console.log(cell);
 
       if (cell.attributes.type === 'opm.Object') {
         this.updateObjectOPL(cell);
@@ -396,7 +395,7 @@ export class RappidMainComponent implements OnInit {
   initializeAttributesEvents(){
     this.graph.on('change:attrs', _.bind(function (cell, attrs){
       //console.log(cell.attributes.attrs);
-      if (cell.previousAttributes().attrs.text && attrs.text) {
+      if (cell.isElement() && cell.previousAttributes().attrs.text && attrs.text) {
         if (cell.previousAttributes().attrs.text.text != attrs.text.text) { //test if label changed
           textWrapping.startWrapping(this.paper, cell);
         }
@@ -429,6 +428,8 @@ export class RappidMainComponent implements OnInit {
             preserveAspectRatio: !!cell.get('preserveAspectRatio'),
             allowOrthogonalResize: cell.get('allowOrthogonalResize') !== false
           }).render();
+
+          console.log('pointer on element');
 
           const halo = new joint.ui.Halo({
             cellView: cellView,

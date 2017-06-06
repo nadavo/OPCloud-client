@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, ViewChild} from '@angular/core';
-
+import { linkDrawing } from '../../link-operating/linkDrawing'
 
 @Component({
   selector: 'dlg',
@@ -19,9 +19,8 @@ export class DialogComponent {
     this.close.emit('event');
     this.selected = link;
     this.newLink.attributes.name = this.selected.name;
-    console.log('link: ', link);
-    console.log('linkSource: ', this.linkSource.attributes.attrs.text.text);
-    console.log('linkTarget: ', this.linkTarget.attributes.attrs.text.text);
+    console.log('newLink: ', this.newLink);
+    linkDrawing.drawLink(this.newLink, this.selected.name)
     createCode(link.name, this.linkSource.attributes.attrs.text.text, this.linkTarget.attributes.attrs.text.text);
   }
   select(link) {
