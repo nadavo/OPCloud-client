@@ -14,7 +14,8 @@
       <div  style="padding-right:40px ;cursor: pointer;" md-list-avatar class='icon {{link.name}}' (click)="onClickedExit(link)">
       </div>
 
-      <div style="cursor: pointer;"  (click)="onClickedExit(link)"><label style="font-size: medium;cursor: pointer;margin-right: 0;" > {{link.opl}}
+      <div style="cursor: pointer;"  (click)="onClickedExit(link)" [innerHtml]="link.opl">
+        <label style="font-size: medium;cursor: pointer;margin-right: 0;" > {{link.opl}}
 
       </label><label style="color:red;font-size: small;font-style: oblique"> {{link.name}}</label></div>
 

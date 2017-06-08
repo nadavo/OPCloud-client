@@ -1,24 +1,17 @@
-import {
-  Component,
-  OnInit,
-  ViewChild,
-  ViewContainerRef,
-  ComponentFactoryResolver,
-  ComponentRef,
-  Input
-} from '@angular/core';
-import {GraphService} from '../services/graph.service';
-import {haloConfig} from '../../config/halo.config';
-import {toolbarConfig} from '../../config/toolbar.config';
-import {opmShapes} from '../../config/opm-shapes.config';
-import {opmRuleSet} from '../../config/opm-validator';
-import {MdDialog} from '@angular/material';
-import {ChooseLinkDialogComponent} from '../../dialogs/choose-link-dialog/choose-link-dialog.component';
-import {linkTypeSelection} from '../../link-operating/linkTypeSelection'
-import {linkDrawing} from './linkDrawing'
-import {addState} from '../../config/add-state';
+import { Component, OnInit, ViewChild, ViewContainerRef,ComponentFactoryResolver,ComponentRef,Input } from '@angular/core';
+import { GraphService } from '../services/graph.service';
+import { haloConfig } from '../../config/halo.config';
+import { toolbarConfig } from '../../config/toolbar.config';
+import { opmShapes } from '../../config/opm-shapes.config';
+import { opmRuleSet } from '../../config/opm-validator';
+import { MdDialog } from '@angular/material';
+import { ChooseLinkDialogComponent } from '../../dialogs/choose-link-dialog/choose-link-dialog.component';
+import { linkTypeSelection} from '../../link-operating/linkTypeSelection'
+import { linkDrawing } from './linkDrawing'
+import { addState } from '../../config/add-state';
+import { CommandManagerService } from '../services/command-manager.service';
+import { textWrapping } from "./textWrapping";
 import {arrangeStates} from '../../config/arrangeStates';
-import {CommandManagerService} from '../services/command-manager.service';
 // popup imports
 import {DialogComponent} from "../../dialogs/choose-link-dialog/Dialog.component";
 import {DialogDirective} from "../../dialogs/choose-link-dialog/DialogDirective.directive";
@@ -81,6 +74,7 @@ export class RappidMainComponent implements OnInit {
     this.initializeKeyboardShortcuts();
     this.initializeTooltips();
     this.handleAddLink();
+    this.initializeAttributesEvents();
   }
 
 //Check Changes
@@ -254,6 +248,26 @@ export class RappidMainComponent implements OnInit {
     }, this);
   }
 
+  initializeAttributesEvents(){
+    this.graph.on('change:attrs', _.bind(function (cell, attrs){
+      //console.log(cell.attributes.attrs);
+      if (cell.previousAttributes().attrs.text && attrs.text) {
+        if (cell.previousAttributes().attrs.text.text != attrs.text.text) { //test if label changed
+          textWrapping.startWrapping(this.paper, cell);
+        }
+      }
+    }, this))
+
+    this.graph.on('change:size', _.bind(function (cell, attrs){
+      if (cell.attributes.attrs.text) {
+        textWrapping.wrapText(cell);
+      }
+    }, this))
+
+    this.graph.on('change:position', _.bind(function (cell, attrs){
+      cell.set('originalPosition', cell.get('position'));
+    }, this))
+  }
 
   initializeHaloAndInspector() {
 

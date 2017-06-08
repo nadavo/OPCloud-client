@@ -59,15 +59,12 @@ export class GraphService {
     this.JSON_string = JSON.stringify(this.JSON);
     // TODO: should add OPL sync to the DB
     // this.modelToSync = { graph: this.JSON_string };
-    // console.log(this.modelObject.name)
     if (this.modelObject.name !== null) {
        // update DB
-      console.log(this.modelObject.name)
       console.log('go to FB');
       this.modelStorage.save(this.modelObject);
     }
     else {
-      // console.log('saving in local storage')
       localStorage.setItem(this.modelObject.name, this.modelToSync);
     }
   }
