@@ -14,7 +14,7 @@ export const haloConfig = {
         }
       }
     },
-    {
+/*    {
       name: 'fork',
       position: 'ne',
       events: { pointerdown: 'startForking', pointermove: 'doFork', pointerup: 'stopForking' },
@@ -26,10 +26,10 @@ export const haloConfig = {
           'data-tooltip-padding': 15
         }
       }
-    },
+    },*/
     {
       name: 'unlink',
-      position: 'w',
+      position: 'ne',
       events: { pointerdown: 'unlinkElement' },
       attrs: {
         '.handle': {
@@ -42,7 +42,7 @@ export const haloConfig = {
     },
     {
       name: 'link',
-      position: 'e',
+      position: 'se',
       events: { pointerdown: 'startLinking', pointermove: 'doLink', pointerup: 'stopLinking' },
       attrs: {
         '.handle': {

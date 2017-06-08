@@ -1,16 +1,24 @@
-import { Component, OnInit, ViewChild, ViewContainerRef,ComponentFactoryResolver,ComponentRef,Input } from '@angular/core';
-import { GraphService } from '../services/graph.service';
-import { haloConfig } from '../../config/halo.config';
-import { toolbarConfig } from '../../config/toolbar.config';
-import { opmShapes } from '../../config/opm-shapes.config';
-import { opmRuleSet } from '../../config/opm-validator';
-import { MdDialog } from '@angular/material';
-import { ChooseLinkDialogComponent } from '../../dialogs/choose-link-dialog/choose-link-dialog.component';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  ViewContainerRef,
+  ComponentFactoryResolver,
+  ComponentRef,
+  Input
+} from '@angular/core';
+import {GraphService} from '../services/graph.service';
+import {haloConfig} from '../../config/halo.config';
+import {toolbarConfig} from '../../config/toolbar.config';
+import {opmShapes} from '../../config/opm-shapes.config';
+import {opmRuleSet} from '../../config/opm-validator';
+import {MdDialog} from '@angular/material';
+import {ChooseLinkDialogComponent} from '../../dialogs/choose-link-dialog/choose-link-dialog.component';
 import {linkTypeSelection} from '../../link-operating/linkTypeSelection'
-import { linkDrawing } from './linkDrawing'
-import { addState } from '../../config/add-state';
-import { arrangeStates } from '../../config/arrangeStates';
-import { CommandManagerService } from '../services/command-manager.service';
+import {linkDrawing} from './linkDrawing'
+import {addState} from '../../config/add-state';
+import {arrangeStates} from '../../config/arrangeStates';
+import {CommandManagerService} from '../services/command-manager.service';
 // popup imports
 import {DialogComponent} from "../../dialogs/choose-link-dialog/Dialog.component";
 import {DialogDirective} from "../../dialogs/choose-link-dialog/DialogDirective.directive";
@@ -51,11 +59,11 @@ export class RappidMainComponent implements OnInit {
   private toolbar;
   private RuleSet;
 
-  @ViewChild('rappidContainer', { read: ViewContainerRef }) rappidContainer;
+  @ViewChild('rappidContainer', {read: ViewContainerRef}) rappidContainer;
 
-  constructor(private graphService:GraphService,
+  constructor(private graphService: GraphService,
               commandManagerService: CommandManagerService,
-              private _dialog: MdDialog,private viewContainer: ViewContainerRef,
+              private _dialog: MdDialog, private viewContainer: ViewContainerRef,
               private componentFactoryResolver: ComponentFactoryResolver) {
     this.graph = graphService.getGraph();
     this.commandManager = commandManagerService.commandManager;
@@ -82,20 +90,20 @@ export class RappidMainComponent implements OnInit {
         cell.on('change:target change:source', (link) => {
           if (link.attributes.source.id && link.attributes.target.id) {
             var relevantLinks = linkTypeSelection.generateLinkWithOpl(link);
-            if (relevantLinks.length > 0){
-             /* let dialogRef = this._dialog.open(ChooseLinkDialogComponent, {viewContainerRef: this.rappidContainer});
-              dialogRef.componentInstance.newLink = link;
-              dialogRef.componentInstance.linkSource = link.getSourceElement();
-              dialogRef.componentInstance.linkTarget = link.getTargetElement();
-              dialogRef.componentInstance.opmLinks = relevantLinks;
-              dialogRef.afterClosed().subscribe(result => {
-                if (!!result) {
-                  console.log('chosen link: ', result);
-                  linkDrawing.drawLink(link, result.name);
-                }
-              });*/
-            // Create Dialog Component
-              this.createDialog(DialogComponent,link);
+            if (relevantLinks.length > 0) {
+              /* let dialogRef = this._dialog.open(ChooseLinkDialogComponent, {viewContainerRef: this.rappidContainer});
+               dialogRef.componentInstance.newLink = link;
+               dialogRef.componentInstance.linkSource = link.getSourceElement();
+               dialogRef.componentInstance.linkTarget = link.getTargetElement();
+               dialogRef.componentInstance.opmLinks = relevantLinks;
+               dialogRef.afterClosed().subscribe(result => {
+               if (!!result) {
+               console.log('chosen link: ', result);
+               linkDrawing.drawLink(link, result.name);
+               }
+               });*/
+              // Create Dialog Component
+              this.createDialog(DialogComponent, link);
             }
           }
         });
@@ -111,7 +119,7 @@ export class RappidMainComponent implements OnInit {
       }
     });
 
-    this.commandManager = new joint.dia.CommandManager({ graph: this.graph });
+    this.commandManager = new joint.dia.CommandManager({graph: this.graph});
 
     var paper = this.paper = new joint.dia.Paper({
       linkConnectionPoint: joint.util.shapePerimeterConnectionPoint,
@@ -138,9 +146,6 @@ export class RappidMainComponent implements OnInit {
   }
 
 
-
-
-
   initializeKeyboardShortcuts() {
 
     this.keyboard = new joint.ui.Keyboard();
@@ -154,7 +159,7 @@ export class RappidMainComponent implements OnInit {
       'ctrl+v': function () {
 
         var pastedCells = this.clipboard.pasteCells(this.graph, {
-          translate: { dx: 20, dy: 20 },
+          translate: {dx: 20, dy: 20},
           useLocalStorage: true
         });
 
@@ -192,12 +197,12 @@ export class RappidMainComponent implements OnInit {
 
       'ctrl+plus': function (evt) {
         evt.preventDefault();
-        this.paperScroller.zoom(0.2, { max: 5, grid: 0.2 });
+        this.paperScroller.zoom(0.2, {max: 5, grid: 0.2});
       },
 
       'ctrl+minus': function (evt) {
         evt.preventDefault();
-        this.paperScroller.zoom(-0.2, { min: 0.2, grid: 0.2 });
+        this.paperScroller.zoom(-0.2, {min: 0.2, grid: 0.2});
       },
 
       'keydown:shift': function (evt) {
@@ -215,7 +220,7 @@ export class RappidMainComponent implements OnInit {
   initializeSelection() {
 
     this.clipboard = new joint.ui.Clipboard();
-    this.selection = new joint.ui.Selection({ paper: this.paper });
+    this.selection = new joint.ui.Selection({paper: this.paper});
 
     // Initiate selecting when the user grabs the blank area of the paper while the Shift key is pressed.
     // Otherwise, initiate paper pan.
@@ -274,31 +279,76 @@ export class RappidMainComponent implements OnInit {
 
           if (cell.attributes.type === 'opm.Object') {
             halo.addHandle({
-              name: 'add_state', position: 's', icon: null, attrs: {
+              name: 'add_state', position: 'sw', icon: null, attrs: {
                 '.handle': {
                   'data-tooltip-class-name': 'small',
                   'data-tooltip': 'Click to add state to the object',
-                  'data-tooltip-position': 'left',
-                  'data-tooltip-padding': 15
-                }
-              }
-            });
-            halo.on('action:add_state:pointerup', addState);
-            halo.addHandle({
-              name: 'arrange', position: 'sw', icon: null, attrs: {
-                '.handle': {
-                  'data-tooltip-class-name': 'small',
-                  'data-tooltip': 'Click to arrange the states inside the object',
                   'data-tooltip-position': 'right',
                   'data-tooltip-padding': 15
                 }
               }
             });
-            halo.on('action:arrange:pointerup', arrangeStates);
+            halo.on('action:add_state:pointerup', addState);
+            let side = 'top';
+            halo.addHandle({
+              name: 'arrange_up', position: 'n', icon: null, attrs: {
+                '.handle': {
+                  'data-tooltip-class-name': 'small',
+                  'data-tooltip': 'Arrange the states at the top inside the object',
+                  'data-tooltip-position': 'bottom',
+                  'data-tooltip-padding': 15
+                }
+              }
+            });
+            halo.on('action:arrange_up:pointerup', function () {
+              side = 'top';
+              arrangeStates.call(this, side);
+            });
+            halo.addHandle({
+              name: 'arrange_down', position: 's', icon: null, attrs: {
+                '.handle': {
+                  'data-tooltip-class-name': 'small',
+                  'data-tooltip': 'Arrange the states at the bottom inside the object',
+                  'data-tooltip-position': 'top',
+                  'data-tooltip-padding': 15
+                }
+              }
+            });
+            halo.on('action:arrange_down:pointerup', function () {
+              side = 'bottom';
+              arrangeStates.call(this, side);
+            });
+            halo.addHandle({
+              name: 'arrange_right', position: 'w', icon: null, attrs: {
+                '.handle': {
+                  'data-tooltip-class-name': 'small',
+                  'data-tooltip': 'Arrange the states to the right inside the object',
+                  'data-tooltip-position': 'right',
+                  'data-tooltip-padding': 15
+                }
+              }
+            });
+            halo.on('action:arrange_right:pointerup', function () {
+              side = 'right';
+              arrangeStates.call(this, side);
+            });
+            halo.addHandle({
+              name: 'arrange_left', position: 'e', icon: null, attrs: {
+                '.handle': {
+                  'data-tooltip-class-name': 'small',
+                  'data-tooltip': 'Arrange the states to the left inside the object',
+                  'data-tooltip-position': 'left',
+                  'data-tooltip-padding': 15
+                }
+              }
+            });
+            halo.on('action:arrange_left:pointerup', function () {
+              side = 'left';
+              arrangeStates.call(this, side);
+            });
           }
-
           this.selection.collection.reset([]);
-          this.selection.collection.add(cell, { silent: true });
+          this.selection.collection.add(cell, {silent: true});
         }
 
         this.cell = cell;
@@ -385,7 +435,7 @@ export class RappidMainComponent implements OnInit {
         title: '(Right-click, and use "Save As" to save the diagram in SVG format)',
         image: 'data:image/svg+xml,' + encodeURIComponent(svg)
       }).open();
-    }, { preserveDimensions: true, convertImagesToDataUris: true });
+    }, {preserveDimensions: true, convertImagesToDataUris: true});
   }
 
 
@@ -396,14 +446,14 @@ export class RappidMainComponent implements OnInit {
         title: '(Right-click, and use "Save As" to save the diagram in PNG format)',
         image: dataURL
       }).open();
-    }, { padding: 10 });
+    }, {padding: 10});
   }
 
 
   onMousewheel(cellView, evt, x, y, delta) {
 
     if (this.keyboard.isActive('alt', evt)) {
-      this.paperScroller.zoom(delta / 10, { min: 0.2, max: 5, ox: x, oy: y });
+      this.paperScroller.zoom(delta / 10, {min: 0.2, max: 5, ox: x, oy: y});
     }
   }
 
@@ -420,14 +470,14 @@ export class RappidMainComponent implements OnInit {
     this.paperScroller.centerContent();
   }
 
-/*
-* popup Links Dialog
-* Input (DialogComponent , link)
-* set linkSource/Target data from link object
-* Return Dialog Component View
-*
-* */
-  createDialog(dialogComponent: { new(): DialogComponent},link): ComponentRef<DialogComponent> {
+  /*
+   * popup Links Dialog
+   * Input (DialogComponent , link)
+   * set linkSource/Target data from link object
+   * Return Dialog Component View
+   *
+   * */
+  createDialog(dialogComponent: {new(): DialogComponent}, link): ComponentRef<DialogComponent> {
 
     this.viewContainer.clear();
 
@@ -437,9 +487,9 @@ export class RappidMainComponent implements OnInit {
 
     let dialogComponentRef = this.viewContainer.createComponent(dialogComponentFactory);
     dialogComponentRef.instance.newLink = link;
-    dialogComponentRef.instance.linkSource=link.getSourceElement() ;
-    dialogComponentRef.instance.linkTarget=link.getTargetElement();
-    dialogComponentRef.instance.opmLinks=linkTypeSelection.generateLinkWithOpl(link);
+    dialogComponentRef.instance.linkSource = link.getSourceElement();
+    dialogComponentRef.instance.linkTarget = link.getTargetElement();
+    dialogComponentRef.instance.opmLinks = linkTypeSelection.generateLinkWithOpl(link);
 
     dialogComponentRef.instance.close.subscribe(() => {
       dialogComponentRef.destroy();
