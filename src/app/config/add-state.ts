@@ -1,6 +1,7 @@
 import {basicDefinitions} from "./basicDefinitions";
 import * as common from "../common/commonFunctions";
 import {gridLayout} from "./gridLayout"
+import {arrangeStates} from '../config/arrangeStates';
 const joint = require('rappid');
 let objectChangedSize = false;
 
@@ -30,15 +31,6 @@ export function addState() {
       }
     });
   }
-  if (fatherObject.get('embeds').length > 1) {
-    gridLayout.layout(embeddedStates, {
-      columns: fatherObject.get('embeds').length,
-      columnWidth: defaultState.getBBox().width * 1.2,
-      rowHeight: defaultState.height,
-      marginY: (fatherObject.getBBox().y + fatherObject.getBBox().height) - common.paddingObject * 3.5,
-      marginX: (fatherObject.getBBox().x + fatherObject.getBBox().width * 0.5) - 0.5 * basicDefinitions.stateWidth * fatherObject.get('embeds').length
-    });
-  }
   //https://resources.jointjs.com/docs/jointjs/v1.1/joint.html#dia.Element.events
   options.graph.on('change:position', function (cell) {
     let parentId = cell.get('parent');
@@ -66,4 +58,7 @@ export function addState() {
       common.CommonFunctions.updateObjectSize(cell);
     }
   });
+  if (fatherObject.get('embeds').length) {
+    arrangeStates.call(this, 'bottom');
+  }
 }

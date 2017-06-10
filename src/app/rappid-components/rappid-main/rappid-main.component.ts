@@ -1,16 +1,24 @@
-import { Component, OnInit, ViewChild, ViewContainerRef,ComponentFactoryResolver,ComponentRef,Input } from '@angular/core';
-import { GraphService } from '../services/graph.service';
-import { haloConfig } from '../../config/halo.config';
-import { toolbarConfig } from '../../config/toolbar.config';
-import { opmShapes } from '../../config/opm-shapes.config';
-import { opmRuleSet } from '../../config/opm-validator';
-import { MdDialog } from '@angular/material';
-import { ChooseLinkDialogComponent } from '../../dialogs/choose-link-dialog/choose-link-dialog.component';
-import { linkTypeSelection} from '../../link-operating/linkTypeSelection'
-import { linkDrawing } from './linkDrawing'
-import { addState } from '../../config/add-state';
-import { CommandManagerService } from '../services/command-manager.service';
-import { textWrapping } from "./textWrapping";
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  ViewContainerRef,
+  ComponentFactoryResolver,
+  ComponentRef,
+  Input
+} from '@angular/core';
+import {GraphService} from '../services/graph.service';
+import {haloConfig} from '../../config/halo.config';
+import {toolbarConfig} from '../../config/toolbar.config';
+import {opmShapes} from '../../config/opm-shapes.config';
+import {opmRuleSet} from '../../config/opm-validator';
+import {MdDialog} from '@angular/material';
+import {ChooseLinkDialogComponent} from '../../dialogs/choose-link-dialog/choose-link-dialog.component';
+import {linkTypeSelection} from '../../link-operating/linkTypeSelection'
+import {linkDrawing} from './linkDrawing'
+import {addState} from '../../config/add-state';
+import {CommandManagerService} from '../services/command-manager.service';
+import {textWrapping} from "./textWrapping";
 import {arrangeStates} from '../../config/arrangeStates';
 // popup imports
 import {DialogComponent} from "../../dialogs/choose-link-dialog/Dialog.component";
@@ -248,8 +256,8 @@ export class RappidMainComponent implements OnInit {
     }, this);
   }
 
-  initializeAttributesEvents(){
-    this.graph.on('change:attrs', _.bind(function (cell, attrs){
+  initializeAttributesEvents() {
+    this.graph.on('change:attrs', _.bind(function (cell, attrs) {
       //console.log(cell.attributes.attrs);
       if (cell.previousAttributes().attrs.text && attrs.text) {
         if (cell.previousAttributes().attrs.text.text != attrs.text.text) { //test if label changed
@@ -258,13 +266,13 @@ export class RappidMainComponent implements OnInit {
       }
     }, this))
 
-    this.graph.on('change:size', _.bind(function (cell, attrs){
+    this.graph.on('change:size', _.bind(function (cell, attrs) {
       if (cell.attributes.attrs.text) {
         textWrapping.wrapText(cell);
       }
     }, this))
 
-    this.graph.on('change:position', _.bind(function (cell, attrs){
+    this.graph.on('change:position', _.bind(function (cell, attrs) {
       cell.set('originalPosition', cell.get('position'));
     }, this))
   }
@@ -272,11 +280,9 @@ export class RappidMainComponent implements OnInit {
   initializeHaloAndInspector() {
 
     this.paper.on('element:pointerup link:options', function (cellView) {
-
       var cell = cellView.model;
 
       if (!this.selection.collection.contains(cell)) {
-
         if (cell.isElement()) {
           new joint.ui.FreeTransform({
             cellView: cellView,
@@ -292,6 +298,7 @@ export class RappidMainComponent implements OnInit {
           }).render();
 
           if (cell.attributes.type === 'opm.Object') {
+            let hasStates = cell.getEmbeddedCells().length;
             halo.addHandle({
               name: 'add_state', position: 'sw', icon: null, attrs: {
                 '.handle': {
@@ -302,7 +309,14 @@ export class RappidMainComponent implements OnInit {
                 }
               }
             });
-            halo.on('action:add_state:pointerup', addState);
+            halo.on('action:add_state:pointerup', function () {
+              hasStates = true;
+              halo.$handles.children('.arrange_up').toggleClass('hidden', !hasStates);
+              halo.$handles.children('.arrange_down').toggleClass('hidden', !hasStates);
+              halo.$handles.children('.arrange_left').toggleClass('hidden', !hasStates);
+              halo.$handles.children('.arrange_right').toggleClass('hidden', !hasStates);
+              addState.call(this);
+            });
             let side = 'top';
             halo.addHandle({
               name: 'arrange_up', position: 'n', icon: null, attrs: {
@@ -360,11 +374,14 @@ export class RappidMainComponent implements OnInit {
               side = 'left';
               arrangeStates.call(this, side);
             });
+            halo.$handles.children('.arrange_up').toggleClass('hidden', !hasStates);
+            halo.$handles.children('.arrange_down').toggleClass('hidden', !hasStates);
+            halo.$handles.children('.arrange_left').toggleClass('hidden', !hasStates);
+            halo.$handles.children('.arrange_right').toggleClass('hidden', !hasStates);
           }
           this.selection.collection.reset([]);
           this.selection.collection.add(cell, {silent: true});
         }
-
         this.cell = cell;
       }
     }, this);
@@ -510,5 +527,4 @@ export class RappidMainComponent implements OnInit {
     });
     return dialogComponentRef;
   }
-
 }
