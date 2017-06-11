@@ -10,7 +10,8 @@ import { linkTypeSelection} from '../../link-operating/linkTypeSelection'
 import { linkDrawing } from '../../link-operating/linkDrawing'
 import { addState } from '../../config/add-state';
 import { CommandManagerService } from '../services/command-manager.service';
-import { textWrapping } from "./textWrapping";
+import { textWrapping } from './textWrapping';
+import { valueHandle } from './valueHandle';
 
 // popup imports
 import {DialogComponent} from "../../dialogs/choose-link-dialog/Dialog.component";
@@ -190,7 +191,6 @@ export class RappidMainComponent implements OnInit {
 //Check Changes. This function has been modified to update opl for each cell once graph is changed
   handleAddLink() {
     this.graph.on('add', (cell) => {
-
       if (cell.attributes.type === 'opm.Link') {
         cell.attributes.name='';
         cell.on('change:target change:source', (link) => {
@@ -394,23 +394,27 @@ export class RappidMainComponent implements OnInit {
 
   initializeAttributesEvents(){
     this.graph.on('change:attrs', _.bind(function (cell, attrs){
-      //console.log(cell.attributes.attrs);
+      //If text was changed - wrap it
       if (cell.isElement() && cell.previousAttributes().attrs.text && attrs.text) {
         if (cell.previousAttributes().attrs.text.text != attrs.text.text) { //test if label changed
+          console.log('if - warpping');
           textWrapping.startWrapping(this.paper, cell);
         }
+      }
+      //If value of an object was changed - add/modify a state according to it
+      if (cell.isElement() && attrs.value){
+        console.log('if - value');
+        valueHandle.updateCell(this.graph, cell);
       }
     }, this))
 
     this.graph.on('change:size', _.bind(function (cell, attrs){
+      console.log('change size');
       if (cell.attributes.attrs.text) {
-        textWrapping.wrapText(cell);
+        textWrapping.wrapTextAfterSizeChange(cell);
       }
     }, this))
 
-    this.graph.on('change:position', _.bind(function (cell, attrs){
-      cell.set('originalPosition', cell.get('position'));
-    }, this))
   }
 
   initializeHaloAndInspector() {
@@ -428,8 +432,6 @@ export class RappidMainComponent implements OnInit {
             preserveAspectRatio: !!cell.get('preserveAspectRatio'),
             allowOrthogonalResize: cell.get('allowOrthogonalResize') !== false
           }).render();
-
-          console.log('pointer on element');
 
           const halo = new joint.ui.Halo({
             cellView: cellView,

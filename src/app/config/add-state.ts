@@ -12,14 +12,10 @@ function saveValues(cell, parent){
   }
 }
 
-export function addState () {
-
-  var options = this.options;
-  //this.startBatch();
-  var fatherObject = options.cellView.model;
+export function addNewState(fatherObject, graph){
   var defaultState = new joint.shapes.opm.StateNorm(basicDefinitions.defineState());
   fatherObject.embed(defaultState);     //makes the state stay in the bounds of the object
-  options.graph.addCells([fatherObject, defaultState]);
+  graph.addCells([fatherObject, defaultState]);
 
   //Placing the new state. By default it is outside the object.
   var xNewState = fatherObject.getBBox().center().x - basicDefinitions.stateWidth/2;
@@ -35,9 +31,9 @@ export function addState () {
     });
   }
 
-  options.graph.on('change:position', function(cell) {
+  graph.on('change:position', function(cell) {
     var parentId = cell.get('parent');
-    var parent = options.graph.getCell(parentId);
+    var parent = graph.getCell(parentId);
     saveValues(cell, parent);
     if (parentId){        //State case
       common.CommonFunctions.updateObjectSize(parent);
@@ -50,9 +46,9 @@ export function addState () {
     }
   });
 
-  options.graph.on('change:size', function(cell) {
+  graph.on('change:size', function(cell) {
     var parentId = cell.get('parent');
-    var parent = options.graph.getCell(parentId);
+    var parent = graph.getCell(parentId);
     saveValues(cell, parent);
     if (parentId){        //State case
       common.CommonFunctions.updateObjectSize(parent);
@@ -62,4 +58,11 @@ export function addState () {
       common.CommonFunctions.updateObjectSize(cell);
     }
   });
+}
+
+export function addState () {
+  var options = this.options;
+  //this.startBatch();
+  var fatherObject = options.cellView.model;
+  addNewState(fatherObject, options.graph);
 }

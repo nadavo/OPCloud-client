@@ -51,7 +51,7 @@ export const basicDefinitions = {
         attrs: {
           [shapeName]: this.createShape(shapeName),
           'text': this.createText(shapeName),
-          'value' : {'value' : 'None', 'valueType' : 'None', 'units' : 'None'}
+          'value' : {'value' : 'None', 'valueType' : 'None', 'units' : ''}
         }
       }, joint.shapes.basic.Generic.prototype.defaults)
     };
