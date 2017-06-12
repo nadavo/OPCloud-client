@@ -193,7 +193,15 @@ export class RappidMainComponent implements OnInit {
     this.graph.on('add', (cell) => {
       if (cell.attributes.type === 'opm.Link') {
         cell.attributes.name='';
-        cell.on('change:target change:source', (link) => {
+        this.paper.on('cell:pointerup ', function (cellView) {
+          var cell = cellView.model;
+          if(cell.attributes.type == 'opm.Link'){
+            if(!cell.attributes.target.id) {
+              cell.remove();
+            }
+          }
+         });
+          cell.on('change:target change:source', (link) => {
           if (link.attributes.source.id && link.attributes.target.id) {
             if(link.attributes.source.id != link.attributes.target.id){
               var relevantLinks = linkTypeSelection.generateLinkWithOpl(link);
