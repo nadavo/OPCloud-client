@@ -44,6 +44,7 @@ export const textWrapping = {
   },
 
   wrapTextAfterSizeChange(cell){
+    cell.attributes.attrs.manuallyResized = true;
     var textString = cell.attributes.attrs.text.text;
     textString = textString.replace(/(\n\s*\n)|\n/g, "$1 ");  //remove line seperators
     textString = textString.replace(/ +(?= )/g,''); //replace multiple white spaces with a single one

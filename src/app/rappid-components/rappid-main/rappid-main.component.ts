@@ -7,7 +7,6 @@ import { opmRuleSet } from '../../config/opm-validator';
 import { MdDialog } from '@angular/material';
 import { ChooseLinkDialogComponent } from '../../dialogs/choose-link-dialog/choose-link-dialog.component';
 import { linkTypeSelection} from '../../link-operating/linkTypeSelection'
-import { linkDrawing } from '../../link-operating/linkDrawing'
 import { addState } from '../../config/add-state';
 import { CommandManagerService } from '../services/command-manager.service';
 import { textWrapping } from './textWrapping';
@@ -406,7 +405,7 @@ export class RappidMainComponent implements OnInit {
       if (cell.isElement() && cell.previousAttributes().attrs.text && attrs.text) {
         if (cell.previousAttributes().attrs.text.text != attrs.text.text) { //test if label changed
           console.log('if - warpping');
-          textWrapping.startWrapping(this.paper, cell);
+          //textWrapping.startWrapping(this.paper, cell);
         }
       }
       //If value of an object was changed - add/modify a state according to it
@@ -418,7 +417,7 @@ export class RappidMainComponent implements OnInit {
 
     this.graph.on('change:size', _.bind(function (cell, attrs){
       console.log('change size');
-      if (cell.attributes.attrs.text) {
+      if (cell.attributes.attrs.text && !cell.attributes.attrs.wrappingResized) { //resized manually
         textWrapping.wrapTextAfterSizeChange(cell);
       }
     }, this))
