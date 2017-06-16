@@ -14,10 +14,8 @@ function saveValues(cell, parent) {
   }
 }
 
-export function addState() {
-  let options = this.options;
-  let fatherObject = options.cellView.model;
-  let defaultState = new joint.shapes.opm.StateNorm(basicDefinitions.defineState());
+export function addNewState(fatherObject, graph){
+  var defaultState = new joint.shapes.opm.StateNorm(basicDefinitions.defineState());
   fatherObject.embed(defaultState);     //makes the state stay in the bounds of the object
   options.graph.addCells([fatherObject, defaultState]);
   let embeddedStates = fatherObject.getEmbeddedCells();
@@ -61,4 +59,11 @@ export function addState() {
   if (fatherObject.get('embeds').length) {
     arrangeStates.call(this, 'bottom');
   }
+}
+
+export function addState () {
+  var options = this.options;
+  //this.startBatch();
+  var fatherObject = options.cellView.model;
+  addNewState(fatherObject, options.graph);
 }

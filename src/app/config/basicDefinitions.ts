@@ -1,4 +1,3 @@
-
 const _ = require('lodash');
 const joint = require('rappid');
 const g = joint.g;
@@ -8,13 +7,18 @@ export const basicDefinitions = {
   stateWidth: 50,
   stateHeight: 25,
 
+  textWrap(s, textWidth){
+    return joint.util.breakText(s, {width: textWidth});
+  },
+
   createShape(shapeName){
     return {
       fill: '#DCDCDC',
+      magnet : true,
       stroke: (shapeName == 'rect') ? '#006400' : ((shapeName == 'ellipse') ? '#00008B' : '#808000'),
       'stroke-width': 2,
       filter: (shapeName == 'state') ? null : {name: 'dropShadow', args: {dx: 3, dy: 3, blur: 0, color: 'grey'}},
-      width: 100,
+      width: 90,
       height: 50,
       rx: (shapeName == 'ellipse') ? 40 : (shapeName == 'state') ? 20 : null,
       ry: (shapeName == 'ellipse') ? 40 : (shapeName == 'state') ? 20 : null,
@@ -24,8 +28,9 @@ export const basicDefinitions = {
   },
 
   createText(shapeName){
+    var textOnShape = (shapeName == 'rect') ? 'Object' : (shapeName == 'ellipse') ? 'Process' : 'state';
     return {
-      text: (shapeName == 'rect') ? 'Object' : (shapeName == 'ellipse') ? 'Process' : 'state',
+      text: this.textWrap(textOnShape, 112),
       fill: 'black',
       'font-size': 14,
       'ref-x': .5,
@@ -42,10 +47,13 @@ export const basicDefinitions = {
       markup: `<g class="rotatable"><g class="scalable"><${shapeName}/></g><text/></g>`,
       defaults: _.defaultsDeep({
         type: (shapeName == 'rect') ? 'opm.Object' : 'opm.Process',
-        size: {width: 100, height: 50},
+        size: {width: 90, height: 50},
         attrs: {
           [shapeName]: this.createShape(shapeName),
-          'text': this.createText(shapeName)
+          'text': this.createText(shapeName),
+          'value' : {'value' : 'None', 'valueType' : 'None', 'units' : ''},
+          'wrappingResized' : false,
+          'manuallyResized' : false
         }
       }, joint.shapes.basic.Generic.prototype.defaults)
     };

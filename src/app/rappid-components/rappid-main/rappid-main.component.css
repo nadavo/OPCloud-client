@@ -4,3 +4,7 @@
   height: -webkit-calc(80% - 60px);
   height: calc(80% - 60px);
 }
+
+:host >>> .object { color: green; }
+:host >>> .process { color: blue; }
+

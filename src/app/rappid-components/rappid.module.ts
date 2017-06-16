@@ -9,6 +9,7 @@ import { GraphService } from './services/graph.service';
 import { RappidInspectorComponent } from './rappid-inspector/rappid-inspector.component';
 import { RappidNavigatorComponent } from './rappid-navigator/rappid-navigator.component';
 import { CommandManagerService } from './services/command-manager.service';
+import { RappidOplComponent } from './rappid-opl/rappid-opl.component';
 
 @NgModule({
   imports: [
@@ -21,7 +22,8 @@ import { CommandManagerService } from './services/command-manager.service';
     RappidStencilComponent,
     RappidPaperComponent,
     RappidInspectorComponent,
-    RappidNavigatorComponent
+    RappidNavigatorComponent,
+    RappidOplComponent,
   ],
   providers: [
     GraphService,

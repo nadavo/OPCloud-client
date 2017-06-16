@@ -35,5 +35,19 @@ export const selectOptions = {
     {value: 30, content: 'Close to source'},
     {value: 0.5, content: 'In the middle'},
     {value: -30, content: 'Close to target'},
+  ],
+
+  predefinedFunctions: [
+    {content: 'None', value: 'None'},
+    {content: 'Add', value: 'Add'},
+    {content: 'Subtract', value: 'Subtract'},
+    {content: 'Multiply', value: 'Multiply'},
+    {content: 'Divide', value: 'Divide'}
+  ],
+
+  valueTypes: [
+    {content: 'None', value: 'None'},
+    {content: 'Number', value: 'Number'},
+    {content: 'String', value: 'String'}
   ]
 };

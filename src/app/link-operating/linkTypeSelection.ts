@@ -8,9 +8,29 @@ export const linkTypeSelection = {
     var desName;
     var srcStateObject;
     var desStateObject;
+    var srcType;
+    var desType;
+
+    srcType=source.attributes.type;
+    desType=target.attributes.type;
 
     srcName=source.attributes.attrs.text.text;
     desName=target.attributes.attrs.text.text;
+
+    switch (srcType){
+      case 'opm.Object':
+        srcName=`<b class="object">${srcName}</b>`;
+      case 'opm.Process':
+        srcName=`<b class="process">${srcName}</b>`;
+    }
+
+    switch (desType){
+      case 'opm.Object':
+        desName=`<b class="object">${desName}</b>`;
+      case 'opm.Process':
+        desName=`<b class="process">${desName}</b>`;
+    }
+
 
     /*if(source.attributes.type == "State"){
      srcStateObject=
@@ -20,10 +40,10 @@ export const linkTypeSelection = {
      desStateObject=
      }*/
 
-    if(linkName=="Unidirectional Relation"){
+    if(linkName=="Unidirectional_Relation"){
       return `${srcName} relates to ${desName}.`;
     }
-    else if(linkName=="Bidirectional Relation"){
+    else if(linkName=="Bidirectional_Relation"){
       return `${srcName} and ${desName} are equivalent.`;
     }
     else if(linkName=="Aggregation-Participation"){
@@ -53,7 +73,7 @@ export const linkTypeSelection = {
     else if(linkName=="Instrument"){
       return `${desName} requires ${srcName}.`;
     }
-    else if(linkName=="In-out Link Pair"){
+    else if(linkName=="In-out_Link_Pair"){
       return ``;//<P> changes <O> from <s1> to <s2>
     }
     else if(linkName=="Agent"){
@@ -62,44 +82,44 @@ export const linkTypeSelection = {
     else if(linkName=="Invocation"){
       return `${srcName} invokes ${desName}.`;
     }
-    else if(linkName=="Overtime exception <maxtime, unit>"){
+    else if(linkName=="Overtime_exception_<maxtime, unit>"){
       return `${desName} occurs if ${srcName} lasts more than <maxtime> <units>.`;
       //<maxtime> and <unit> can be typed after the popup menu,
       //bur need these parameters to generate OPL in the opl widget
     }
-    else if(linkName=="Undertime exception <minitime, unit>"){
+    else if(linkName=="Undertime_exception <minitime, unit>"){
       return `${this.desName} occurs if ${this.srcName} falls short of <mintime> <units>.`;
       //<mintime> and <unit> can be typed after the popup menu,
       //bur need these parameters to generate OPL in the opl widget
     }
-    else if(linkName=="Condition Consumption"){
+    else if(linkName=="Condition_Consumption"){
       return `${desName} occurs if ${srcName} exists, in which case ${desName} consumes ${srcName}, otherwise ${desName} is skipped.`;
     }
-    else if(linkName=="Condition Effect"){
+    else if(linkName=="Condition_Effect"){
       return `${desName} occurs if ${srcName} exists, in which case ${desName} affects ${srcName}, otherwise ${desName} is skipped.`;
     }
-    else if(linkName=="Condition Input"){
+    else if(linkName=="Condition_Input"){
       return `${desName} occurs if ${srcStateObject} is at state ${srcName}.`;
     }
-    else if(linkName=="Condition Instrument"){
+    else if(linkName=="Condition_Instrument"){
       return `${desName} occurs if ${srcName} exists, otherwise ${desName} is skipped.`;
     }
-    else if(linkName=="Condition Agent"){
+    else if(linkName=="Condition_Agent"){
       return `${desName} occurs if ${srcName} exists, otherwise ${desName} is skipped.`;
     }
-    else if(linkName=="Event Consumption"){
+    else if(linkName=="Event_Consumption"){
       return `${srcName} initiates ${desName}, which consumes ${srcName}.`;
     }
-    else if(linkName=="Event Effect"){
+    else if(linkName=="Event_Effect"){
       return `${srcName} initiates ${desName}, which affects ${srcName}.`;
     }
-    else if(linkName=="Event Input"){
+    else if(linkName=="Event_Input"){
       return ``;
     }
-    else if(linkName=="Event Instrument"){
+    else if(linkName=="Event_Instrument"){
       return `${srcName} initiates ${desName}, which requires ${srcName}.`;
     }
-    else if(linkName=="Event Agent"){
+    else if(linkName=="Event_Agent"){
       return `${srcName} initiates and handles ${desName}.`;
     }
 
@@ -109,7 +129,6 @@ export const linkTypeSelection = {
   availableOPL(linkObject, availableLinks){
     var source = linkObject.getSourceElement();
     var target = linkObject.getTargetElement();
-    var link;
     var linksNamesWithOpl: Array<any> = [];
 
     for(var i=0; i<availableLinks.length; i++){
@@ -150,8 +169,7 @@ export const linkTypeSelection = {
   },
 
   generateLinkWithOpl(link){
-    var linkNames: Array<any> = [];
-    linkNames = this.findSuitableLinks(link);
+    var linkNames = this.findSuitableLinks(link);
     return this.availableOPL(link, linkNames);
   }
 

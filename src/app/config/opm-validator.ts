@@ -15,6 +15,9 @@ export function opmRuleSet(validator, graph) {
         if ((link.getSourceElement().attributes.type == 'opm.StateNorm') && (link.getTargetElement().attributes.type == 'opm.StateNorm')) {
           return next('A link cannot connect between two states!');
         }
+        if(link.getSourceElement().id == link.getTargetElement().id){
+          return next('An element cannot be connected to itself!');
+        }
       }
       return next();
     },

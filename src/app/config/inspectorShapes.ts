@@ -28,9 +28,21 @@ export const inspectorShapes = {
    font-size: The size of the text shown on the element. Picked from a range bar. Appears in styling group.Ordered fifth.
    */
   textDefinition: {
-    text: CommonFunctions.createTextContentObject('Text', 3),
+    text: CommonFunctions.createTextContentObject('Text', 'text', 3),
     fill: CommonFunctions.createColorsObject('Text fill', 4),
     'font-size': CommonFunctions.createRangeObject(10, 80, 'Font size', 5)
+  },
+
+  falseDefinition: {  },
+
+  valueDefinition: {
+    'valueType' : CommonFunctions.createSelection('select-box', selectOptions.valueTypes, 'Type', 'computation', 9),
+    'value': CommonFunctions.createTextContentObject('Value', 'computation', 10),
+    'units' : CommonFunctions.createTextContentObject('Units', 'computation', 11),
+  },
+
+  functionDefinition: {
+    'value': CommonFunctions.createSelection('select-box', selectOptions.predefinedFunctions, 'Function', 'computation', 9)
   },
 
   //From this point defined  the groups that all the inspector parameters are grouped by.

@@ -2,6 +2,9 @@ import { opmStyle } from '../config/opmStyle';
 export const _ = require('lodash');
 export const paddingObject = 10;
 export const joint = require('rappid');
+export const width = require('text-width');
+export const height = require('text-height');
+export const wrapText = require("wrap-text");
 
 export const CommonFunctions = {
 
@@ -74,24 +77,25 @@ export const CommonFunctions = {
     };
   },
 
-//Function CreateTextContentObject gets text label and index and generates a text box object.
-  createTextContentObject(textLabel, textIndex){
+//Function CreateTextContentObject gets text label, text group and index and generates a text box object.
+  createTextContentObject(textLabel, textGroup, textIndex){
     return {
       type: 'content-editable',
       label: textLabel,
-      group: 'text',
+      group: textGroup,
       index: textIndex,
     };
   },
 
   //Function CreateInspectorPart gets shapeName and needed definitions and generates suitable fields in the inspector.
   //Fits for object, process and state (doesn't fit for link)
-  CreateInspectorShapesPart(shapeName, shapeDefinition, textDefinition, groupsDefinition) {
+  CreateInspectorShapesPart(shapeName, shapeDefinition, textDefinition, valueDefinition, groupsDefinition) {
     var inspectorPart = {
       inputs: {
         attrs: {
           [shapeName]: shapeDefinition,
-          text: textDefinition
+          text: textDefinition,
+          value: valueDefinition,
         }
       },
       groups: groupsDefinition

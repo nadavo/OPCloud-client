@@ -9,46 +9,120 @@ export const textWrapping = {
     });
   },
 
-  updateDimensions(cell, textBox){
-    var gapFromOriginalY = textBox.height + common.paddingObject * 2 - cell.get('originalSize').height;
-    var gapFromOriginalX = textBox.width + common.paddingObject * 2 - cell.get('originalSize').width;
-    if ((gapFromOriginalY > -1) || (gapFromOriginalX > -1)) {
-      var newY = cell.get('originalPosition').y - gapFromOriginalY / 2;
-      var newCornerY = newY + Math.max(cell.get('originalSize').height, (textBox.height + (common.paddingObject * 2)));
-      var newX = cell.get('originalPosition').x - gapFromOriginalX / 2;
-      var newCornerX = newX + Math.max(cell.get('originalSize').width, (textBox.width + (common.paddingObject * 2)));
-      /* if(((newCornerY-newY)/(newCornerX-newX))>(5/9)){
-       var widthNew = (newCornerY-newY)*9/5;
-       newCornerX = newX + widthNew;
-       }
-       else if(((newCornerY-newY)/(newCornerX-newX))<(5/9)) {
-       var heightNew = (newCornerX-newX)*5/9;
-       newCornerY = newY + heightNew;
-       }*/
-      this.updateCell(cell, newX, newY, newCornerX, newCornerY);
-      this.wrapText(cell);
-    }
+  getTextWidth(text, fontSize, fontWeight, fontFamily){
+    return common.width(text, {
+      family: fontFamily,
+      size: fontSize,
+      weight: fontWeight
+    });
   },
 
-  wrapText(cell){
-    var currentText = cell.attributes.attrs.text.text;
-    currentText = currentText.replace(/(\n\s*\n)|\n/g, "$1 ");  //remove line seperators
-    var cellWidth = cell.get('size').width - common.paddingObject*2;
-    var newText = common.joint.util.breakText(currentText, {width: cellWidth}, {'font-size': cell.attributes.attrs.text['font-size']}); //break the text
-    cell.set('previousText', newText);
-    //If needed wrapping
-    if (newText && (newText != currentText)) { cell.attr({text: {text: newText}});}
+  getTextHeight(text, fontSize, fontWeight, fontFamily){
+    return common.height(text, {
+      family: fontFamily,
+      size: fontSize,
+      weight: fontWeight
+    }).height;
+  },
+
+  getParagraphWidth(text, cell){
+    var size;
+    var textArray = text.split('\n');
+    var maxLineWidth = 0;
+    for(var i=0; i<textArray.length; i++) {
+      var textWidth = this.getTextWidth(textArray[i], cell.attributes.attrs.text['font-size'], cell.attributes.attrs.text['font-weight'], cell.attributes.attrs.text['font-family']);
+      if(textWidth > maxLineWidth)
+        maxLineWidth = textWidth;
+    }
+    return maxLineWidth;
+  },
+
+  getParagraphHeight(text,cell){
+    var textArray = text.split('\n');
+    var textHeight = this.getTextHeight(textArray[0], cell.attributes.attrs.text['font-size'], cell.attributes.attrs.text['font-weight'], cell.attributes.attrs.text['font-family']);
+    return textArray.length * textHeight;
+  },
+
+  wrapTextAfterSizeChange(cell){
+    cell.attributes.attrs.manuallyResized = true;
+    var textString = cell.attributes.attrs.text.text;
+    textString = textString.replace(/(\n\s*\n)|\n/g, "$1 ");  //remove line seperators
+    textString = textString.replace(/ +(?= )/g,''); //replace multiple white spaces with a single one
+    var cellWidth = cell.get('size').width;
+    textString = common.joint.util.breakText(textString, {width: cellWidth}, {'font-size': cell.attributes.attrs.text['font-size']}); //break the text
+    //units have to be bellow the object's name
+    if(textString.includes('[') && !textString.includes('\n[')){
+      textString = textString.replace('[', '\n[');
+      if(textString.includes('[\n')){
+        textString = textString.replace('[\n', '[');
+      }
+    }
+    if(textString != cell.attributes.attrs.text.text)  cell.attr({text: {text: textString}});
   },
 
   startWrapping(paper, cell){
-      if (!cell.get('originalSize')) cell.set('originalSize', cell.get('size')); //store original/default size
-      if (!cell.get('originalPosition')) cell.set('originalPosition', cell.get('position')); //store original/default size
-      var view = paper.findViewByModel(cell),
-        text = view.$("text"), //get shape element
-        bboxText = text[0].getClientRects()[0]; //text box dimensions
-      if (!cell.get('previousText') || (cell.attributes.attrs.text.text != cell.get('previousText'))) {
-        this.wrapText(cell);
+    if (!cell.get('originalSize')) cell.set('originalSize', cell.get('size')); //store original/default size
+    if (!cell.get('originalPosition')) cell.set('originalPosition', cell.get('position')); //store original/default size
+    var textString = cell.attributes.attrs.text.text;
+    var textWidth = this.getParagraphWidth(textString, cell);
+    var textHeight = this.getParagraphHeight(textString, cell);
+    var cellWidth = cell.get('size').width;
+    var cellHeight = cell.get('size').height;
+    var updateSize = false;   //flag for deciding if the size need to be updated
+    var textForUpdating = textString;
+    var newText = textString.replace(/(\n\s*\n)|\n/g, "$1 ");  //remove line seperators
+    if((textWidth < cellWidth) && (textHeight < cellHeight)) {
+     newText = common.joint.util.breakText(textString, {width: cellWidth/1.1}, {'font-size': cell.attributes.attrs.text['font-size']}); //break the text
+      var newTextWidth = this.getParagraphWidth(newText, cell);
+      var newTextHeight = this.getParagraphHeight(newText, cell);
+      while ((newTextWidth < (cellWidth/1.1)) && (newTextHeight < (cellHeight/1.1)) && (cellHeight/1.1 >= 50) && (cellWidth/1.1 >=90)) {
+        cellWidth = cellWidth/1.1;
+        cellHeight = cellHeight/1.1;
+        updateSize = true;
+        textForUpdating = newText;
+        newText = textString.replace(/(\n\s*\n)|\n/g, "$1 ");
+        newText = common.joint.util.breakText(textString, {width: cellWidth/1.1}, {'font-size': cell.attributes.attrs.text['font-size']}); //break the text
+        newTextWidth = this.getParagraphWidth(newText, cell);
+        newTextHeight = this.getParagraphHeight(newText, cell);
       }
-      else { this.updateDimensions(cell, bboxText); }
+    }
+    else {
+      newText = common.joint.util.breakText(newText, {width: cellWidth}, {'font-size': cell.attributes.attrs.text['font-size']}); //break the text
+      var newTextWidth = this.getParagraphWidth(newText, cell);
+      var newTextHeight = this.getParagraphHeight(newText, cell);
+      textForUpdating = newText;
+
+      while ((newTextWidth > cellWidth) || (newTextHeight > cellHeight)) {
+        cellWidth = 1.1*cellWidth;
+        cellHeight = 1.1*cellHeight;
+        newText = textString.replace(/(\n\s*\n)|\n/g, "$1 ");
+        newText = common.joint.util.breakText(newText, {width: cellWidth}, {'font-size': cell.attributes.attrs.text['font-size']}); //break the text
+        var newTextWidth = this.getParagraphWidth(newText, cell);
+        var newTextHeight = this.getParagraphHeight(newText, cell);
+        if ((newTextWidth <= cellWidth) && (newTextHeight <= cellHeight)) {
+          updateSize = true;
+          textForUpdating = newText;
+        }
       }
+    }
+    //units have to be bellow the object's name
+    if(textForUpdating.includes('[') && !textForUpdating.includes('\n[')){
+      textForUpdating = textForUpdating.replace('[', '\n[');
+      if(textForUpdating.includes('[\n')){
+        textForUpdating = textForUpdating.replace('[\n', '[');
+      }
+      if(this.getParagraphHeight(textForUpdating, cell) > cellHeight)
+        cellHeight = this.getParagraphHeight(textForUpdating, cell);
+    }
+    if(updateSize){
+      var newY = cell.get('position').y - (cellHeight - cell.get('size').height)/2;
+      var newCornerY = newY+cellHeight;
+      var newX = cell.get('position').x - (cellWidth - cell.get('size').width)/2;
+      var newCornerX = newX+cellWidth;
+      this.updateCell(cell, newX, newY, newCornerX, newCornerY);
+    }
+    if (textForUpdating != textString) {
+      cell.attr({text: {text: textForUpdating}});
+    }
+  }
 };
