@@ -18,9 +18,10 @@ import { AuthService } from './services/auth.service';
 import { AuthComponent } from './auth/auth.component';
 import { ModelStorageInterface } from './services/storage/model-storage.interface';
 import { ModelFbStorageService } from './services/storage/model-fb-storage.service';
-// popup Links
+// popup
 import {DialogComponent} from './dialogs/choose-link-dialog/Dialog.component';
-import {DialogDirective} from './dialogs/choose-link-dialog/DialogDirective.directive';
+import {Tab} from "./dialogs/choose-link-dialog/tab";
+import {Tabs} from "./dialogs/choose-link-dialog/tabs";
 // Run {npm install ng2draggable}  add Draggable option for div’s
 import { Draggable } from '../../node_modules/ng2draggable/draggable.directive';
 import { OplDialogComponent } from './dialogs/opl-dialog/opl-dialog.component';
@@ -35,10 +36,10 @@ import { OplDialogComponent } from './dialogs/opl-dialog/opl-dialog.component';
     OplWidgetComponent,
     AuthComponent,
     //popup Links
-    DialogComponent,
-    DialogDirective,
+   DialogComponent,
     Draggable,
-    OplDialogComponent
+    Tabs,
+    Tab
   ],
   imports: [
     BrowserModule,
