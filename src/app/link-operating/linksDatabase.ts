@@ -69,8 +69,9 @@ export class dataBase {
 
       {sourceType: "object1", targetType1: "process2",targetType2: "null", linkName: "Consumption"},
       {sourceType: "object1.state", targetType1: "process2",targetType2: "null", linkName: "Consumption"},
+     // {sourceType: "object1", targetType1: "process2",targetType2: "null", linkName: "Effect"},
 
-      {sourceType: "process1", targetType1: "object2",targetType2: "null", linkName: "Effect"},
+
 
       {sourceType: "object1", targetType1: "process2",targetType2: "null", linkName: "Agent"},
       {sourceType: "object1.state", targetType1: "process2",targetType2: "null", linkName: "Agent"},
@@ -87,21 +88,22 @@ export class dataBase {
       {sourceType: "process1", targetType1: "object2.state",targetType2: "null", linkName: "Split_output"},
 
       {sourceType: "process1", targetType1: "process2",targetType2: "null", linkName: "Invocation"},
-      {sourceType: "process1", targetType1: "process1",targetType2: "null", linkName: "Invocation"},
+     // {sourceType: "process1", targetType1: "process1",targetType2: "null", linkName: "Self_Invocation"},
 
-      {sourceType: "process1", targetType1: "process2",targetType2: "null", linkName: "Overtime_exeption"},
-      {sourceType: "object1.state", targetType1: "process2",targetType2: "null", linkName: "Overtime_exeption"},
-      {sourceType: "object1.state1", targetType1: "object1.state2",targetType2: "null", linkName: "Overtime_exeption"},
-      {sourceType: "object1.state", targetType1: "object1",targetType2: "null", linkName: "Overtime_exeption"},
+      {sourceType: "process1", targetType1: "process2",targetType2: "null", linkName: "Overtime_exception"},
+      {sourceType: "object1.state", targetType1: "process2",targetType2: "null", linkName: "Overtime_exception"},
+      {sourceType: "object1.state1", targetType1: "object1.state2",targetType2: "null", linkName: "Overtime_exception"},
+      {sourceType: "object1.state", targetType1: "object1",targetType2: "null", linkName: "Overtime_exception"},
 
-      {sourceType: "process1", targetType1: "process2",targetType2: "null", linkName: "Undertime_exeption"},
+      {sourceType: "process1", targetType1: "process2",targetType2: "null", linkName: "Undertime_exception"},
 
-      {sourceType: "process1", targetType1: "process2",targetType2: "null", linkName: "Undertime_and_overtime_exeption"},
+//      {sourceType: "process1", targetType1: "process2",targetType2: "null", linkName: "Undertime_and_overtime_exeption"},
 
       {sourceType: "object1", targetType1: "process2",targetType2: "null", linkName: "Condition_Consumption"},
       {sourceType: "object1.state", targetType1: "process2",targetType2: "null", linkName: "Condition_Consumption"},
 
-      {sourceType: "object1", targetType1: "process2",targetType2: "null", linkName: "Condition_Effect"},
+
+
 
       {sourceType: "object1.state1", targetType1: "object1.state2",targetType2: "null", linkName: "Condition_Input"},
       {sourceType: "object1.state", targetType1: "object1",targetType2: "null", linkName: "Condition_Input"},
@@ -115,8 +117,12 @@ export class dataBase {
 
       {sourceType: "object1", targetType1: "process2",targetType2: "null", linkName: "Event_Consumption"},
       {sourceType: "object1.state", targetType1: "process2",targetType2: "null", linkName: "Event_Consumption"},
-
+      {sourceType: "object1", targetType1: "process2",targetType2: "null", linkName: "Effect"},
       {sourceType: "object1", targetType1: "process2",targetType2: "null", linkName: "Event_Effect"},
+      {sourceType: "object1", targetType1: "process2",targetType2: "null", linkName: "Condition_Effect"},
+      {sourceType: "process1", targetType1: "object2",targetType2: "null", linkName: "Effect"},
+      {sourceType: "process1", targetType1: "object2",targetType2: "null", linkName: "Event_Effect"},
+      {sourceType: "process1", targetType1: "object2",targetType2: "null", linkName: "Condition_Effect"},
 
       {sourceType: "object1", targetType1: "process2",targetType2: "null", linkName: "Event_Instrument"},
 
