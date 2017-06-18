@@ -82,15 +82,23 @@ export const linkTypeSelection = {
     else if(linkName=="Invocation"){
       return `${srcName} invokes ${desName}.`;
     }
-    else if(linkName=="Overtime_exception_<maxtime, unit>"){
-      return `${desName} occurs if ${srcName} lasts more than <maxtime> <units>.`;
+    // cant read link name format 
+    //else if(linkName=="Overtime_exception_<maxtime, unit>"){
+     // return `${desName} occurs if ${srcName} lasts more than <maxtime> <units>.`;
       //<maxtime> and <unit> can be typed after the popup menu,
       //bur need these parameters to generate OPL in the opl widget
-    }
-    else if(linkName=="Undertime_exception <minitime, unit>"){
-      return `${this.desName} occurs if ${this.srcName} falls short of <mintime> <units>.`;
+    
+    //}
+    //else if(linkName=="Undertime_exception <minitime, unit>"){
+     // return `${this.desName} occurs if ${this.srcName} falls short of <mintime> <units>.`;
       //<mintime> and <unit> can be typed after the popup menu,
       //bur need these parameters to generate OPL in the opl widget
+   // }
+      else if(linkName=="Overtime_exception"){
+      return `${desName} occurs if ${srcName} lasts more than maxtime units.`; 
+    }
+    else if(linkName=="Undertime_exception"){
+      return `${desName} occurs if ${srcName} falls short of mintime units.`;
     }
     else if(linkName=="Condition_Consumption"){
       return `${desName} occurs if ${srcName} exists, in which case ${desName} consumes ${srcName}, otherwise ${desName} is skipped.`;

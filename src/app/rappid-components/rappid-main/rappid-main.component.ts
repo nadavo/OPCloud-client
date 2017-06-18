@@ -14,7 +14,6 @@ import { valueHandle } from './valueHandle';
 
 // popup imports
 import {DialogComponent} from "../../dialogs/choose-link-dialog/Dialog.component";
-import {DialogDirective} from "../../dialogs/choose-link-dialog/DialogDirective.directive";
 import {OplDialogComponent} from "../../dialogs/opl-dialog/opl-dialog.component";
 
 const joint = require('rappid');
@@ -131,13 +130,13 @@ export class RappidMainComponent implements OnInit {
 
   }
 
-  /*
-   * popup Links Dialog
-   * Input (DialogComponent , link)
-   * set linkSource/Target data from link object
-   * Return Dialog Component View
-   *
-   * */
+ /*
+* popup Links Dialog
+* Input (DialogComponent , link)
+* set linkSource/Target data from link object
+* Return Dialog Component View
+*
+* */
   createDialog(dialogComponent: { new(): DialogComponent},link): ComponentRef<DialogComponent> {
 
     this.viewContainer.clear();
@@ -147,16 +146,61 @@ export class RappidMainComponent implements OnInit {
 
 
     let dialogComponentRef = this.viewContainer.createComponent(dialogComponentFactory);
-    dialogComponentRef.instance.newLink = link;
-    dialogComponentRef.instance.linkSource=link.getSourceElement() ;
+    dialogComponentRef.instance.linkSource=link.getSourceElement();
     dialogComponentRef.instance.linkTarget=link.getTargetElement();
     dialogComponentRef.instance.opmLinks=linkTypeSelection.generateLinkWithOpl(link);
+    for(let link of dialogComponentRef.instance.opmLinks){
+      //Structrial Links
+      if(link.name =="Aggregation-Participation"
+        || link.name =="Generalization-Specialization"
+        || link.name =="Exhibition-Characterization"
+        || link.name =="Classification-Instantiation"
+        || link.name =="Unidirectional_Relation"
+        || link.name =="Bidirectional_Relation") {
 
-    dialogComponentRef.instance.close.subscribe(result => {
+          dialogComponentRef.instance.Structural_Links.push(link);
+        }
+        //Agent Links
+       else if(link.name =="Agent" || link.name =="Event_Agent" || link.name =="Condition_Agent")
+        {
+          dialogComponentRef.instance.Agent_Links.push(link);
+        }
+        //Instrument links
+       else if(link.name == "Instrument" || link.name =="Condition_Instrument" || link.name == "Event_Instrument")
+        {
+          dialogComponentRef.instance.Instrument_Links.push(link);
+        }
+        //Effect links
+       else if( link.name=="Condition_Effect" || link.name =="Event_Effect" || link.name == "Effect")
+        {
+          dialogComponentRef.instance.Effect_links.push(link);
+          dialogComponentRef.instance.Effect_links.reverse()
+        }
+        //Consumption links
+      else if(link.name == "Consumption" || link.name=="Condition_Consumption" || link.name =="Event_Consumption")
+      {
+        dialogComponentRef.instance.Consumption_links.push(link);
+      }
+      //Result
+     else if(link.name == "Result")
+      {
+        dialogComponentRef.instance.Result_Link.push(link);
+      }
+      //Invocation
+     else if(link.name=="Invocation")
+      {
+        dialogComponentRef.instance.Invocation_links.push(link);
+      }
+      //Excetion Links
+     else if(link.name == "Overtime_exception" || link.name=="Undertime_exception")
+      {
+        dialogComponentRef.instance.Exception_links.push(link);
+      }
+    }
+    dialogComponentRef.instance.close.subscribe(() => {
       dialogComponentRef.destroy();
-      link.attributes.opl=result.opl;
+    //  linkDrawing.drawLink(link, name);
     });
-
 
     return dialogComponentRef;
   }
