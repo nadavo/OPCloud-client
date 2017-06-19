@@ -10,7 +10,7 @@ import { ModelLocalStorageService } from './services/storage/model-local-storage
 import { MaterialModule } from '@angular/material';
 import { SaveModelDialogComponent } from './dialogs/save-model-dialog/save-model-dialog.component';
 import { LoadModelDialogComponent } from './dialogs/load-model-dialog/load-model-dialog.component';
-import { ChooseLinkDialogComponent } from './dialogs/choose-link-dialog/choose-link-dialog.component';
+
 import { OplWidgetComponent } from './opl-widget/opl-widget.component';
 import { AngularFireModule } from 'angularfire2';
 import { firebaseConfig, firebaseAuthConfig } from './config/firbase.config';
@@ -32,7 +32,7 @@ import { OplDialogComponent } from './dialogs/opl-dialog/opl-dialog.component';
     HeaderComponent,
     SaveModelDialogComponent,
     LoadModelDialogComponent,
-    ChooseLinkDialogComponent,
+
     OplWidgetComponent,
     AuthComponent,
     //popup Links
@@ -56,7 +56,7 @@ import { OplDialogComponent } from './dialogs/opl-dialog/opl-dialog.component';
   entryComponents: [
     SaveModelDialogComponent,
     LoadModelDialogComponent,
-    ChooseLinkDialogComponent,
+
     //popup Component
     DialogComponent,
   ],

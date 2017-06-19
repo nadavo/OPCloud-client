@@ -1,4 +1,5 @@
-import { dataBase } from './linksDatabase'
+import { dataBase } from './linksDatabase';
+
 
 export const linkTypeSelection = {
 
@@ -11,6 +12,7 @@ export const linkTypeSelection = {
     var srcType;
     var desType;
 
+
     srcType=source.attributes.type;
     desType=target.attributes.type;
 
@@ -22,6 +24,11 @@ export const linkTypeSelection = {
         srcName=`<b class="object">${srcName}</b>`;
       case 'opm.Process':
         srcName=`<b class="process">${srcName}</b>`;
+     // case 'opm.StateNorm':
+     //   var parentName=graph.getCell(source.attributes.parent).attributes.attrs.text.text;
+       // var stateName=source.attributes.attrs.text.text;
+      //  srcName=`<b class="state">${stateName} ${parentName}</b>`;
+
     }
 
     switch (desType){
