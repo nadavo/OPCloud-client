@@ -90,6 +90,7 @@ padding: 4px;
   background: orangered;
 }
 
+
 .dialog header label{
   font-weight: bold;
   white-space: nowrap;
@@ -102,6 +103,10 @@ padding: 4px;
   vertical-align: top;
   max-width:20ch
 }
+
+:host >>> .object { color: #006400; }
+:host >>> .process { color: #00008B; }
+
 
 .dialog header label:hover{
   background:lightcyan;
