@@ -78,6 +78,7 @@ export class RappidMainComponent implements OnInit {
     this.initializeKeyboardShortcuts();
     this.initializeTooltips();
     this.handleAddLink();
+    this.initializeTextEditing();
     this.initializeAttributesEvents();
  //   this.linkHoverEvent();
   }
@@ -443,15 +444,56 @@ export class RappidMainComponent implements OnInit {
     }, this);
   }
 
+  initializeTextEditing () {
+    this.paper.on('cell:pointerdblclick', function (cellView, evt) {
+      joint.ui.TextEditor.edit(evt.target, {
+        cellView: cellView,
+        textProperty: cellView.model.isLink() ? 'labels/0/attrs/text/text' : 'attrs/text/text'
+      });
+    }, this)
+
+    this.graph.on('change:attrs', function (cell) {
+      var view = this.paper.findViewByModel(cell),
+        text = view.$("text"),                     // Get shape element
+        bboxText = text[0].getClientRects()[0];    // Text box dimensions
+      // Units have to be bellow the object's name
+      var textString = cell.attributes.attrs.text.text;
+      if(textString.includes('[') && !textString.includes('\n[')){
+        textString = textString.replace('[', '\n[');
+        if(textString.includes('[\n')){
+          textString = textString.replace('[\n', '[');
+        }
+        cell.attr({text: {text: textString}});
+      }
+      // Give the element padding on the right/bottom while keeping shape's ratio being 5/9.
+      var newShapeWidth = bboxText.width + 35,
+        newShapeHeight = bboxText.height + 35,
+        currentWidth = cell.get('size').width,
+        currentHeight = cell.get('size').height,
+        manuallyResized = cell.attributes.attrs.manuallyResized;
+      // Shape being resized to text size if not being manually resized or if being renamed after manually resize
+      if ( !(((newShapeWidth + 1 < currentWidth) && (newShapeHeight + 1 < currentHeight)) && manuallyResized) ) {
+        var division = newShapeHeight/newShapeWidth;
+        var editionToWidth = 0, editionToHeight = 0;
+        // Calculating the edition needed for the denominator to keep the ratio.
+        if (division > 5/9) { editionToWidth = (9 / 5) * newShapeHeight - newShapeWidth; }
+        // Calculating the edition needed for the numerator to keep the ratio.
+        else if (division < 5/9) { editionToHeight = (5 / 9) * newShapeWidth - newShapeHeight; }
+        // Flag signals the wrapper that auto-resizing is being performed
+        cell.attributes.attrs.wrappingResized = true;
+        cell.resize(newShapeWidth + editionToWidth, newShapeHeight + editionToHeight);
+        cell.attributes.attrs.wrappingResized = false;
+        cell.attributes.attrs.manuallyResized = false;
+      }
+    }, this)
+
+    this.paper.on('blank:pointerdown', function(cellView, evt) {
+      joint.ui.TextEditor.close();
+    }, this)
+  }
+
   initializeAttributesEvents(){
     this.graph.on('change:attrs', _.bind(function (cell, attrs){
-      //If text was changed - wrap it
-      if (cell.isElement() && cell.previousAttributes().attrs.text && attrs.text) {
-        if (cell.previousAttributes().attrs.text.text != attrs.text.text) { //test if label changed
-          console.log('if - warpping');
-          //textWrapping.startWrapping(this.paper, cell);
-        }
-      }
       //If value of an object was changed - add/modify a state according to it
       if (cell.isElement() && attrs.value){
         console.log('if - value');
@@ -460,7 +502,6 @@ export class RappidMainComponent implements OnInit {
     }, this))
 
     this.graph.on('change:size', _.bind(function (cell, attrs){
-      console.log('change size');
       if (cell.attributes.attrs.text && !cell.attributes.attrs.wrappingResized) { //resized manually
         textWrapping.wrapTextAfterSizeChange(cell);
       }
