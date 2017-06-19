@@ -1,6 +1,5 @@
 import {basicDefinitions} from "./basicDefinitions";
 import * as common from "../common/commonFunctions";
-import {gridLayout} from "./gridLayout"
 import {arrangeStates} from '../config/arrangeStates';
 const joint = require('rappid');
 let objectChangedSize = false;
@@ -14,11 +13,10 @@ function saveValues(cell, parent) {
   }
 }
 
-export function addNewState(fatherObject, graph){
-  var defaultState = new joint.shapes.opm.StateNorm(basicDefinitions.defineState());
+export function addNewState(fatherObject, graph) {
+  let defaultState = new joint.shapes.opm.StateNorm(basicDefinitions.defineState());
   fatherObject.embed(defaultState);     //makes the state stay in the bounds of the object
-  options.graph.addCells([fatherObject, defaultState]);
-  let embeddedStates = fatherObject.getEmbeddedCells();
+  graph.addCells([fatherObject, defaultState]);
   //Placing the new state. By default it is outside the object.
   let xNewState = fatherObject.getBBox().center().x - basicDefinitions.stateWidth / 2;
   let yNewState = fatherObject.getBBox().y + fatherObject.getBBox().height - basicDefinitions.stateHeight - common.paddingObject;
@@ -30,9 +28,9 @@ export function addNewState(fatherObject, graph){
     });
   }
   //https://resources.jointjs.com/docs/jointjs/v1.1/joint.html#dia.Element.events
-  options.graph.on('change:position', function (cell) {
+  graph.on('change:position', function (cell) {
     let parentId = cell.get('parent');
-    let parent = options.graph.getCell(parentId);
+    let parent = graph.getCell(parentId);
     saveValues(cell, parent);
     if (parentId) {        //State case
       common.CommonFunctions.updateObjectSize(parent);
@@ -44,9 +42,9 @@ export function addNewState(fatherObject, graph){
       }
     }
   });
-  options.graph.on('change:size', function (cell) {
+  graph.on('change:size', function (cell) {
     let parentId = cell.get('parent');
-    let parent = options.graph.getCell(parentId);
+    let parent = graph.getCell(parentId);
     saveValues(cell, parent);
     if (parentId) {        //State case
       common.CommonFunctions.updateObjectSize(parent);
@@ -56,14 +54,25 @@ export function addNewState(fatherObject, graph){
       common.CommonFunctions.updateObjectSize(cell);
     }
   });
-  if (fatherObject.get('embeds').length) {
+  //Add the new state using the current states arrangement
+  if (fatherObject.get('embeds').length < 2){
     arrangeStates.call(this, 'bottom');
+  }
+  else {
+    if (fatherObject.attributes.attrs.text["text-anchor"] == 'middle') {
+      if (fatherObject.attributes.attrs.text["ref-y"] == '85%') arrangeStates.call(this, 'top');
+      else if (fatherObject.attributes.attrs.text["ref-y"] == '15%') arrangeStates.call(this, 'bottom');
+    }
+    else if (fatherObject.attributes.attrs.text["ref-y"] == '0.5') {
+      if (fatherObject.attributes.attrs.text["text-anchor"] == 'end') arrangeStates.call(this, 'left');
+      else if (fatherObject.attributes.attrs.text["text-anchor"] == 'start') arrangeStates.call(this, 'right')
+    }
   }
 }
 
-export function addState () {
-  var options = this.options;
+export function addState() {
+  let options = this.options;
   //this.startBatch();
-  var fatherObject = options.cellView.model;
-  addNewState(fatherObject, options.graph);
+  let fatherObject = options.cellView.model;
+  addNewState.call(this, fatherObject, options.graph);
 }
