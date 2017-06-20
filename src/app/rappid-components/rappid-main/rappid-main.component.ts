@@ -10,6 +10,7 @@ import { addState } from '../../config/add-state';
 import { CommandManagerService } from '../services/command-manager.service';
 import { textWrapping } from './textWrapping';
 import { valueHandle } from './valueHandle';
+import {arrangeStates} from '../../config/arrangeStates';
 
 // popup imports
 import {DialogComponent} from "../../dialogs/choose-link-dialog/Dialog.component";
@@ -373,7 +374,6 @@ export class RappidMainComponent implements OnInit {
         textProperty: cellView.model.isLink() ? 'labels/0/attrs/text/text' : 'attrs/text/text'
       });
     }, this)
-
     this.graph.on('change:attrs', function (cell) {
       var view = this.paper.findViewByModel(cell),
         text = view.$("text"),                     // Get shape element
@@ -418,7 +418,7 @@ export class RappidMainComponent implements OnInit {
     this.graph.on('change:attrs', _.bind(function (cell, attrs){
       //If value of an object was changed - add/modify a state according to it
       if (cell.isElement() && attrs.value){
-        console.log('if - value');
+        // console.log('if - value');
         valueHandle.updateCell(this.graph, cell);
       }
     }, this))
@@ -454,23 +454,90 @@ export class RappidMainComponent implements OnInit {
           }).render();
 
           if (cell.attributes.type === 'opm.Object') {
+            let hasStates = cell.getEmbeddedCells().length;
             halo.addHandle({
-              name: 'add_state', position: 's', icon: null, attrs: {
+              name: 'add_state', position: 'sw', icon: null, attrs: {
                 '.handle': {
                   'data-tooltip-class-name': 'small',
                   'data-tooltip': 'Click to add state to the object',
+                  'data-tooltip-position': 'right',
+                  'data-tooltip-padding': 15
+                }
+              }
+            });
+            halo.on('action:add_state:pointerup', function () {
+              hasStates = true;
+              halo.$handles.children('.arrange_up').toggleClass('hidden', !hasStates);
+              halo.$handles.children('.arrange_down').toggleClass('hidden', !hasStates);
+              halo.$handles.children('.arrange_left').toggleClass('hidden', !hasStates);
+              halo.$handles.children('.arrange_right').toggleClass('hidden', !hasStates);
+              addState.call(this);
+            });
+            let side = 'top';
+            halo.addHandle({
+              name: 'arrange_up', position: 'n', icon: null, attrs: {
+                '.handle': {
+                  'data-tooltip-class-name': 'small',
+                  'data-tooltip': 'Arrange the states at the top inside the object',
+                  'data-tooltip-position': 'bottom',
+                  'data-tooltip-padding': 15
+                }
+              }
+            });
+            halo.on('action:arrange_up:pointerup', function () {
+              side = 'top';
+              arrangeStates.call(this, side);
+            });
+            halo.addHandle({
+              name: 'arrange_down', position: 's', icon: null, attrs: {
+                '.handle': {
+                  'data-tooltip-class-name': 'small',
+                  'data-tooltip': 'Arrange the states at the bottom inside the object',
+                  'data-tooltip-position': 'top',
+                  'data-tooltip-padding': 15
+                }
+              }
+            });
+            halo.on('action:arrange_down:pointerup', function () {
+              side = 'bottom';
+              arrangeStates.call(this, side);
+            });
+            halo.addHandle({
+              name: 'arrange_right', position: 'w', icon: null, attrs: {
+                '.handle': {
+                  'data-tooltip-class-name': 'small',
+                  'data-tooltip': 'Arrange the states to the right inside the object',
+                  'data-tooltip-position': 'right',
+                  'data-tooltip-padding': 15
+                }
+              }
+            });
+            halo.on('action:arrange_right:pointerup', function () {
+              side = 'right';
+              arrangeStates.call(this, side);
+            });
+            halo.addHandle({
+              name: 'arrange_left', position: 'e', icon: null, attrs: {
+                '.handle': {
+                  'data-tooltip-class-name': 'small',
+                  'data-tooltip': 'Arrange the states to the left inside the object',
                   'data-tooltip-position': 'left',
                   'data-tooltip-padding': 15
                 }
               }
             });
-            halo.on('action:add_state:pointerdown', addState);
+            halo.on('action:arrange_left:pointerup', function () {
+              side = 'left';
+              arrangeStates.call(this, side);
+            });
+            halo.$handles.children('.arrange_up').toggleClass('hidden', !hasStates);
+            halo.$handles.children('.arrange_down').toggleClass('hidden', !hasStates);
+            halo.$handles.children('.arrange_left').toggleClass('hidden', !hasStates);
+            halo.$handles.children('.arrange_right').toggleClass('hidden', !hasStates);
           }
-
           this.selection.collection.reset([]);
           this.selection.collection.add(cell, { silent: true });
         }
-
         this.cell = cell;
       }
     }, this);
