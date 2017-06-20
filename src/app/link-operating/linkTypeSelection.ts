@@ -1,4 +1,5 @@
-import { dataBase } from './linksDatabase'
+import { dataBase } from './linksDatabase';
+
 
 export const linkTypeSelection = {
 
@@ -11,6 +12,7 @@ export const linkTypeSelection = {
     var srcType;
     var desType;
 
+
     srcType=source.attributes.type;
     desType=target.attributes.type;
 
@@ -22,6 +24,11 @@ export const linkTypeSelection = {
         srcName=`<b class="object">${srcName}</b>`;
       case 'opm.Process':
         srcName=`<b class="process">${srcName}</b>`;
+     // case 'opm.StateNorm':
+     //   var parentName=graph.getCell(source.attributes.parent).attributes.attrs.text.text;
+       // var stateName=source.attributes.attrs.text.text;
+      //  srcName=`<b class="state">${stateName} ${parentName}</b>`;
+
     }
 
     switch (desType){
@@ -82,15 +89,23 @@ export const linkTypeSelection = {
     else if(linkName=="Invocation"){
       return `${srcName} invokes ${desName}.`;
     }
-    else if(linkName=="Overtime_exception_<maxtime, unit>"){
-      return `${desName} occurs if ${srcName} lasts more than <maxtime> <units>.`;
+    // cant read link name format 
+    //else if(linkName=="Overtime_exception_<maxtime, unit>"){
+     // return `${desName} occurs if ${srcName} lasts more than <maxtime> <units>.`;
       //<maxtime> and <unit> can be typed after the popup menu,
       //bur need these parameters to generate OPL in the opl widget
-    }
-    else if(linkName=="Undertime_exception <minitime, unit>"){
-      return `${this.desName} occurs if ${this.srcName} falls short of <mintime> <units>.`;
+    
+    //}
+    //else if(linkName=="Undertime_exception <minitime, unit>"){
+     // return `${this.desName} occurs if ${this.srcName} falls short of <mintime> <units>.`;
       //<mintime> and <unit> can be typed after the popup menu,
       //bur need these parameters to generate OPL in the opl widget
+   // }
+      else if(linkName=="Overtime_exception"){
+      return `${desName} occurs if ${srcName} lasts more than maxtime units.`; 
+    }
+    else if(linkName=="Undertime_exception"){
+      return `${desName} occurs if ${srcName} falls short of mintime units.`;
     }
     else if(linkName=="Condition_Consumption"){
       return `${desName} occurs if ${srcName} exists, in which case ${desName} consumes ${srcName}, otherwise ${desName} is skipped.`;
