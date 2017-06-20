@@ -1,78 +1,68 @@
 import {basicDefinitions} from "./basicDefinitions";
 import * as common from "../common/commonFunctions";
-import {arrangeStates} from '../config/arrangeStates';
 const joint = require('rappid');
-let objectChangedSize = false;
+var objectChangedSize = false;
 
-function saveValues(cell, parent) {
+function saveValues(cell, parent){
   cell.set('originalSize', cell.get('size'));
   cell.set('originalPosition', cell.get('position'));
-  if (parent) {
+  if (parent){
     if (!parent.get('originalPosition')) parent.set('originalPosition', parent.get('position'));
     if (!parent.get('originalSize')) parent.set('originalSize', parent.get('size'));
   }
 }
 
-export function addNewState(fatherObject, graph) {
-  let defaultState = new joint.shapes.opm.StateNorm(basicDefinitions.defineState());
+export function addNewState(fatherObject, graph){
+  var defaultState = new joint.shapes.opm.StateNorm(basicDefinitions.defineState());
   fatherObject.embed(defaultState);     //makes the state stay in the bounds of the object
   graph.addCells([fatherObject, defaultState]);
+
   //Placing the new state. By default it is outside the object.
-  let xNewState = fatherObject.getBBox().center().x - basicDefinitions.stateWidth / 2;
-  let yNewState = fatherObject.getBBox().y + fatherObject.getBBox().height - basicDefinitions.stateHeight - common.paddingObject;
-  if (fatherObject.get('embeds') && fatherObject.get('embeds').length) {
-    common._.each(fatherObject.getEmbeddedCells(), function (child) {
-      if (!fatherObject.getBBox().containsPoint(child.getBBox().origin()) || !fatherObject.getBBox().containsPoint(child.getBBox().topRight()) || !fatherObject.getBBox().containsPoint(child.getBBox().corner()) || !fatherObject.getBBox().containsPoint(child.getBBox().bottomLeft())) {
+  var xNewState = fatherObject.getBBox().center().x - basicDefinitions.stateWidth/2;
+  var yNewState = fatherObject.getBBox().y + fatherObject.getBBox().height - basicDefinitions.stateHeight - common.paddingObject;
+  if (fatherObject.get('embeds') && fatherObject.get('embeds').length){
+    common._.each(fatherObject.getEmbeddedCells(), function(child) {
+      if (!fatherObject.getBBox().containsPoint(child.getBBox().origin()) ||
+          !fatherObject.getBBox().containsPoint(child.getBBox().topRight()) ||
+          !fatherObject.getBBox().containsPoint(child.getBBox().corner()) ||
+          !fatherObject.getBBox().containsPoint(child.getBBox().bottomLeft())) {
         child.set({position: {x: xNewState, y: yNewState}});
       }
     });
   }
-  //https://resources.jointjs.com/docs/jointjs/v1.1/joint.html#dia.Element.events
-  graph.on('change:position', function (cell) {
-    let parentId = cell.get('parent');
-    let parent = graph.getCell(parentId);
+
+  graph.on('change:position', function(cell) {
+    var parentId = cell.get('parent');
+    var parent = graph.getCell(parentId);
     saveValues(cell, parent);
-    if (parentId) {        //State case
+    if (parentId){        //State case
       common.CommonFunctions.updateObjectSize(parent);
     }
-    else if (cell.get('embeds') && cell.get('embeds').length) {  //Object case
-      if (objectChangedSize) {
+    else if (cell.get('embeds') && cell.get('embeds').length){  //Object case
+      if(objectChangedSize) {
         common.CommonFunctions.updateObjectSize(cell);
         objectChangedSize = false;
       }
     }
   });
-  graph.on('change:size', function (cell) {
-    let parentId = cell.get('parent');
-    let parent = graph.getCell(parentId);
+
+  graph.on('change:size', function(cell) {
+    var parentId = cell.get('parent');
+    var parent = graph.getCell(parentId);
     saveValues(cell, parent);
-    if (parentId) {        //State case
+    if (parentId){        //State case
       common.CommonFunctions.updateObjectSize(parent);
     }
-    else if (cell.get('embeds') && cell.get('embeds').length) {  //Object case
+    else if (cell.get('embeds') && cell.get('embeds').length){  //Object case
       objectChangedSize = true;
       common.CommonFunctions.updateObjectSize(cell);
     }
   });
-  //Add the new state using the current states arrangement
-  if (fatherObject.get('embeds').length < 2){
-    arrangeStates.call(this, 'bottom');
-  }
-  else {
-    if (fatherObject.attributes.attrs.text["text-anchor"] == 'middle') {
-      if (fatherObject.attributes.attrs.text["ref-y"] == '85%') arrangeStates.call(this, 'top');
-      else if (fatherObject.attributes.attrs.text["ref-y"] == '15%') arrangeStates.call(this, 'bottom');
-    }
-    else if (fatherObject.attributes.attrs.text["ref-y"] == '0.5') {
-      if (fatherObject.attributes.attrs.text["text-anchor"] == 'end') arrangeStates.call(this, 'left');
-      else if (fatherObject.attributes.attrs.text["text-anchor"] == 'start') arrangeStates.call(this, 'right')
-    }
-  }
 }
 
-export function addState() {
-  let options = this.options;
+export function addState () {
+  var options = this.options;
   //this.startBatch();
-  let fatherObject = options.cellView.model;
-  addNewState.call(this, fatherObject, options.graph);
+  var fatherObject = options.cellView.model;
+  addNewState(fatherObject, options.graph);
 }

@@ -5,16 +5,14 @@ import { toolbarConfig } from '../../config/toolbar.config';
 import { opmShapes } from '../../config/opm-shapes.config';
 import { opmRuleSet } from '../../config/opm-validator';
 import { MdDialog } from '@angular/material';
-import { ChooseLinkDialogComponent } from '../../dialogs/choose-link-dialog/choose-link-dialog.component';
 import { linkTypeSelection} from '../../link-operating/linkTypeSelection'
 import { addState } from '../../config/add-state';
 import { CommandManagerService } from '../services/command-manager.service';
 import { textWrapping } from './textWrapping';
 import { valueHandle } from './valueHandle';
-import {arrangeStates} from '../../config/arrangeStates';
+
 // popup imports
 import {DialogComponent} from "../../dialogs/choose-link-dialog/Dialog.component";
-import {DialogDirective} from "../../dialogs/choose-link-dialog/DialogDirective.directive";
 import {OplDialogComponent} from "../../dialogs/opl-dialog/opl-dialog.component";
 
 const joint = require('rappid');
@@ -22,6 +20,10 @@ const joint = require('rappid');
 const $ = require('jquery');
 // window.jQuery = $;
 const _ = require('lodash');
+
+
+
+
 
 @Component({
   selector: 'opcloud-rappid-main',
@@ -56,11 +58,14 @@ export class RappidMainComponent implements OnInit {
   private toolbar;
   private RuleSet;
 
-  @ViewChild('rappidContainer', {read: ViewContainerRef}) rappidContainer;
 
-  constructor(private graphService: GraphService,
+
+
+  @ViewChild('rappidContainer', { read: ViewContainerRef }) rappidContainer;
+
+  constructor(private graphService:GraphService,
               commandManagerService: CommandManagerService,
-              private _dialog: MdDialog, private viewContainer: ViewContainerRef,
+              private _dialog: MdDialog,private viewContainer: ViewContainerRef,
               private componentFactoryResolver: ComponentFactoryResolver) {
     this.graph = graphService.getGraph();
     this.commandManager = commandManagerService.commandManager;
@@ -78,65 +83,20 @@ export class RappidMainComponent implements OnInit {
     this.initializeKeyboardShortcuts();
     this.initializeTooltips();
     this.handleAddLink();
+    this.initializeTextEditing();
     this.initializeAttributesEvents();
  //   this.linkHoverEvent();
   }
 
 
-  //Function getElementEssence(cell) receives a cell from graph and gets its essence ('Physica' or 'Informatical').
-  getElementEssence(cell){
-    if(cell.attributes.type==='opm.Object') var essence=cell.attributes.attrs.rect.filter.args;
-    if(cell.attributes.type==='opm.Process') var essence=cell.attributes.attrs.ellipse.filter.args;
-    if(essence.dx>0) return 'physical';
-    if(essence.dx==0) return 'informatical';
-  }
 
-  //Function getElementAffiliation(cell) receives a cell and gets its affliation ('Environmental' or 'Informatical').
-  getElementAffiliation(cell){
-
-    if(cell.attributes.type==='opm.Object'){
-      if(cell.attributes.attrs.rect["stroke-dasharray"]== '10,5') return 'environmental';
-      else return 'systemic';
-    }
-    if(cell.attributes.type==='opm.Process'){
-      if(cell.attributes.attrs.ellipse["stroke-dasharray"]== '10,5') return 'environmental';
-      else return 'systemic';
-    }
-
-  }
-
-  //update OPL for a link when link is added or changed
-  updateLinkOPL(cell){
-    var src=cell.getSourceElement();
-    var tgt=cell.getTargetElement();
-    cell.attributes.opl=linkTypeSelection.generateOPL(src,tgt,cell.attributes.name);
-  }
-  //update OPL for an Object when object is added or changed
-  updateObjectOPL(cell){
-    var essence=this.getElementEssence(cell);
-    var affiliation=this.getElementAffiliation(cell);
-    var objectName=cell.attributes.attrs.text.text;
-
-    cell.attributes.opl=`<b class="object">${objectName}</b> is <i>${affiliation}</i> and <i>${essence}</i><b>.</b>`;
-
-  }
-  //update OPL for a Process when process is added or changed
-  updateProcessOPL(cell){
-    var essence=this.getElementEssence(cell);
-    var affiliation=this.getElementAffiliation(cell);
-    var processName=cell.attributes.attrs.text.text;
-
-    cell.attributes.opl=`<b class="process">${processName}</b> is <i>${affiliation}</i> and <i>${essence}</i><b>.</b>`;
-
-  }
-
-  /*
-   * popup Links Dialog
-   * Input (DialogComponent , link)
-   * set linkSource/Target data from link object
-   * Return Dialog Component View
-   *
-   * */
+ /*
+* popup Links Dialog
+* Input (DialogComponent , link)
+* set linkSource/Target data from link object
+* Return Dialog Component View
+*
+* */
   createDialog(dialogComponent: { new(): DialogComponent},link): ComponentRef<DialogComponent> {
 
     this.viewContainer.clear();
@@ -147,20 +107,67 @@ export class RappidMainComponent implements OnInit {
 
     let dialogComponentRef = this.viewContainer.createComponent(dialogComponentFactory);
     dialogComponentRef.instance.newLink = link;
-    dialogComponentRef.instance.linkSource=link.getSourceElement() ;
+    dialogComponentRef.instance.linkSource=link.getSourceElement();
     dialogComponentRef.instance.linkTarget=link.getTargetElement();
     dialogComponentRef.instance.opmLinks=linkTypeSelection.generateLinkWithOpl(link);
+    for(let link of dialogComponentRef.instance.opmLinks){
+      //Structrial Links
+      if(link.name =="Aggregation-Participation"
+        || link.name =="Generalization-Specialization"
+        || link.name =="Exhibition-Characterization"
+        || link.name =="Classification-Instantiation"
+        || link.name =="Unidirectional_Relation"
+        || link.name =="Bidirectional_Relation") {
 
-    dialogComponentRef.instance.close.subscribe(result => {
+          dialogComponentRef.instance.Structural_Links.push(link);
+        }
+        //Agent Links
+       else if(link.name =="Agent" || link.name =="Event_Agent" || link.name =="Condition_Agent")
+        {
+          dialogComponentRef.instance.Agent_Links.push(link);
+        }
+        //Instrument links
+       else if(link.name == "Instrument" || link.name =="Condition_Instrument" || link.name == "Event_Instrument")
+        {
+          dialogComponentRef.instance.Instrument_Links.push(link);
+        }
+        //Effect links
+       else if( link.name=="Condition_Effect" || link.name =="Event_Effect" || link.name == "Effect")
+        {
+          dialogComponentRef.instance.Effect_links.push(link);
+          dialogComponentRef.instance.Effect_links.reverse()
+        }
+        //Consumption links
+      else if(link.name == "Consumption" || link.name=="Condition_Consumption" || link.name =="Event_Consumption")
+      {
+        dialogComponentRef.instance.Consumption_links.push(link);
+      }
+      //Result
+     else if(link.name == "Result")
+      {
+        dialogComponentRef.instance.Result_Link.push(link);
+      }
+      //Invocation
+     else if(link.name=="Invocation")
+      {
+        dialogComponentRef.instance.Invocation_links.push(link);
+      }
+      //Exception Links
+     else if(link.name == "Overtime_exception" || link.name=="Undertime_exception")
+      {
+        dialogComponentRef.instance.Exception_links.push(link);
+      }
+    }
+    dialogComponentRef.instance.close.subscribe((result) => {
       dialogComponentRef.destroy();
       link.attributes.opl=result.opl;
+    //  linkDrawing.drawLink(link, name);
     });
-
 
     return dialogComponentRef;
   }
 
-  //Opl popup when user hovers on a link
+  //Opl popup dialog when user hovers on a link
   createOplDialog(OplDialogComponent: { new(): OplDialogComponent},linkView): ComponentRef<OplDialogComponent> {
 
     this.viewContainer.clear();
@@ -172,12 +179,12 @@ export class RappidMainComponent implements OnInit {
     OplDialogComponentRef.instance.link = linkView.model;
     return OplDialogComponentRef;
   }
-/*
+
   linkHoverEvent(){
     var oplDialog;
-    this.paper.on('cell:mouseover', (cellView,evt)=>{
+    this.paper.on('link:mouseover', (cellView,evt)=>{
       this.createOplDialog(OplDialogComponent, cellView);
-      console.log("mouse on link");
+      console.log("mouse over link");
       cellView.highlight();
     });
     this.paper.on('link:mouseleave', (cellView,evt)=>{
@@ -185,23 +192,23 @@ export class RappidMainComponent implements OnInit {
       console.log("mouse leave link");
     });
   }
-*/
+
 //Check Changes. This function has been modified to update opl for each cell once graph is changed
   handleAddLink() {
     this.graph.on('add', (cell) => {
       if (cell.attributes.type === 'opm.Link') {
-        cell.attributes.name='';
+        cell.attributes.name = '';
         this.paper.on('cell:pointerup ', function (cellView) {
           var cell = cellView.model;
-          if(cell.attributes.type == 'opm.Link'){
-            if(!cell.attributes.target.id) {
+          if (cell.attributes.type == 'opm.Link') {
+            if (!cell.attributes.target.id) {
               cell.remove();
             }
           }
-         });
-          cell.on('change:target change:source', (link) => {
+        });
+        cell.on('change:target change:source', (link) => {
           if (link.attributes.source.id && link.attributes.target.id) {
-            if(link.attributes.source.id != link.attributes.target.id){
+            if (link.attributes.source.id != link.attributes.target.id) {
               var relevantLinks = linkTypeSelection.generateLinkWithOpl(link);
               if (relevantLinks.length > 0) {
                 this.createDialog(DialogComponent, link);
@@ -210,46 +217,7 @@ export class RappidMainComponent implements OnInit {
           }
         });
       }
-
-      if (cell.attributes.type === 'opm.Object') {
-        this.updateObjectOPL(cell);
-      }
-
-      if (cell.attributes.type === 'opm.Process') {
-        this.updateProcessOPL(cell);
-      }
-
-      if (cell.attributes.type === 'opm.StateNorm'){
-
-      }
-    });
-
-    this.graph.on('change', (cell) => {
-
-      if (cell.attributes.type === 'opm.Object') {
-        this.updateObjectOPL(cell);
-      }
-
-      if (cell.attributes.type === 'opm.Process') {
-        this.updateProcessOPL(cell)
-      }
-
-      if (cell.attributes.type != 'opm.Link'){
-        var pt;
-        var outboundLinks=this.graph.getConnectedLinks(cell,{ outbound: true });
-        for ( pt in outboundLinks){
-          this.updateLinkOPL(outboundLinks[pt]);
-        }
-        var inboundLinks=this.graph.getConnectedLinks(cell,{ inbound: true});
-        for (pt in inboundLinks){
-          this.updateLinkOPL(inboundLinks[pt]);
-        }
-      }
-
-      if (cell.attributes.type === 'opm.Link' && cell.attributes.opl!=null){
-        this.updateLinkOPL(cell);
-      }
-    });
+    })
   }
 
 
@@ -262,7 +230,7 @@ export class RappidMainComponent implements OnInit {
       }
     });
 
-    this.commandManager = new joint.dia.CommandManager({graph: this.graph});
+    this.commandManager = new joint.dia.CommandManager({ graph: this.graph });
 
     var paper = this.paper = new joint.dia.Paper({
       linkConnectionPoint: joint.util.shapePerimeterConnectionPoint,
@@ -304,7 +272,7 @@ export class RappidMainComponent implements OnInit {
       'ctrl+v': function () {
 
         var pastedCells = this.clipboard.pasteCells(this.graph, {
-          translate: {dx: 20, dy: 20},
+          translate: { dx: 20, dy: 20 },
           useLocalStorage: true
         });
 
@@ -342,12 +310,12 @@ export class RappidMainComponent implements OnInit {
 
       'ctrl+plus': function (evt) {
         evt.preventDefault();
-        this.paperScroller.zoom(0.2, {max: 5, grid: 0.2});
+        this.paperScroller.zoom(0.2, { max: 5, grid: 0.2 });
       },
 
       'ctrl+minus': function (evt) {
         evt.preventDefault();
-        this.paperScroller.zoom(-0.2, {min: 0.2, grid: 0.2});
+        this.paperScroller.zoom(-0.2, { min: 0.2, grid: 0.2 });
       },
 
       'keydown:shift': function (evt) {
@@ -364,7 +332,7 @@ export class RappidMainComponent implements OnInit {
   initializeSelection() {
 
     this.clipboard = new joint.ui.Clipboard();
-    this.selection = new joint.ui.Selection({paper: this.paper});
+    this.selection = new joint.ui.Selection({ paper: this.paper });
 
     // Initiate selecting when the user grabs the blank area of the paper while the Shift key is pressed.
     // Otherwise, initiate paper pan.
@@ -398,15 +366,56 @@ export class RappidMainComponent implements OnInit {
     }, this);
   }
 
+  initializeTextEditing () {
+    this.paper.on('cell:pointerdblclick', function (cellView, evt) {
+      joint.ui.TextEditor.edit(evt.target, {
+        cellView: cellView,
+        textProperty: cellView.model.isLink() ? 'labels/0/attrs/text/text' : 'attrs/text/text'
+      });
+    }, this)
+
+    this.graph.on('change:attrs', function (cell) {
+      var view = this.paper.findViewByModel(cell),
+        text = view.$("text"),                     // Get shape element
+        bboxText = text[0].getClientRects()[0];    // Text box dimensions
+      // Units have to be bellow the object's name
+      var textString = cell.attributes.attrs.text.text;
+      if(textString.includes('[') && !textString.includes('\n[')){
+        textString = textString.replace('[', '\n[');
+        if(textString.includes('[\n')){
+          textString = textString.replace('[\n', '[');
+        }
+        cell.attr({text: {text: textString}});
+      }
+      // Give the element padding on the right/bottom while keeping shape's ratio being 5/9.
+      var newShapeWidth = bboxText.width + 35,
+        newShapeHeight = bboxText.height + 35,
+        currentWidth = cell.get('size').width,
+        currentHeight = cell.get('size').height,
+        manuallyResized = cell.attributes.attrs.manuallyResized;
+      // Shape being resized to text size if not being manually resized or if being renamed after manually resize
+      if ( !(((newShapeWidth + 1 < currentWidth) && (newShapeHeight + 1 < currentHeight)) && manuallyResized) ) {
+        var division = newShapeHeight/newShapeWidth;
+        var editionToWidth = 0, editionToHeight = 0;
+        // Calculating the edition needed for the denominator to keep the ratio.
+        if (division > 5/9) { editionToWidth = (9 / 5) * newShapeHeight - newShapeWidth; }
+        // Calculating the edition needed for the numerator to keep the ratio.
+        else if (division < 5/9) { editionToHeight = (5 / 9) * newShapeWidth - newShapeHeight; }
+        // Flag signals the wrapper that auto-resizing is being performed
+        cell.attributes.attrs.wrappingResized = true;
+        cell.resize(newShapeWidth + editionToWidth, newShapeHeight + editionToHeight);
+        cell.attributes.attrs.wrappingResized = false;
+        cell.attributes.attrs.manuallyResized = false;
+      }
+    }, this)
+
+    this.paper.on('blank:pointerdown', function(cellView, evt) {
+      joint.ui.TextEditor.close();
+    }, this)
+  }
+
   initializeAttributesEvents(){
     this.graph.on('change:attrs', _.bind(function (cell, attrs){
-      //If text was changed - wrap it
-      if (cell.isElement() && cell.previousAttributes().attrs.text && attrs.text) {
-        if (cell.previousAttributes().attrs.text.text != attrs.text.text) { //test if label changed
-          console.log('if - warpping');
-          //textWrapping.startWrapping(this.paper, cell);
-        }
-      }
       //If value of an object was changed - add/modify a state according to it
       if (cell.isElement() && attrs.value){
         console.log('if - value');
@@ -415,7 +424,6 @@ export class RappidMainComponent implements OnInit {
     }, this))
 
     this.graph.on('change:size', _.bind(function (cell, attrs){
-      console.log('change size');
       if (cell.attributes.attrs.text && !cell.attributes.attrs.wrappingResized) { //resized manually
         textWrapping.wrapTextAfterSizeChange(cell);
       }
@@ -425,9 +433,11 @@ export class RappidMainComponent implements OnInit {
 
   initializeHaloAndInspector() {
     this.paper.on('element:pointerup link:options', function (cellView) {
+
       var cell = cellView.model;
 
       if (!this.selection.collection.contains(cell)) {
+
         if (cell.isElement()) {
 
           new joint.ui.FreeTransform({
@@ -444,90 +454,23 @@ export class RappidMainComponent implements OnInit {
           }).render();
 
           if (cell.attributes.type === 'opm.Object') {
-            let hasStates = cell.getEmbeddedCells().length;
             halo.addHandle({
-              name: 'add_state', position: 'sw', icon: null, attrs: {
+              name: 'add_state', position: 's', icon: null, attrs: {
                 '.handle': {
                   'data-tooltip-class-name': 'small',
                   'data-tooltip': 'Click to add state to the object',
-                  'data-tooltip-position': 'right',
-                  'data-tooltip-padding': 15
-                }
-              }
-            });
-            halo.on('action:add_state:pointerup', function () {
-              hasStates = true;
-              halo.$handles.children('.arrange_up').toggleClass('hidden', !hasStates);
-              halo.$handles.children('.arrange_down').toggleClass('hidden', !hasStates);
-              halo.$handles.children('.arrange_left').toggleClass('hidden', !hasStates);
-              halo.$handles.children('.arrange_right').toggleClass('hidden', !hasStates);
-              addState.call(this);
-            });
-            let side = 'top';
-            halo.addHandle({
-              name: 'arrange_up', position: 'n', icon: null, attrs: {
-                '.handle': {
-                  'data-tooltip-class-name': 'small',
-                  'data-tooltip': 'Arrange the states at the top inside the object',
-                  'data-tooltip-position': 'bottom',
-                  'data-tooltip-padding': 15
-                }
-              }
-            });
-            halo.on('action:arrange_up:pointerup', function () {
-              side = 'top';
-              arrangeStates.call(this, side);
-            });
-            halo.addHandle({
-              name: 'arrange_down', position: 's', icon: null, attrs: {
-                '.handle': {
-                  'data-tooltip-class-name': 'small',
-                  'data-tooltip': 'Arrange the states at the bottom inside the object',
-                  'data-tooltip-position': 'top',
-                  'data-tooltip-padding': 15
-                }
-              }
-            });
-            halo.on('action:arrange_down:pointerup', function () {
-              side = 'bottom';
-              arrangeStates.call(this, side);
-            });
-            halo.addHandle({
-              name: 'arrange_right', position: 'w', icon: null, attrs: {
-                '.handle': {
-                  'data-tooltip-class-name': 'small',
-                  'data-tooltip': 'Arrange the states to the right inside the object',
-                  'data-tooltip-position': 'right',
-                  'data-tooltip-padding': 15
-                }
-              }
-            });
-            halo.on('action:arrange_right:pointerup', function () {
-              side = 'right';
-              arrangeStates.call(this, side);
-            });
-            halo.addHandle({
-              name: 'arrange_left', position: 'e', icon: null, attrs: {
-                '.handle': {
-                  'data-tooltip-class-name': 'small',
-                  'data-tooltip': 'Arrange the states to the left inside the object',
                   'data-tooltip-position': 'left',
                   'data-tooltip-padding': 15
                 }
               }
             });
-            halo.on('action:arrange_left:pointerup', function () {
-              side = 'left';
-              arrangeStates.call(this, side);
-            });
-            halo.$handles.children('.arrange_up').toggleClass('hidden', !hasStates);
-            halo.$handles.children('.arrange_down').toggleClass('hidden', !hasStates);
-            halo.$handles.children('.arrange_left').toggleClass('hidden', !hasStates);
-            halo.$handles.children('.arrange_right').toggleClass('hidden', !hasStates);
+            halo.on('action:add_state:pointerdown', addState);
           }
+
           this.selection.collection.reset([]);
-          this.selection.collection.add(cell, {silent: true});
+          this.selection.collection.add(cell, { silent: true });
         }
+
         this.cell = cell;
       }
     }, this);
@@ -612,7 +555,7 @@ export class RappidMainComponent implements OnInit {
         title: '(Right-click, and use "Save As" to save the diagram in SVG format)',
         image: 'data:image/svg+xml,' + encodeURIComponent(svg)
       }).open();
-    }, {preserveDimensions: true, convertImagesToDataUris: true});
+    }, { preserveDimensions: true, convertImagesToDataUris: true });
   }
 
 
@@ -623,14 +566,14 @@ export class RappidMainComponent implements OnInit {
         title: '(Right-click, and use "Save As" to save the diagram in PNG format)',
         image: dataURL
       }).open();
-    }, {padding: 10});
+    }, { padding: 10 });
   }
 
 
   onMousewheel(cellView, evt, x, y, delta) {
 
     if (this.keyboard.isActive('alt', evt)) {
-      this.paperScroller.zoom(delta / 10, {min: 0.2, max: 5, ox: x, oy: y});
+      this.paperScroller.zoom(delta / 10, { min: 0.2, max: 5, ox: x, oy: y });
     }
   }
 

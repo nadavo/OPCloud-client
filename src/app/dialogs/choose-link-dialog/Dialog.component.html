@@ -1,25 +1,305 @@
+
 <div  [ng2-draggable]="true" class="dialog" >
-  <header  ><div class="title" > OPM LINKS DIALOG BOX</div><div  class="exit-button" (click)="onClickedExit()">x</div></header>
-  <div style="background-color: #4b4a67;;margin-top: -20px">
 
-    <p style="color: white;height: 30px;text-align: center;">
-      Choose Link From <label style="color: yellow">{{ linkSource.attributes.type }}</label> To <label style="color: yellow">{{ linkTarget.attributes.type }}</label>
-    </p>
+  <header >
+      please choose the link kind from
+    <span [style.color]="get_style(linkSource.attributes.type)" mdTooltip="{{ linkSource.attributes.attrs.text.text }}"
+          data-tooltip-position="above" >
+      <label >{{ linkSource.attributes.attrs.text.text }}</label>
+    </span>
+      to   <span [style.color]="get_style(linkTarget.attributes.type)" mdTooltip="{{ linkTarget.attributes.attrs.text.text }}"
+                 data-tooltip-position="above" >
+      <label >{{ linkTarget.attributes.attrs.text.text }}</label>
+    </span>
 
-  </div>
+    <div  class="exit-button" (click)="onClickedExit()">x</div>
+
+  </header>
 
 
-  <md-list style="overflow-y: scroll;height: 300px;">
-    <md-list-item style="border-bottom:groove" *ngFor="let link of opmLinks"  ng-class="{selected: isSelected(link)}" >
-      <div  style="padding-right:40px ;cursor: pointer;" md-list-avatar class='icon {{link.name}}' (click)="onClickedExit(link)">
-      </div>
+  <div style="height:85%;overflow-y:auto;overflow-x: hidden">
 
-      <div style="cursor: pointer;"  (click)="onClickedExit(link)" [innerHtml]="link.opl">
-        <label style="font-size: medium;cursor: pointer;margin-right: 0;" > {{link.opl}}
-
-      </label><label style="color:red;font-size: small;font-style: oblique"> {{link.name}}</label></div>
-
-    </md-list-item>
-  </md-list>
-
+  <!-- Structural Links -->
+<div *ngIf=check_empty(Structural_Links)>
+  <md-grid-list  cols="2"  (click)="onClickedExit(link)"  rowHeight="8:1" *ngFor="let link of Structural_Links">
+    <md-grid-tile>
+      <div style="margin-left: -60%" class='Structrial {{link.name}}'></div>
+    </md-grid-tile>
+    <md-grid-tile class="item">
+      <div class="opl" [innerHtml]="link.opl">{{link.opl}}</div></md-grid-tile>
+    <md-grid-tile><p class="oplname">{{replacename(link.name)}}</p></md-grid-tile>
+  </md-grid-list >
 </div>
+  <!-- Result Link -->
+    <div *ngIf=check_empty(Result_Link)>
+  <md-grid-list cols="2"  (click)="onClickedExit(link)" rowHeight="8:1" *ngFor="let link of Result_Link">
+    <md-grid-tile>
+      <div style="margin-left: -60%" class='Result {{link.name}}'></div>
+    </md-grid-tile>
+    <md-grid-tile class="item">
+      <p class="opl" [innerHtml]="link.opl">{{link.opl}}</p></md-grid-tile>
+    <md-grid-tile><p class="oplname">{{replacename(link.name)}}</p></md-grid-tile>
+  </md-grid-list >
+</div>
+  <!-- Invocation Link -->
+
+<div *ngIf=check_empty(Invocation_links)>
+    <md-grid-list cols="2"  (click)="onClickedExit(link)" rowHeight="8:1" *ngFor="let link of Invocation_links">
+    <md-grid-tile>
+      <div style="margin-left: -60%" class='Invocation {{link.name}}'></div>
+    </md-grid-tile>
+    <md-grid-tile class="item">
+      <p class="opl" [innerHtml]="link.opl">{{link.opl}}</p></md-grid-tile>
+    <md-grid-tile><p class="oplname">{{replacename(link.name)}}</p></md-grid-tile>
+  </md-grid-list >
+</div>
+  <!-- Exception Links -->
+    <!--
+<div *ngIf=check_empty(Exception_links) >
+  <md-grid-list cols="2" (click)="onClickedExit(link)" rowHeight="8:1" *ngFor="let link of Exception_links">
+    <md-grid-tile>
+      <div style="margin-left: -60%" class='Exceptions {{link.name}}'></div>
+    </md-grid-tile>
+    <md-grid-tile class="item">
+      <p class="opl" [innerHtml]="link.opl">
+        {{link.opl}}</p></md-grid-tile>
+    <md-grid-tile>
+      <p class="oplname">
+        {{replacename(link.name)}}
+      </p></md-grid-tile>
+  </md-grid-list >
+</div>-->
+
+
+    <div *ngIf=check_empty(Exception_links) >
+      <tabs>
+        <tab [tabTitle]="'Overtime exception'" >
+          <md-grid-list cols="2"  (click)="onClickedExit(Exception_links[0])" rowHeight="8:1">
+            <md-grid-tile>
+              <div style="margin-left: -60%" class='Exceptions {{Exception_links[0].name}}'></div>
+            </md-grid-tile>
+            <md-grid-tile class="item">
+              <p class="opl" [innerHtml]="Exception_links[0].opl">
+                {{Exception_links[0].opl}}</p></md-grid-tile>
+            <md-grid-tile>
+              <p class="oplname">
+                {{replacename(Exception_links[0].name)}}
+              </p></md-grid-tile>
+          </md-grid-list >
+        </tab>
+        <tab [tabTitle]="'Undertime exception'" >
+          <md-grid-list cols="2"  (click)="onClickedExit(Exception_links[1])" rowHeight="8:1">
+            <md-grid-tile>
+              <div style="margin-left: -60%" class='Exceptions {{Exception_links[1].name}}'></div>
+            </md-grid-tile>
+            <md-grid-tile class="item">
+              <p class="opl" [innerHtml]="Exception_links[1].opl">
+                {{Exception_links[1].opl}}</p></md-grid-tile>
+            <md-grid-tile>
+              <p class="oplname">
+                {{replacename(Exception_links[1].name)}}
+              </p></md-grid-tile>
+          </md-grid-list >
+        </tab>
+      </tabs>
+    </div>
+
+<!-- Agents Links -->
+<div *ngIf=check_empty(Agent_Links) >
+  <tabs>
+    <tab [tabTitle]="'(wait)'" >
+      <md-grid-list cols="2"  (click)="onClickedExit(Agent_Links[0])" rowHeight="8:1">
+        <md-grid-tile>
+          <div style="margin-left: -60%" class='Agents {{Agent_Links[0].name}}'></div>
+        </md-grid-tile>
+        <md-grid-tile class="item">
+          <p class="opl" [innerHtml]="Agent_Links[0].opl">
+            {{Agent_Links[0].opl}}</p></md-grid-tile>
+        <md-grid-tile>
+          <p class="oplname">
+            {{replacename(Agent_Links[0].name)}}
+          </p></md-grid-tile>
+      </md-grid-list >
+    </tab>
+    <tab [tabTitle]="'c (skip)'" >
+      <md-grid-list cols="2"  (click)="onClickedExit(Agent_Links[1])" rowHeight="8:1">
+        <md-grid-tile>
+          <div style="margin-left: -60%" class='Agents {{Agent_Links[1].name}}'></div>
+        </md-grid-tile>
+        <md-grid-tile class="item">
+          <p class="opl" [innerHtml]="Agent_Links[1].opl">
+            {{Agent_Links[1].opl}}</p></md-grid-tile>
+        <md-grid-tile>
+          <p class="oplname">
+            {{replacename(Agent_Links[1].name)}}
+          </p></md-grid-tile>
+      </md-grid-list >
+    </tab>
+    <tab [tabTitle]="'e (trigger)'" >
+      <md-grid-list cols="2"  (click)="onClickedExit(Agent_Links[2])" rowHeight="8:1">
+        <md-grid-tile>
+          <div style="margin-left: -60%" class='Agents {{Agent_Links[2].name}}'></div>
+        </md-grid-tile>
+        <md-grid-tile class="item" >
+          <p class="opl" [innerHtml]="Agent_Links[2].opl">
+            {{Agent_Links[2].opl}}</p></md-grid-tile>
+        <md-grid-tile>
+          <p class="oplname">
+            {{replacename(Agent_Links[2].name)}}
+          </p></md-grid-tile>
+      </md-grid-list >
+    </tab>
+  </tabs>
+</div>
+  <!-- Instrument Links -->
+<div  *ngIf=check_empty(Instrument_Links) >
+  <tabs >
+    <tab [tabTitle]="'(wait)'">
+      <md-grid-list cols="2" (click)="onClickedExit(Instrument_Links[0])" rowHeight="8:1">
+        <md-grid-tile>
+          <div style="margin-left: -60%" class='Instruments {{Instrument_Links[0].name}}'></div>
+        </md-grid-tile>
+        <md-grid-tile class="item">
+          <p class="opl" [innerHtml]="Instrument_Links[0].opl">
+            {{Instrument_Links[0].opl}}</p></md-grid-tile>
+        <md-grid-tile>
+          <p class="oplname">
+            {{replacename(Instrument_Links[0].name)}}
+          </p></md-grid-tile>
+      </md-grid-list >
+    </tab>
+    <tab [tabTitle]="'c (skip)'">
+      <md-grid-list cols="2"  (click)="onClickedExit(Instrument_Links[1])" rowHeight="8:1">
+        <md-grid-tile>
+          <div style="margin-left: -60%" class='Instruments {{Instrument_Links[1].name}}'></div>
+        </md-grid-tile>
+        <md-grid-tile class="item">
+          <p class="opl" [innerHtml]="Instrument_Links[1].opl">
+            {{Instrument_Links[1].opl}}</p></md-grid-tile>
+        <md-grid-tile>
+          <p class="oplname">
+            {{replacename(Instrument_Links[1].name)}}
+          </p></md-grid-tile>
+      </md-grid-list >
+    </tab>
+    <tab [tabTitle]="'e (trigger)'">
+      <md-grid-list cols="2"  (click)="onClickedExit(Instrument_Links[2])" rowHeight="8:1">
+        <md-grid-tile>
+          <div style="margin-left: -60%" class='Instruments {{Instrument_Links[2].name}}'></div>
+        </md-grid-tile>
+        <md-grid-tile class="item">
+          <p class="opl" [innerHtml]="Instrument_Links[2].opl">
+            {{Instrument_Links[2].opl}}</p></md-grid-tile>
+        <md-grid-tile>
+          <p class="oplname">
+            {{replacename(Instrument_Links[2].name)}}
+          </p></md-grid-tile>
+      </md-grid-list >
+    </tab>
+  </tabs>
+</div>
+
+<!-- Consumption Links -->
+    <div  *ngIf=check_empty(Consumption_links)>
+
+  <tabs >
+    <tab [tabTitle]="'(wait)'">
+      <md-grid-list cols="2"  (click)="onClickedExit(Consumption_links[0])" rowHeight="8:1">
+        <md-grid-tile>
+          <div style="margin-left: -60%" class='Consumptions {{Consumption_links[0].name}}'></div>
+        </md-grid-tile>
+        <md-grid-tile class="item">
+          <p class="opl" [innerHtml]="Consumption_links[0].opl">
+            {{Consumption_links[0].opl}}</p></md-grid-tile>
+        <md-grid-tile>
+          <p class="oplname">
+            {{replacename(Consumption_links[0].name)}}
+          </p></md-grid-tile>
+      </md-grid-list >
+    </tab>
+    <tab [tabTitle]="'c (skip)'">
+      <md-grid-list cols="2"  (click)="onClickedExit(Consumption_links[1])" rowHeight="8:1">
+        <md-grid-tile>
+          <div style="margin-left: -60%" class='Consumptions {{Consumption_links[1].name}}'></div>
+        </md-grid-tile>
+        <md-grid-tile class="item">
+          <p class="opl" [innerHtml]="Consumption_links[1].opl">
+            {{Consumption_links[1].opl}}</p></md-grid-tile>
+        <md-grid-tile>
+          <p class="oplname">
+            {{replacename(Consumption_links[1].name)}}
+          </p></md-grid-tile>
+      </md-grid-list >
+    </tab>
+    <tab [tabTitle]="'e (trigger)'">
+      <md-grid-list cols="2"  (click)="onClickedExit(Consumption_links[2])" rowHeight="8:1">
+        <md-grid-tile>
+          <div style="margin-left: -60%" class='Consumptions {{Consumption_links[2].name}}'></div>
+        </md-grid-tile>
+        <md-grid-tile class="item">
+          <p class="opl" [innerHtml]="Consumption_links[2].opl">
+            {{Consumption_links[2].opl}}</p></md-grid-tile>
+        <md-grid-tile>
+          <p class="oplname">
+            {{replacename(Consumption_links[2].name)}}
+          </p></md-grid-tile>
+      </md-grid-list >
+    </tab>
+  </tabs>
+    </div>
+
+  <!-- Effect Links -->
+<div *ngIf="check_empty(Effect_links)">
+  <tabs >
+    <tab [tabTitle]="'(wait)'">
+      <md-grid-list cols="2"  (click)="onClickedExit(Effect_links[1])" rowHeight="8:1">
+        <md-grid-tile>
+          <div style="margin-left: -60%" class='Effects {{Effect_links[1].name}}'></div>
+        </md-grid-tile>
+        <md-grid-tile class="item">
+          <p class="opl" [innerHtml]="Effect_links[1].opl">
+            {{Effect_links[1].opl}}</p></md-grid-tile>
+        <md-grid-tile>
+          <p class="oplname">
+            {{replacename(Effect_links[1].name)}}
+          </p></md-grid-tile>
+      </md-grid-list >
+    </tab>
+    <tab [tabTitle]="'c (skip)'">
+      <md-grid-list cols="2"  (click)="onClickedExit(Effect_links[0])" rowHeight="8:1">
+        <md-grid-tile>
+          <div style="margin-left: -60%" class='Effects {{Effect_links[0].name}}'></div>
+        </md-grid-tile>
+        <md-grid-tile class="item" >
+          <p class="opl" [innerHtml]="Effect_links[0].opl">
+            {{Effect_links[0].opl}}</p></md-grid-tile>
+        <md-grid-tile>
+          <p class="oplname">
+            {{replacename(Effect_links[0].name)}}
+          </p></md-grid-tile>
+      </md-grid-list >
+    </tab>
+
+    <tab [tabTitle]="'e (trigger)'">
+      <md-grid-list cols="2"  (click)="onClickedExit(Effect_links[2])" rowHeight="8:1">
+        <md-grid-tile>
+          <div style="margin-left: -60%" class='Effects {{Effect_links[2].name}}'></div>
+        </md-grid-tile>
+        <md-grid-tile class="item">
+          <p class="opl" [innerHtml]="Effect_links[2].opl">
+            {{Effect_links[2].opl}}</p></md-grid-tile>
+        <md-grid-tile>
+          <p class="oplname">
+            {{replacename(Effect_links[2].name)}}
+          </p></md-grid-tile>
+      </md-grid-list >
+    </tab>
+  </tabs>
+</div>
+  </div>
+</div>
+
+
+
+
+
