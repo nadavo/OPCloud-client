@@ -378,32 +378,45 @@ export class RappidMainComponent implements OnInit {
       var view = this.paper.findViewByModel(cell),
         text = view.$("text"),                     // Get shape element
         bboxText = text[0].getClientRects()[0];    // Text box dimensions
-      // Units have to be bellow the object's name
+      // Give the element padding on the right/bottom while keeping shape's ratio being 5/9 for process\object and 1/2 for state.
+      var aspectRatio = (cell.attributes.type == 'opm.StateNorm') ? (1/4) : ((cell.attributes.type == 'opm.Object') ? (1/3) : (5/9));
+      var padding = (cell.attributes.type == 'opm.StateNorm') ? 10 : ((cell.attributes.type == 'opm.Object') ? 15 : 35);
       var textString = cell.attributes.attrs.text.text;
+      var newShapeWidth = bboxText.width + padding,
+        newShapeHeight = bboxText.height + padding,
+        currentWidth = cell.get('size').width,
+        currentHeight = cell.get('size').height,
+        manuallyResized = cell.attributes.attrs.manuallyResized;
+      // Units have to be bellow the object's name
+      if(newShapeWidth >= currentWidth){
+        var lastWhiteSpace = textString.lastIndexOf(' ');
+        if(lastWhiteSpace >-1)
+          textString = textString.slice(0,lastWhiteSpace)+'\n'+textString.slice(lastWhiteSpace+1);
+      }
       if(textString.includes('[') && !textString.includes('\n[')){
         textString = textString.replace('[', '\n[');
         if(textString.includes('[\n')){
           textString = textString.replace('[\n', '[');
         }
-        cell.attr({text: {text: textString}});
       }
-      // Give the element padding on the right/bottom while keeping shape's ratio being 5/9.
-      var newShapeWidth = bboxText.width + 35,
-        newShapeHeight = bboxText.height + 35,
-        currentWidth = cell.get('size').width,
-        currentHeight = cell.get('size').height,
-        manuallyResized = cell.attributes.attrs.manuallyResized;
+      if(textString != cell.attributes.attrs.text.text){
+        newShapeWidth = textWrapping.getParagraphWidth(textString, cell)+padding;
+        cell.attr({text: {text: textString}});
+
+      }
       // Shape being resized to text size if not being manually resized or if being renamed after manually resize
-      if ( !(((newShapeWidth + 1 < currentWidth) && (newShapeHeight + 1 < currentHeight)) && manuallyResized) ) {
+      if ( !((newShapeWidth < currentWidth) && (newShapeHeight < currentHeight) && manuallyResized) ) {
         var division = newShapeHeight/newShapeWidth;
         var editionToWidth = 0, editionToHeight = 0;
         // Calculating the edition needed for the denominator to keep the ratio.
-        if (division > 5/9) { editionToWidth = (9 / 5) * newShapeHeight - newShapeWidth; }
+        if (division > aspectRatio) { editionToWidth = (1 / aspectRatio) * newShapeHeight - newShapeWidth; }
         // Calculating the edition needed for the numerator to keep the ratio.
-        else if (division < 5/9) { editionToHeight = (5 / 9) * newShapeWidth - newShapeHeight; }
+        else if (division < aspectRatio) { editionToHeight = aspectRatio * newShapeWidth - newShapeHeight; }
         // Flag signals the wrapper that auto-resizing is being performed
+        var newWidthForUpdate = Math.max(newShapeWidth + editionToWidth, 90);
+        var newHeightForUpdate = Math.max(newShapeHeight + editionToHeight ,50);
         cell.attributes.attrs.wrappingResized = true;
-        cell.resize(newShapeWidth + editionToWidth, newShapeHeight + editionToHeight);
+        cell.resize(newWidthForUpdate, newHeightForUpdate);
         cell.attributes.attrs.wrappingResized = false;
         cell.attributes.attrs.manuallyResized = false;
       }
