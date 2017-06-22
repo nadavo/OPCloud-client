@@ -28,7 +28,6 @@ export class DialogComponent {
   public Invocation_links: Array<any> = [];
 
   onClickedExit(link) {
-
     this.selected = link;
     this.newLink.attributes.name = this.selected.name;
 
@@ -36,7 +35,6 @@ export class DialogComponent {
     //linkDrawing.drawLink(this.newLink, this.selected.name)
    // createCode(link.name, this.linkSource.attributes.attrs.text.text, this.linkTarget.attributes.attrs.text.text);
 
-    console.log('chaneged: ', this.selected);
     this.close.emit(this.selected);
 
   }
@@ -75,10 +73,10 @@ export class DialogComponent {
      }
     return serv;
   }
-//Close Button 
- DefaultExit(){
-    this.close.emit('event');
-
+//Close Button
+ DefaultExit(link){
+   link.remove();
+   this.close.emit('event');
   }
 
 
