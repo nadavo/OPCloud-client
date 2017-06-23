@@ -53,10 +53,12 @@ export class RappidOplComponent implements OnInit {
       });
 
       this.graph.on('change', (cell) => {
-        console.log(cell);
         if (cell.attributes.type === 'opm.StateNorm') {
-          var parent = this.graph.getCell(cell.attributes.parent).attributes.attrs.text.text;
-          cell.attributes['opl'] = `${parent} can be ${cell.attributes.attrs.text.text}`;
+          var parentId = cell.attributes.parent;
+          if(parentId){
+            var parent = this.graph.getCell(parentId).attributes.attrs.text.text;
+            cell.attributes['opl'] = `${parent} can be ${cell.attributes.attrs.text.text}`;
+          }
         }
 
         if (cell.attributes.type === 'opm.Object') {
@@ -87,7 +89,6 @@ export class RappidOplComponent implements OnInit {
 
   HoverOnCells(){
     this.paper.on('link:mouseenter',function(cellView,evt){
-console.log(cellView);
     },this);
   }
 

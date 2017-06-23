@@ -14,6 +14,7 @@ import { valueHandle } from './valueHandle';
 // popup imports
 import {DialogComponent} from "../../dialogs/choose-link-dialog/Dialog.component";
 import {OplDialogComponent} from "../../dialogs/opl-dialog/opl-dialog.component";
+import {linkDrawing} from "../../link-operating/linkDrawing";
 
 const joint = require('rappid');
 
@@ -161,7 +162,6 @@ export class RappidMainComponent implements OnInit {
     dialogComponentRef.instance.close.subscribe((result) => {
       dialogComponentRef.destroy();
       link.attributes.opl=result.opl;
-    //  linkDrawing.drawLink(link, name);
     });
 
     return dialogComponentRef;
@@ -370,55 +370,62 @@ export class RappidMainComponent implements OnInit {
     this.paper.on('cell:pointerdblclick', function (cellView, evt) {
       joint.ui.TextEditor.edit(evt.target, {
         cellView: cellView,
-        textProperty: cellView.model.isLink() ? 'labels/0/attrs/text/text' : 'attrs/text/text'
+        textProperty: cellView.model.isLink() ? 'labels/attrs/text/text' : 'attrs/text/text'
       });
     }, this)
 
     this.graph.on('change:attrs', function (cell) {
-      var view = this.paper.findViewByModel(cell),
-        text = view.$("text"),                     // Get shape element
-        bboxText = text[0].getClientRects()[0];    // Text box dimensions
-      // Give the element padding on the right/bottom while keeping shape's ratio being 5/9 for process\object and 1/2 for state.
-      var aspectRatio = (cell.attributes.type == 'opm.StateNorm') ? (1/4) : ((cell.attributes.type == 'opm.Object') ? (1/3) : (5/9));
-      var padding = (cell.attributes.type == 'opm.StateNorm') ? 10 : ((cell.attributes.type == 'opm.Object') ? 15 : 35);
-      var textString = cell.attributes.attrs.text.text;
-      var newShapeWidth = bboxText.width + padding,
-        newShapeHeight = bboxText.height + padding,
-        currentWidth = cell.get('size').width,
-        currentHeight = cell.get('size').height,
-        manuallyResized = cell.attributes.attrs.manuallyResized;
-      // Units have to be bellow the object's name
-      if(newShapeWidth >= currentWidth){
-        var lastWhiteSpace = textString.lastIndexOf(' ');
-        if(lastWhiteSpace >-1)
-          textString = textString.slice(0,lastWhiteSpace)+'\n'+textString.slice(lastWhiteSpace+1);
-      }
-      if(textString.includes('[') && !textString.includes('\n[')){
-        textString = textString.replace('[', '\n[');
-        if(textString.includes('[\n')){
-          textString = textString.replace('[\n', '[');
+      if(cell.attributes.type != 'opm.Link'){
+        var view = this.paper.findViewByModel(cell),
+          text = view.$("text"),                     // Get shape element
+          bboxText = text[0].getClientRects()[0];    // Text box dimensions
+        // Give the element padding on the right/bottom while keeping shape's ratio being 5/9 for process\object and 1/2 for state.
+        var aspectRatio = (cell.attributes.type == 'opm.StateNorm') ? (1/2) : ((cell.attributes.type == 'opm.Object') ? (1/3) : (5/9));
+        var padding = (cell.attributes.type == 'opm.StateNorm') ? 10 : ((cell.attributes.type == 'opm.Object') ? 15 : 35);
+        var minWidth = (cell.attributes.type == 'opm.StateNorm') ? 50 : 90;
+        var minHeight = (cell.attributes.type == 'opm.StateNorm') ? 25 : 50;
+        var textString = cell.attributes.attrs.text.text;
+        var newShapeWidth = bboxText ? (bboxText.width + padding) : 0,
+          newShapeHeight = bboxText ? (bboxText.height + padding) : 0,
+          currentWidth = cell.get('size').width,
+          currentHeight = cell.get('size').height,
+          manuallyResized = cell.attributes.attrs.manuallyResized;
+        // Units have to be bellow the object's name
+        if(newShapeWidth >= currentWidth){
+          var lastWhiteSpace = textString.lastIndexOf(' ');
+          if(lastWhiteSpace >-1)
+            textString = textString.slice(0,lastWhiteSpace)+'\n'+textString.slice(lastWhiteSpace+1);
         }
-      }
-      if(textString != cell.attributes.attrs.text.text){
-        newShapeWidth = textWrapping.getParagraphWidth(textString, cell)+padding;
-        cell.attr({text: {text: textString}});
+        if(textString.includes('[') && !textString.includes('\n[')){
+          textString = textString.replace('[', '\n[');
+          if(textString.includes('[\n')){
+            textString = textString.replace('[\n', '[');
+          }
+        }
+        if(textString == ''){
+          textString = '\t';
+        }
+        if(textString != cell.attributes.attrs.text.text){
+          newShapeWidth = textWrapping.getParagraphWidth(textString, cell)+padding;
+          cell.attr({text: {text: textString}});
+        }
+        // Shape being resized to text size if not being manually resized or if being renamed after manually resize
+        if ( !((newShapeWidth < currentWidth) && (newShapeHeight < currentHeight) && manuallyResized) ) {
+          var division = newShapeHeight/newShapeWidth;
+          var editionToWidth = 0, editionToHeight = 0;
+          // Calculating the edition needed for the denominator to keep the ratio.
+          if (division > aspectRatio) { editionToWidth = (1 / aspectRatio) * newShapeHeight - newShapeWidth; }
+          // Calculating the edition needed for the numerator to keep the ratio.
+          else if (division < aspectRatio) { editionToHeight = aspectRatio * newShapeWidth - newShapeHeight; }
+          // Flag signals the wrapper that auto-resizing is being performed
 
-      }
-      // Shape being resized to text size if not being manually resized or if being renamed after manually resize
-      if ( !((newShapeWidth < currentWidth) && (newShapeHeight < currentHeight) && manuallyResized) ) {
-        var division = newShapeHeight/newShapeWidth;
-        var editionToWidth = 0, editionToHeight = 0;
-        // Calculating the edition needed for the denominator to keep the ratio.
-        if (division > aspectRatio) { editionToWidth = (1 / aspectRatio) * newShapeHeight - newShapeWidth; }
-        // Calculating the edition needed for the numerator to keep the ratio.
-        else if (division < aspectRatio) { editionToHeight = aspectRatio * newShapeWidth - newShapeHeight; }
-        // Flag signals the wrapper that auto-resizing is being performed
-        var newWidthForUpdate = Math.max(newShapeWidth + editionToWidth, 90);
-        var newHeightForUpdate = Math.max(newShapeHeight + editionToHeight ,50);
-        cell.attributes.attrs.wrappingResized = true;
-        cell.resize(newWidthForUpdate, newHeightForUpdate);
-        cell.attributes.attrs.wrappingResized = false;
-        cell.attributes.attrs.manuallyResized = false;
+          var newWidthForUpdate = Math.max(newShapeWidth + editionToWidth, minWidth);
+          var newHeightForUpdate = Math.max(newShapeHeight + editionToHeight ,minHeight);
+          cell.attributes.attrs.wrappingResized = true;
+          cell.resize(newWidthForUpdate, newHeightForUpdate);
+          cell.attributes.attrs.wrappingResized = false;
+          cell.attributes.attrs.manuallyResized = false;
+        }
       }
     }, this)
 
@@ -442,6 +449,11 @@ export class RappidMainComponent implements OnInit {
       }
     }, this))
 
+    this.graph.on('change.position', _.bind(function(cell){
+      if (cell.attributes.type === 'opm.Link') {
+        linkDrawing.linkUpdating(cell);
+      }
+    }, this));
   }
 
   initializeHaloAndInspector() {

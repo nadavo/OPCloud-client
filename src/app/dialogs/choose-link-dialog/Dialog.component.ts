@@ -31,8 +31,7 @@ export class DialogComponent {
     this.selected = link;
     this.newLink.attributes.name = this.selected.name;
 
-    //console.log('newLink: ', this.newLink);
-    //linkDrawing.drawLink(this.newLink, this.selected.name)
+    linkDrawing.drawLink(this.newLink, this.selected.name)
    // createCode(link.name, this.linkSource.attributes.attrs.text.text, this.linkTarget.attributes.attrs.text.text);
 
     this.close.emit(this.selected);
