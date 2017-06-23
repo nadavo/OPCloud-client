@@ -25,6 +25,10 @@ import {Tabs} from "./dialogs/choose-link-dialog/tabs";
 // Run {npm install ng2draggable}  add Draggable option for div’s
 import { Draggable } from '../../node_modules/ng2draggable/draggable.directive';
 import { OplDialogComponent } from './dialogs/opl-dialog/opl-dialog.component';
+//treeView
+import { TreeModule } from 'angular-tree-component';
+import { OPDHierarchyComponent } from './opd-hierarchy/opd-hierarchy.component';
+import {TreeViewService} from './services/tree-view.service';
 
 @NgModule({
   declarations: [
@@ -35,6 +39,7 @@ import { OplDialogComponent } from './dialogs/opl-dialog/opl-dialog.component';
 
     OplWidgetComponent,
     AuthComponent,
+    OPDHierarchyComponent,
     //popup Links
    DialogComponent,
     Draggable,
@@ -46,12 +51,14 @@ import { OplDialogComponent } from './dialogs/opl-dialog/opl-dialog.component';
     FormsModule,
     HttpModule,
     RappidModule,
+    TreeModule,
     MaterialModule.forRoot(),
     AngularFireModule.initializeApp(firebaseConfig, firebaseAuthConfig)
   ],
   providers: [
     AuthService,
     { provide: ModelStorageInterface, useClass: ModelFbStorageService },
+    TreeViewService
   ],
   entryComponents: [
     SaveModelDialogComponent,
