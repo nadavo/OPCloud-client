@@ -23,7 +23,6 @@ export const valueHandle = {
         cell.set('previousUnits', units);
         var newText = cell.attributes.attrs.text.text;
         var indexOfStartUnits = newText.lastIndexOf('[');
-        console.log('indexOfStartUnits: ', indexOfStartUnits);
         if(indexOfStartUnits>0){    //At the first time it will be -1, meaning no units were  defined yet
             newText  = newText.substring(0, indexOfStartUnits) + '[' + units +']';
         }

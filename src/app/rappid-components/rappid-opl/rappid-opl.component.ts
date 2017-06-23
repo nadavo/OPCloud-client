@@ -53,10 +53,13 @@ export class RappidOplComponent implements OnInit {
       });
 
       this.graph.on('change', (cell) => {
-/*        if (cell.attributes.type === 'opm.StateNorm') {
-          var parent = this.graph.getCell(cell.attributes.parent).attributes.attrs.text.text;
-          cell.attributes['opl'] = `${parent} can be ${cell.attributes.attrs.text.text}`;
-        }*/
+        if (cell.attributes.type === 'opm.StateNorm') {
+          var parentId = cell.attributes.parent;
+          if(parentId){
+            var parent = this.graph.getCell(parentId).attributes.attrs.text.text;
+            cell.attributes['opl'] = `${parent} can be ${cell.attributes.attrs.text.text}`;
+          }
+        }
 
         if (cell.attributes.type === 'opm.Object') {
           this.updateObjectOPL(cell);
@@ -86,7 +89,7 @@ export class RappidOplComponent implements OnInit {
 
   HoverOnCells(){
     this.paper.on('link:mouseenter',function(cellView,evt){
-      },this);
+    },this);
   }
 
   //Function getElementEssence(cell) receives a cell from graph and gets its essence ('Physica' or 'Informatical').
