@@ -4,6 +4,7 @@
 import * as common from "../common/commonFunctions";
 import {gridLayout} from "./gridLayout";
 const joint = require('rappid');
+const paddingObject = common.paddingObject;
 
 export function arrangeStates(side) {
   let options = this.options;
@@ -45,21 +46,17 @@ export function arrangeStates(side) {
         columns: embeddedStates.length,
         columnWidth: maxWidth + 5,
         rowHeight: maxHeight,
-        marginY: (fatherObject.getBBox().y + common.paddingObject),
+        marginY: (fatherObject.getBBox().y + paddingObject),
         marginX: (fatherObject.getBBox().x + fatherObject.getBBox().width * 0.5) - 0.5 * (maxWidth + 5) * embeddedStates.length
       });
       common._.each(embeddedStates, function (child) {
-        if (child.getBBox().containsPoint({
-            'x': textBBox.x,
-            'y': textBBox.y
-          }) || child.getBBox().containsPoint({
-            'x': textBBox.x + textBBox.width,
-            'y': textBBox.y
-          })) overText = true;
+        if (child.getBBox().y  + child.getBBox().height >= textBBox.y + textBBox.height)
+          overText = true;
       });
       if (overText) {
+        debugger;
         common._.each(embeddedStates, function (child) {
-          child.set({position: {x: child.getBBox().x, y: textBBox.y - maxHeight * 1.5}});
+          child.set({position: {x: child.getBBox().x, y: textBBox.y - textBBox.height - maxHeight }});
         });
         overText = false;
       }
@@ -75,20 +72,17 @@ export function arrangeStates(side) {
         columns: embeddedStates.length,
         columnWidth: maxWidth + 5,
         rowHeight: maxHeight,
-        marginY: ((fatherObject.getBBox().y + fatherObject.getBBox().height) - common.paddingObject) - maxHeight,
+        marginY: ((fatherObject.getBBox().y + fatherObject.getBBox().height) - paddingObject) - maxHeight,
         marginX: (fatherObject.getBBox().x + fatherObject.getBBox().width * 0.5) - 0.5 * (maxWidth + 5) * embeddedStates.length
       });
       common._.each(embeddedStates, function (child) {
-        if (child.getBBox().containsPoint({
-            'x': textBBox.x,
-            'y': textBBox.y + textBBox.height
-          }) || child.getBBox().containsPoint({'x': textBBox.x + textBBox.width, 'y': textBBox.y + textBBox.height})) {
+        if (child.getBBox().y <= textBBox.y) {
           overText = true;
         }
       });
       if (overText) {
         common._.each(embeddedStates, function (child) {
-          child.set({position: {x: child.getBBox().x, y: textBBox.y + maxHeight * 1.5}});
+          child.set({position: {x: child.getBBox().x, y: textBBox.y + maxHeight}});
         });
         overText = false;
       }
@@ -105,18 +99,20 @@ export function arrangeStates(side) {
         columnWidth: maxWidth,
         rowHeight: maxHeight + 5,
         marginY: (fatherObject.getBBox().y + fatherObject.getBBox().height * 0.5) - 0.5 * (maxHeight + 5) * embeddedStates.length,
-        marginX: ((fatherObject.getBBox().x + fatherObject.getBBox().width) - common.paddingObject) - maxWidth
+        marginX: ((fatherObject.getBBox().x + fatherObject.getBBox().width) - paddingObject) - maxWidth
       });
       common._.each(embeddedStates, function (child) {
-        if (child.getBBox().containsPoint({
-            'x': textBBox.x + textBBox.width,
-            'y': textBBox.y
-          }) || child.getBBox().containsPoint({'x': textBBox.x + textBBox.width, 'y': textBBox.y + textBBox.height}))
+        if (child.getBBox().x <= textBBox.x + textBBox.width)
           overText = true;
       });
       if (overText) {
         common._.each(embeddedStates, function (child) {
-          child.set({position: {x: textBBox.x + textBBox.width + maxWidth, y: child.getBBox().y}});
+          child.set({
+            position: {
+              x: textBBox.x + textBBox.width + paddingObject + maxWidth,
+              y: child.getBBox().y
+            }
+          });
         });
         overText = false;
       }
@@ -133,16 +129,11 @@ export function arrangeStates(side) {
         columnWidth: maxWidth,
         rowHeight: maxHeight + 5,
         marginY: (fatherObject.getBBox().y + fatherObject.getBBox().height * 0.5) - 0.5 * (maxHeight + 5) * embeddedStates.length,
-        marginX: fatherObject.getBBox().x + common.paddingObject
+        marginX: fatherObject.getBBox().x + paddingObject
       });
       common._.each(embeddedStates, function (child) {
-        if ((child.getBBox().containsPoint({
-            'x': textBBox.x,
-            'y': textBBox.y
-          }) || child.getBBox().containsPoint({
-            'x': textBBox.x,
-            'y': textBBox.y + textBBox.height
-          }))) overText = true;
+        if (child.getBBox().x + child.getBBox().width >= textBBox.x)
+          overText = true;
       });
       if (overText) {
         common._.each(embeddedStates, function (child) {
