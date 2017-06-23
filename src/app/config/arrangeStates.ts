@@ -37,7 +37,8 @@ export function arrangeStates(side) {
     if (side == 'top') {
       //Change the attributes of the object - will be applied when rendered
       fatherObject.attributes.attrs.text["ref-y"] = '85%';
-      fatherObject.attributes.attrs.text["text-anchor"] = 'middle';
+      fatherObject.attributes.attrs.statesArrange = 'top';
+      // fatherObject.attributes.attrs.text["text-anchor"] = 'middle';
       this.options.cellView.render();
       textBoundBox();
       gridLayout.layout(embeddedStates, {
@@ -66,7 +67,8 @@ export function arrangeStates(side) {
     else if (side == 'bottom') {
       //Change the attributes of the object - will be applied when rendered
       fatherObject.attributes.attrs.text["ref-y"] = '15%';
-      fatherObject.attributes.attrs.text["text-anchor"] = 'middle';
+      fatherObject.attributes.attrs.statesArrange = 'bottom';
+      // fatherObject.attributes.attrs.text["text-anchor"] = 'middle';
       this.options.cellView.render();
       textBoundBox();
       gridLayout.layout(embeddedStates, {
@@ -93,7 +95,8 @@ export function arrangeStates(side) {
     }
     else if (side == 'left') {
       fatherObject.attributes.attrs.text["ref-y"] = '0.5';
-      fatherObject.attributes.attrs.text["text-anchor"] = 'end';
+      fatherObject.attributes.attrs.statesArrange = 'left';
+      // fatherObject.attributes.attrs.text["text-anchor"] = 'end';
       this.options.cellView.render();
       textBoundBox();
       gridLayout.layout(embeddedStates, {
@@ -113,14 +116,15 @@ export function arrangeStates(side) {
       });
       if (overText) {
         common._.each(embeddedStates, function (child) {
-          child.set({position: {x: textBBox.x + maxWidth * 1.5, y: child.getBBox().y}});
+          child.set({position: {x: textBBox.x + textBBox.width + maxWidth, y: child.getBBox().y}});
         });
         overText = false;
       }
     }
     else if (side == 'right') {
       fatherObject.attributes.attrs.text["ref-y"] = '0.5';
-      fatherObject.attributes.attrs.text["text-anchor"] = 'start';
+      fatherObject.attributes.attrs.statesArrange = 'right';
+      // fatherObject.attributes.attrs.text["text-anchor"] = 'start';
       this.options.cellView.render();
       textBoundBox();
       gridLayout.layout(embeddedStates, {
@@ -142,7 +146,7 @@ export function arrangeStates(side) {
       });
       if (overText) {
         common._.each(embeddedStates, function (child) {
-          child.set({position: {x: textBBox.x - maxWidth * 1.5, y: child.getBBox().y}});
+          child.set({position: {x: textBBox.x - textBBox.width - maxWidth, y: child.getBBox().y}});
         });
         overText = false;
       }

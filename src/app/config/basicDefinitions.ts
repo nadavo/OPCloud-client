@@ -53,7 +53,8 @@ export const basicDefinitions = {
           'text': this.createText(shapeName),
           'value' : {'value' : 'None', 'valueType' : 'None', 'units' : ''},
           'wrappingResized' : false,
-          'manuallyResized' : false
+          'manuallyResized' : false,
+          'statesArrange' : 'bottom'
         }
       }, joint.shapes.basic.Generic.prototype.defaults)
     };

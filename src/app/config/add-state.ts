@@ -1,6 +1,6 @@
 import {basicDefinitions} from "./basicDefinitions";
 import * as common from "../common/commonFunctions";
-import {arrangeStates} from '../config/arrangeStates';
+import {arrangeStates} from "../config/arrangeStates";
 const joint = require('rappid');
 let objectChangedSize = false;
 
@@ -55,18 +55,11 @@ export function addNewState(fatherObject, graph) {
     }
   });
   //Add the new state using the current states arrangement
-  if (fatherObject.get('embeds').length < 2){
+  if (fatherObject.get('embeds').length < 2) {
     arrangeStates.call(this, 'bottom');
   }
   else {
-    if (fatherObject.attributes.attrs.text["text-anchor"] == 'middle') {
-      if (fatherObject.attributes.attrs.text["ref-y"] == '85%') arrangeStates.call(this, 'top');
-      else if (fatherObject.attributes.attrs.text["ref-y"] == '15%') arrangeStates.call(this, 'bottom');
-    }
-    else if (fatherObject.attributes.attrs.text["ref-y"] == '0.5') {
-      if (fatherObject.attributes.attrs.text["text-anchor"] == 'end') arrangeStates.call(this, 'left');
-      else if (fatherObject.attributes.attrs.text["text-anchor"] == 'start') arrangeStates.call(this, 'right')
-    }
+    arrangeStates.call(this, fatherObject.attributes.attrs.statesArrange);
   }
 }
 
