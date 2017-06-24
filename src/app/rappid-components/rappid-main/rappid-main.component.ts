@@ -70,7 +70,7 @@ export class RappidMainComponent implements OnInit {
   constructor(private graphService:GraphService,
               commandManagerService: CommandManagerService,
               private _dialog: MdDialog,private viewContainer: ViewContainerRef,
-              private componentFactoryResolver: ComponentFactoryResolver,,private treeViewService:TreeViewService) {
+              private componentFactoryResolver: ComponentFactoryResolver,private treeViewService:TreeViewService) {
     this.graph = graphService.getGraph();
     this.commandManager = commandManagerService.commandManager;
   }
@@ -485,6 +485,7 @@ export class RappidMainComponent implements OnInit {
   }
 
   initializeHaloAndInspector() {
+     var _this = this;
     this.paper.on('element:pointerup link:options', function (cellView) {
 
       var cell = cellView.model;
