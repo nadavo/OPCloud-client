@@ -70,7 +70,7 @@ export class RappidMainComponent implements OnInit {
   constructor(private graphService:GraphService,
               commandManagerService: CommandManagerService,
               private _dialog: MdDialog,private viewContainer: ViewContainerRef,
-              private componentFactoryResolver: ComponentFactoryResolver) {
+              private componentFactoryResolver: ComponentFactoryResolver,,private treeViewService:TreeViewService) {
     this.graph = graphService.getGraph();
     this.commandManager = commandManagerService.commandManager;
   }
