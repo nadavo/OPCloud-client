@@ -5,17 +5,22 @@ export function opmRuleSet(validator, graph) {
     "change:target change:source",
     function (err, command, next) {
       if (command.data.type === 'opm.Link') {
+
         const link = graph.getCell(command.data.id);
-        if ((null === link.getTargetElement())) {
+        console.log('link = ', link);
+
+        var source = link.getSourceElement();
+        var target = link.getTargetElement();
+        if ((null === target)) {
           return next('A link must connect to a target element!');
         }
-        else if(link.getTargetElement().id == link.getSourceElement().get('parent')){
+        else if(target.id == source.get('parent')){
           return next('A state cannot be connected to his object!');
         }
-        if ((link.getSourceElement().attributes.type == 'opm.StateNorm') && (link.getTargetElement().attributes.type == 'opm.StateNorm')) {
-          return next('A link cannot connect between two states!');
+        if ((source.attributes.type == 'opm.StateNorm') && (target.attributes.type == 'opm.StateNorm') && source.get('parent')==target.get('parent')) {
+          return next('A link cannot connect between two states inside the same object!');
         }
-        if(link.getSourceElement().id == link.getTargetElement().id){
+        if(source.id == target.id){
           return next('An element cannot be connected to itself!');
         }
       }

@@ -103,7 +103,6 @@ export class RappidMainComponent implements OnInit {
 *
 * */
   createDialog(dialogComponent: { new(): DialogComponent},link): ComponentRef<DialogComponent> {
-
     this.viewContainer.clear();
 
     let dialogComponentFactory =
@@ -196,7 +195,7 @@ export class RappidMainComponent implements OnInit {
       console.log("mouse leave link");
     });
   }
-  
+
   handleRemoveElement(){
     var _this=this;
     this.graph.on('remove', (cell) => {
@@ -222,9 +221,12 @@ export class RappidMainComponent implements OnInit {
         cell.on('change:target change:source', (link) => {
           if (link.attributes.source.id && link.attributes.target.id) {
             if (link.attributes.source.id != link.attributes.target.id) {
-              var relevantLinks = linkTypeSelection.generateLinkWithOpl(link);
-              if (relevantLinks.length > 0) {
-                this.createDialog(DialogComponent, link);
+              if(!link.get('previousTargetId') || (link.get('previousTargetId')!=link.attributes.target.id)) {
+                var relevantLinks = linkTypeSelection.generateLinkWithOpl(link);
+                if (relevantLinks.length > 0) {
+                  link.set('previousTargetId', link.attributes.target.id);
+                  this.createDialog(DialogComponent, link);
+                }
               }
             }
           }
@@ -261,16 +263,19 @@ export class RappidMainComponent implements OnInit {
     // When the dragged cell is dropped over another cell, let it become a child of the
     // element below.
     paper.on('cell:pointerup', function(cellView, evt, x, y) {
+        var cell = cellView.model;
+      if(cell.attributes.type == 'opm.Process'){
+        var cellViewsBelow = paper.findViewsFromPoint(cell.getBBox().center());
+        if (cellViewsBelow.length) {
+          // Note that the findViewsFromPoint() returns the view for the `cell` itself.
+          var cellViewBelow = _.find(cellViewsBelow, function (c) {
+            return c.model.id !== cell.id
+          });
 
-      var cell = cellView.model;
-      var cellViewsBelow = paper.findViewsFromPoint(cell.getBBox().center());
-      if (cellViewsBelow.length) {
-        // Note that the findViewsFromPoint() returns the view for the `cell` itself.
-        var cellViewBelow = _.find(cellViewsBelow, function(c) { return c.model.id !== cell.id });
-
-        // Prevent recursive embedding.
-        if (cellViewBelow && cellViewBelow.model.get('parent') !== cell.id) {
-          cellViewBelow.model.embed(cell);
+          // Prevent recursive embedding.
+          if (cellViewBelow && cellViewBelow.model.get('parent') !== cell.id) {
+            cellViewBelow.model.embed(cell);
+          }
         }
       }
     });
