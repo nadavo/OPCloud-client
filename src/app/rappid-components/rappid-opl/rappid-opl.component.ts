@@ -45,11 +45,13 @@ export class RappidOplComponent implements OnInit {
           this.updateProcessOPL(cell);
         }
 
-/*        if (cell.attributes.type === 'opm.StateNorm') {
-          var parent=this.graph.getCell(cell.attributes.parent).attributes.attrs.text.text;
-          cell.attributes['opl']=`${parent} can be ${cell.attributes.attrs.text.text}`;
-
-        }*/
+        if (cell.attributes.type === 'opm.StateNorm') {
+          var parentId = cell.attributes.parent;
+          if(parentId) {
+            var parent = this.graph.getCell(parentId).attributes.attrs.text.text;
+            cell.attributes['opl'] = `${parent} can be ${cell.attributes.attrs.text.text}`;
+          }
+        }
       });
 
       this.graph.on('change', (cell) => {
