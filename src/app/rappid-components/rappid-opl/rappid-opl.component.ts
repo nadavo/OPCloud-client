@@ -118,7 +118,8 @@ export class RappidOplComponent implements OnInit {
   updateLinkOPL(cell){
     var src=cell.getSourceElement();
     var tgt=cell.getTargetElement();
-    cell.attributes.opl=linkTypeSelection.generateOPL(src,tgt,cell.attributes.name);
+    if(src && tgt)
+        cell.attributes.opl=linkTypeSelection.generateOPL(src,tgt,cell.attributes.name);
   }
   //update OPL for an Object when object is added or changed
   updateObjectOPL(cell){

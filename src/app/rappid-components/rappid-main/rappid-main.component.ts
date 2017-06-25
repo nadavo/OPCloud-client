@@ -11,6 +11,9 @@ import { CommandManagerService } from '../services/command-manager.service';
 import { textWrapping } from './textWrapping';
 import { valueHandle } from './valueHandle';
 import {arrangeStates} from '../../config/arrangeStates';
+//treeview imports
+import {TreeViewService} from '../../services/tree-view.service';
+import { processInzooming } from '../../config/process-inzooming';
 
 // popup imports
 import {DialogComponent} from "../../dialogs/choose-link-dialog/Dialog.component";
@@ -68,7 +71,7 @@ export class RappidMainComponent implements OnInit {
   constructor(private graphService:GraphService,
               commandManagerService: CommandManagerService,
               private _dialog: MdDialog,private viewContainer: ViewContainerRef,
-              private componentFactoryResolver: ComponentFactoryResolver) {
+              private componentFactoryResolver: ComponentFactoryResolver,private treeViewService:TreeViewService) {
     this.graph = graphService.getGraph();
     this.commandManager = commandManagerService.commandManager;
   }
@@ -87,6 +90,7 @@ export class RappidMainComponent implements OnInit {
     this.handleAddLink();
     this.initializeTextEditing();
     this.initializeAttributesEvents();
+    this.handleRemoveElement();
  //   this.linkHoverEvent();
   }
 
@@ -100,7 +104,6 @@ export class RappidMainComponent implements OnInit {
 *
 * */
   createDialog(dialogComponent: { new(): DialogComponent},link): ComponentRef<DialogComponent> {
-
     this.viewContainer.clear();
 
     let dialogComponentFactory =
@@ -194,6 +197,15 @@ export class RappidMainComponent implements OnInit {
     });
   }
 
+  handleRemoveElement(){
+    var _this=this;
+    this.graph.on('remove', (cell) => {
+      if (cell.attributes.type === 'opm.Process') {
+        _this.treeViewService.removeNode(cell.id);
+      }
+    });
+  }
+
 //Check Changes. This function has been modified to update opl for each cell once graph is changed
   handleAddLink() {
     this.graph.on('add', (cell) => {
@@ -210,9 +222,12 @@ export class RappidMainComponent implements OnInit {
         cell.on('change:target change:source', (link) => {
           if (link.attributes.source.id && link.attributes.target.id) {
             if (link.attributes.source.id != link.attributes.target.id) {
-              var relevantLinks = linkTypeSelection.generateLinkWithOpl(link);
-              if (relevantLinks.length > 0) {
-                this.createDialog(DialogComponent, link);
+              if(!link.get('previousTargetId') || (link.get('previousTargetId')!=link.attributes.target.id)) {
+                var relevantLinks = linkTypeSelection.generateLinkWithOpl(link);
+                if (relevantLinks.length > 0) {
+                  link.set('previousTargetId', link.attributes.target.id);
+                  this.createDialog(DialogComponent, link);
+                }
               }
             }
           }
@@ -246,7 +261,25 @@ export class RappidMainComponent implements OnInit {
 
     paper.on('blank:mousewheel', _.partial(this.onMousewheel, null), this);
     paper.on('cell:mousewheel', this.onMousewheel, this);
+    // When the dragged cell is dropped over another cell, let it become a child of the
+    // element below.
+    paper.on('cell:pointerup', function(cellView, evt, x, y) {
+        var cell = cellView.model;
+      if(cell.attributes.type == 'opm.Process'){
+        var cellViewsBelow = paper.findViewsFromPoint(cell.getBBox().center());
+        if (cellViewsBelow.length) {
+          // Note that the findViewsFromPoint() returns the view for the `cell` itself.
+          var cellViewBelow = _.find(cellViewsBelow, function (c) {
+            return c.model.id !== cell.id
+          });
 
+          // Prevent recursive embedding.
+          if (cellViewBelow && cellViewBelow.model.get('parent') !== cell.id) {
+            cellViewBelow.model.embed(cell);
+          }
+        }
+      }
+    });
 
     var paperScroller = this.paperScroller = new joint.ui.PaperScroller({
       paper: paper,
@@ -457,6 +490,7 @@ export class RappidMainComponent implements OnInit {
   }
 
   initializeHaloAndInspector() {
+     var _this = this;
     this.paper.on('element:pointerup link:options', function (cellView) {
 
       var cell = cellView.model;
@@ -560,6 +594,27 @@ export class RappidMainComponent implements OnInit {
             halo.$handles.children('.arrange_left').toggleClass('hidden', !hasStates);
             halo.$handles.children('.arrange_right').toggleClass('hidden', !hasStates);
           }
+           if (cell.attributes.type === 'opm.Process') {
+            halo.addHandle({
+              name: 'add_state', position: 's', icon: null, attrs: {
+                '.handle': {
+                  'data-tooltip-class-name': 'small',
+                  'data-tooltip': 'Click to In-zoom the process',
+                  'data-tooltip-position': 'left',
+                  'data-tooltip-padding': 15
+                }
+              }
+            });
+            halo.on('action:add_state:pointerdown', function(evt,x,y){
+              let cellModel=this.options.cellView.model;
+              let CellClone=cell.clone();
+              CellClone.set('id',cellModel.id);
+              _this.treeViewService.insertNode(cellModel);
+              let elementlinks=_this.graphService.graphLinks;
+               processInzooming(evt, x, y,this,CellClone,elementlinks);
+            });
+          }
+
           this.selection.collection.reset([]);
           this.selection.collection.add(cell, { silent: true });
         }

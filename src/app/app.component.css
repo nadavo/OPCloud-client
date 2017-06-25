@@ -1,0 +1,17 @@
+#block_container
+{
+  display: inline-block;
+  margin: 0 auto;
+  max-width: 1000px;
+
+}
+#opl-block
+{
+  float: left;
+  width: 65%;
+}
+#opd-block
+{
+  float: left;
+  width: 35%;
+}

@@ -61,23 +61,16 @@ export class TreeViewService {
 
 
   removeNode(nodeId){
-
     let node=this.getNodeById(nodeId);
-    this.removeNodeFromTree(this.nodes[0],nodeId,this);
+    const idStr = nodeId.toString();
+   this.removeNodeBy((node) => node.id.toString() === idStr,this.nodes[0],nodeId);
     if (node!=null){
-      console.log(node.parent.id);
       this.graphService.removeGraphById(nodeId,node.parent.id);
     }
 
     this.nodesSubject.next(this.nodes);
   }
 
-  removeNodeFromTree(parent, childNameToRemove,_this){
-  parent.children = parent.children
-    .filter(function(child){ return child.id !== childNameToRemove})
-    .map(function(child){ return _this.removeNodeFromTree(child, childNameToRemove)});
-  return parent;
-  }
 
 
 
@@ -102,6 +95,24 @@ export class TreeViewService {
       }
     }
   }
+
+
+
+  removeNodeBy(predicate, startNode = this.nodes[0],childNameToRemove) {
+    startNode = startNode;
+    if (!startNode.children) return null;
+    const found = find(startNode.children, predicate);
+    if (found) { // found in children
+      startNode.children=startNode.children.filter(function(child){ return child.id !== childNameToRemove});
+      return found;
+    } else { // look in children's children
+      for (let child of startNode.children) {
+        const foundInChildren = this.removeNodeBy(predicate, child,childNameToRemove);
+        if (foundInChildren) return foundInChildren;
+      }
+    }
+  }
+
 
 
 }

@@ -2,11 +2,14 @@ import { Injectable } from '@angular/core';
 import { ModelObject } from '../../services/storage/model-object.class';
 import { ModelStorageInterface } from '../../services/storage/model-storage.interface';
 const joint = require('rappid');
+const rootId="SD";
 
 
 @Injectable()
 export class GraphService {
   graph;
+  graphLinks;
+  currentGraphId;
   modelObject;
   modelStorage;
   private JSON;
@@ -20,6 +23,8 @@ export class GraphService {
     this.modelStorage = modelStorage;
     this.graph = new joint.dia.Graph;
     this.JSON = this.graph.toJSON();
+    localStorage.setItem(rootId, JSON.stringify(this.graph.toJSON()));
+    this.currentGraphId = rootId;
     // this.initializeDatabase();
     // TODO: change:position emits on mousemove, find a better event - when drag stopped
     this.graph.on(`add 
@@ -97,5 +102,43 @@ export class GraphService {
    _.bind(this.graph.listen, this.graph);
    this.graph.listen();
    }*/
+  
+  getGraphById(ElementId: string) {
+    this.graph.fromJSON(JSON.parse(localStorage.getItem(ElementId)));
+  }
+
+  removeGraphById(ElementId: string,ParentId: string) {
+     this.changeGraphModel(ParentId);
+    localStorage.removeItem(ElementId);
+  }
+
+  graphSetUpdate(ElementId: string) {
+    localStorage.setItem(this.currentGraphId, JSON.stringify(this.graph.toJSON()));
+    var newGraph = new joint.dia.Graph;
+    this.copyConntectedGraphElements(newGraph,ElementId);
+    newGraph=newGraph.toJSON();
+    localStorage.setItem(ElementId, JSON.stringify(newGraph));
+    this.graph.fromJSON(newGraph);
+    this.currentGraphId = ElementId;
+  }
+
+  //star
+
+  private copyConntectedGraphElements(newGraph,elementId)
+  {
+    let gCell=this.graph.getCell(elementId);
+    let connctedCells=this.graph.getNeighbors(gCell);
+    newGraph.addCells(connctedCells);
+    this.graphLinks = this.graph.getConnectedLinks(gCell);
+  }
+
+  changeGraphModel(elementId) {
+    if (elementId == this.currentGraphId)
+      return 0;
+    localStorage.setItem(this.currentGraphId, JSON.stringify(this.graph.toJSON()));
+    this.graph.fromJSON(JSON.parse(localStorage.getItem(elementId)));
+    this.currentGraphId = elementId;
+  }
+
 
 }
