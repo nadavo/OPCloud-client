@@ -596,7 +596,7 @@ export class RappidMainComponent implements OnInit {
           }
            if (cell.attributes.type === 'opm.Process') {
             halo.addHandle({
-              name: 'add_state', position: 's', icon: null, attrs: {
+              name: 'add_state', position: 'sw', icon: null, attrs: {
                 '.handle': {
                   'data-tooltip-class-name': 'small',
                   'data-tooltip': 'Click to In-zoom the process',

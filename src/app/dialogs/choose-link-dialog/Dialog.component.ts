@@ -7,7 +7,7 @@ import { linkDrawing } from '../../link-operating/linkDrawing'
   styleUrls: ['./Dialog.component.css']
 })
 export class DialogComponent {
- //resize 
+ //resize
   x: number;
   y: number;
   px: number;
@@ -20,7 +20,7 @@ export class DialogComponent {
   draggingCorner: boolean;
   draggingWindow: boolean;
   resizer: Function;
-  
+
    close = new EventEmitter();
   public newLink: any;
   public linkSource: any;
@@ -87,13 +87,13 @@ export class DialogComponent {
   }
 //Close Button
  DefaultExit(link){
-   link.remove();
    this.close.emit('event');
-  }
+   link.remove();
+ }
 
-  
+
   //resize functions
-  
+
    constructor() {
     this.x = 400;
     this.y = 100;
@@ -191,7 +191,7 @@ export class DialogComponent {
     this.draggingWindow = false;
     this.draggingCorner = false;
   }
-  
+
 }
 
 function createCode(linkType, source, target){
