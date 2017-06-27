@@ -35,7 +35,7 @@ export class RappidOplComponent implements OnInit {
 
   GenerateOPL(){
       this.graph.on('add', (cell) => {
-
+        console.log('add');
 
         if (cell.attributes.type === 'opm.Object') {
           this.updateObjectOPL(cell);
@@ -55,6 +55,7 @@ export class RappidOplComponent implements OnInit {
       });
 
       this.graph.on('change', (cell) => {
+        console.log('change');
         if (cell.attributes.type === 'opm.StateNorm') {
           var parentId = cell.attributes.parent;
           if(parentId){
@@ -197,9 +198,13 @@ export class RappidOplComponent implements OnInit {
 
   highlightCell(cell){
     switch(cell.attributes.type) {
-      case 'opm.Object': this.highlightObject(cell);
+      case 'opm.Object':
+        this.highlightObject(cell);
+        break;
       case 'opm.Process': this.highlightProcess(cell);
+        break;
       case 'opm.Link': this.highlightLink(cell);
+        break;
     }
 
   }
@@ -207,8 +212,11 @@ export class RappidOplComponent implements OnInit {
   unhighlightCell(cell){
     switch(cell.attributes.type) {
       case 'opm.Object': this.unhighlightObject(cell);
+        break;
       case 'opm.Process': this.unhighlightProcess(cell);
+        break;
       case 'opm.Link': this.unhighlightLink(cell);
+        break;
     }
 
   }

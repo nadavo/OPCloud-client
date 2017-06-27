@@ -610,7 +610,9 @@ export class RappidMainComponent implements OnInit {
             halo.on('action:add_state:pointerdown', function(evt,x,y){
               let cellModel=this.options.cellView.model;
               let CellClone=cell.clone();
+              var textString = cell.attributes.attrs.text.text;
               CellClone.set('id',cellModel.id);
+              CellClone.attr({text: {text: textString}});
               _this.treeViewService.insertNode(cellModel);
               let elementlinks=_this.graphService.graphLinks;
                processInzooming(evt, x, y,this,CellClone,elementlinks);

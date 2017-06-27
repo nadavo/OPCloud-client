@@ -7,7 +7,6 @@ export function opmRuleSet(validator, graph) {
       if (command.data.type === 'opm.Link') {
 
         const link = graph.getCell(command.data.id);
-        console.log('link = ', link);
 
         var source = link.getSourceElement();
         var target = link.getTargetElement();
