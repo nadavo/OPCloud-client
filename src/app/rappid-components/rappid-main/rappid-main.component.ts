@@ -40,8 +40,10 @@ const _ = require('lodash');
       <opcloud-rappid-inspector [cell]="cell"></opcloud-rappid-inspector>
       <opcloud-rappid-navigator [paperScroller]="paperScroller"></opcloud-rappid-navigator>
     </div>
-
-    <opcloud-rappid-opl [graph]="graph" [paper]="paper"></opcloud-rappid-opl>
+    <div id="block_container">
+      <opcloud-opd-hierarchy id="opd-block"></opcloud-opd-hierarchy>
+      <opcloud-rappid-opl [graph]="graph" [paper]="paper"></opcloud-rappid-opl>
+    </div>
   `,
   styleUrls: ['./rappid-main.component.css'],
   //add DialogComponent
