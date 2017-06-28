@@ -107,7 +107,6 @@ export class RappidMainComponent implements OnInit {
 * */
   createDialog(dialogComponent: { new(): DialogComponent},link): ComponentRef<DialogComponent> {
     this.viewContainer.clear();
-
     let dialogComponentFactory =
       this.componentFactoryResolver.resolveComponentFactory(dialogComponent);
 
@@ -212,13 +211,12 @@ export class RappidMainComponent implements OnInit {
   handleAddLink() {
     this.graph.on('add', (cell) => {
       if (cell.attributes.type === 'opm.Link') {
-        cell.attributes.name = '';
         this.paper.on('cell:pointerup ', function (cellView) {
           var cell = cellView.model;
-          if (cell.attributes.type == 'opm.Link') {
-            if (!cell.attributes.target.id) {
+          //If it is a new link and is not connected to any element - deleting it. Otherwise it will be reconnected to
+          //the previous element
+          if (cell.isLink() && !cell.attributes.target.id && !cell.get('previousTargetId')) {
               cell.remove();
-            }
           }
         });
         cell.on('change:target change:source', (link) => {

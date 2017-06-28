@@ -35,7 +35,6 @@ export class RappidOplComponent implements OnInit {
 
   GenerateOPL(){
       this.graph.on('add', (cell) => {
-        console.log('add');
 
         if (cell.attributes.type === 'opm.Object') {
           this.updateObjectOPL(cell);
@@ -55,7 +54,6 @@ export class RappidOplComponent implements OnInit {
       });
 
       this.graph.on('change', (cell) => {
-        console.log('change');
         if (cell.attributes.type === 'opm.StateNorm') {
           var parentId = cell.attributes.parent;
           if(parentId){
@@ -142,12 +140,6 @@ export class RappidOplComponent implements OnInit {
     cell.attributes.opl=`<b class="process">${processName}</b> is <i>${affiliation}</i> and <i>${essence}</i><b>.</b>`;
 
   }
-
-
-
-
-
-
 
   highlightObject(cell){
     var cellView = this.paper.findViewByModel(cell);

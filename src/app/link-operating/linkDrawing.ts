@@ -108,6 +108,7 @@ function conditionOrEvent(link, s: string){
 
 export const linkDrawing = {
   drawLink(link, linkName, ftag: string = null, btag: string = null){
+    console.log('in drawlink');
     var linkInfo = DictOfLinksValue[linkName];
 
     if(!linkInfo){

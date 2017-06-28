@@ -5,9 +5,7 @@ export function opmRuleSet(validator, graph) {
     "change:target change:source",
     function (err, command, next) {
       if (command.data.type === 'opm.Link') {
-
         const link = graph.getCell(command.data.id);
-
         var source = link.getSourceElement();
         var target = link.getTargetElement();
         if ((null === target)) {
