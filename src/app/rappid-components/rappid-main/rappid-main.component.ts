@@ -401,7 +401,11 @@ export class RappidMainComponent implements OnInit {
   }
 
   initializeTextEditing () {
+    var lastEnteredText;
+    var currentCellView;
     this.paper.on('cell:pointerdblclick', function (cellView, evt) {
+      lastEnteredText =  cellView.model.attributes.attrs.text.text;
+      currentCellView = cellView.model;
       joint.ui.TextEditor.edit(evt.target, {
         cellView: cellView,
         textProperty: cellView.model.isLink() ? 'labels/attrs/text/text' : 'attrs/text/text'
@@ -463,8 +467,11 @@ export class RappidMainComponent implements OnInit {
     }, this)
 
     this.paper.on('blank:pointerdown', function(cellView, evt) {
+      var currentText = joint.ui.TextEditor.ed.getTextContent();
       joint.ui.TextEditor.close();
-    }, this)
+      if (currentText == '\t') {
+        currentCellView.attr({text: {text: lastEnteredText}});
+      }    }, this)
   }
 
   initializeAttributesEvents(){
