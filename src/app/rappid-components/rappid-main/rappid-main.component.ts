@@ -467,11 +467,14 @@ export class RappidMainComponent implements OnInit {
     }, this)
 
     this.paper.on('blank:pointerdown', function(cellView, evt) {
-      var currentText = joint.ui.TextEditor.ed.getTextContent();
-      joint.ui.TextEditor.close();
-      if (currentText == '\t') {
-        currentCellView.attr({text: {text: lastEnteredText}});
-      }    }, this)
+      if(currentCellView && !currentCellView.isLink()){
+        var currentText = currentCellView.attributes.attrs.text.text;
+        if (currentText == '\t') {
+          currentCellView.attr({text: {text: lastEnteredText}});
+        }
+        joint.ui.TextEditor.close();
+      }
+      }, this)
   }
 
   initializeAttributesEvents(){
