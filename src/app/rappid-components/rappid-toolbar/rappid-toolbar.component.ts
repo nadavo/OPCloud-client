@@ -37,7 +37,6 @@ export class RappidToolbarComponent implements OnInit {
   }
 
   saveModel() {
-    debugger;
     if (this.graphService.modelObject.name === null) {
       return this.saveModelAs();
     }
