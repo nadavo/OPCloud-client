@@ -11,6 +11,8 @@ import { CommandManagerService } from '../services/command-manager.service';
 import { textWrapping } from './textWrapping';
 import { valueHandle } from './valueHandle';
 import {arrangeStates} from '../../config/arrangeStates';
+import * as common from "../../common/commonFunctions";
+
 //treeview imports
 import {TreeViewService} from '../../services/tree-view.service';
 import { processInzooming } from '../../config/process-inzooming';
@@ -276,6 +278,8 @@ export class RappidMainComponent implements OnInit {
           // Prevent recursive embedding.
           if (cellViewBelow && cellViewBelow.model.get('parent') !== cell.id) {
             cellViewBelow.model.embed(cell);
+            cell.toFront();
+            common.CommonFunctions.updateObjectSize(cellViewBelow.model);
           }
         }
       }
@@ -475,6 +479,12 @@ export class RappidMainComponent implements OnInit {
         joint.ui.TextEditor.close();
       }
       }, this)
+
+    this.graph.on('change:size', _.bind(function (cell, attrs){
+      if (cell.attributes.attrs.text && !cell.attributes.attrs.wrappingResized) { //resized manually
+        textWrapping.wrapTextAfterSizeChange(cell);
+      }
+    }, this))
   }
 
   initializeAttributesEvents(){
@@ -483,12 +493,6 @@ export class RappidMainComponent implements OnInit {
       if (cell.isElement() && attrs.value){
         // console.log('if - value');
         valueHandle.updateCell(this.graph, cell);
-      }
-    }, this))
-
-    this.graph.on('change:size', _.bind(function (cell, attrs){
-      if (cell.attributes.attrs.text && !cell.attributes.attrs.wrappingResized) { //resized manually
-        textWrapping.wrapTextAfterSizeChange(cell);
       }
     }, this))
 

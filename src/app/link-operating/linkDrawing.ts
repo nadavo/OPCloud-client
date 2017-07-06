@@ -4,10 +4,10 @@ const DictOfLinksValue = {
   "Bidirectional_Relation": {src: true, dst: true, middle: false, c: false, e: false, value: {fill: 'black', d: 'M 8,33 L -12,25 L 8,33 L-12,25 Z', 'stroke-width': 2}},
   "Bi-direct(tag)": {src: true, dst: true, middle: false, c: false, e: false, value: {fill: 'black', d: 'M 8,33 L -12,25 L 8,33 L-12,25 Z', 'stroke-width': 2}},
   "Bi-direct(ftag, btag)": {src: true, dst: true, middle: false, c: false, e: false, value: {fill: 'black', d: 'M 8,33 L -12,25 L 8,33 L-12,25 Z', 'stroke-width': 2}},
-  "Aggregation-Participation": {src: false, dst: false, middle: true, c: false, e: false, value: { fill: '#000000', d: 'M64 48 L64 16 L30 32 L64 48','stroke-width': 2, 'stroke': '#000000'}},
-  "Exhibition-Characterization": {src: false, dst: false, middle: true, c: false, e: false, value: { fill: 'black', d: 'M58 48 L58 16 Z M58 16 L24 32 Z M24 32 L58 48 Z M34 32 L52 24 L52 40 L34 32 Z','stroke-width': 2, 'stroke': '#000000'}},
-  "Generalization-Specialization": {src: false, dst: false, middle: true, c: false, e: false, value: { fill: 'white', d: 'M64 48 L64 16 L30 32 L64 48','stroke-width': 2, 'stroke': 'black'}},
-  "Classification-Instantiation": {src: false, dst: false, middle: true, c: false, e: false, value: { fill: 'white', d: 'M64 48 L64 16 L30 32 L64 48 M 48 32 a 5 5 0 1 0 10 0 a 5 5 0 1 0 -10 0','stroke-width': 2, 'stroke': '#000000'}},
+  "Aggregation-Participation": {src: false, dst: false, middle: true, c: false, e: false, value: 'StructrialAgg.png'},
+  "Exhibition-Characterization": {src: false, dst: false, middle: true, c: false, e: false, value: 'StructrialExhibit.png'},
+  "Generalization-Specialization": {src: false, dst: false, middle: true, c: false, e: false, value: 'StructrialGeneral.png'},
+  "Classification-Instantiation": {src: false, dst: false, middle: true, c: false, e: false, value: 'StructrialSpecify.png'},
   "Result": {src: false, dst: true, middle: false, c: false, e: false, value: {fill: 'white', d: 'M 8,33 L -12,25 L 8,17 L0,25 L 8,33 M 0,25', 'stroke-width': 2}},
   "Consumption": {src: false, dst: true, middle: false, c: false, e: false, value: {fill: 'white', d: 'M 8,33 L -12,25 L 8,17 L0,25 L 8,33 M 0,25', 'stroke-width': 2}},
   "Effect": {src: true, dst: true, middle: false, c: false, e: false, value: {fill: 'white', d: 'M 8,33 L -12,25 L 8,17 L0,25 L 8,33 M 0,25', 'stroke-width': 2}},
@@ -122,6 +122,9 @@ export const linkDrawing = {
     if(link.attributes.labels){
       link.unset('labels');
     }
+    if(link.attributes.labelMarkup){
+      link.unset('labelMarkup');
+    }
     var newAttributes = {
       '.connection': { stroke: 'black', 'stroke-width': 2, 'stroke-dasharray': "0" },
       '.marker-source' : {d:'', 'stroke-width': 2},
@@ -141,7 +144,15 @@ export const linkDrawing = {
     else if (linkInfo.middle) {   //structural links
       ftag = btag = null;
       link.set('router', { name: 'manhattan' });
-      newAttributes[".marker-target"] = linkInfo.value;
+      var img = "src/app/link-operating/"+linkInfo.value;
+      //newAttributes[".marker-target"] = linkInfo.value;
+      link.set('labels', [ {  position: 0.5, attrs: { text: {text: ''}, rect: {fill: 'transparent'} } } ]);
+      link.set('labelMarkup', [
+        '<g class="label">',
+        '<image href="'+img+'" x="-14" />',
+        '<text />',
+        '</g>'
+      ].join(''))
     }
     if (ftag && btag) {
       link.set('labels', [ { position: 0.75, attrs: { text: {text: ftag+'\n'}, rect: {fill: 'transparent'} } },
