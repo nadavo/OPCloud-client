@@ -144,7 +144,7 @@ export const linkDrawing = {
     else if (linkInfo.middle) {   //structural links
       ftag = btag = null;
       link.set('router', { name: 'manhattan' });
-      var img = "src/assets/OPM_Links/"+linkInfo.value;
+      var img = "../../assets/OPM_Links/"+linkInfo.value;
       //newAttributes[".marker-target"] = linkInfo.value;
       link.set('labels', [ {  position: 0.5, attrs: { text: {text: ''}, rect: {fill: 'transparent'} } } ]);
       link.set('labelMarkup', [
