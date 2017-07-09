@@ -8,7 +8,6 @@ export class ModelObject {
   }
 
   saveModelParam(newName, newModel) {
-    debugger;
     this.name = newName;
     this.modelData = newModel;
   }

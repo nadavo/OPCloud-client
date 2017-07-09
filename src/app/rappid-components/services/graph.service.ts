@@ -45,7 +45,6 @@ export class GraphService {
   }
 
   saveGraph(modelName) {
-    debugger;
     console.log('inside saveModel func')
     // TODO: work on this.graph.modelObject - might be JSON
     this.modelObject.saveModelParam(modelName, firebaseKeyEncode.deepEncode(this.JSON));
@@ -53,9 +52,7 @@ export class GraphService {
   }
 
   loadGraph(name) {
-    debugger;
     this.modelStorage.get(name).then((res) => {
-      debugger;
       this.modelObject = res;
       this.graph.fromJSON(firebaseKeyEncode.deepDecode(this.modelObject.modelData));
     });
