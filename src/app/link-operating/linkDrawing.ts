@@ -152,19 +152,26 @@ export const linkDrawing = {
       triangle.set('position', {x: newX, y: newY});
       triangle.set('size', {width: 40, height: 35});
       triangle.set('linkId', link.id);
+      triangle.set('linkName', linkName);
       triangle.attr({image: { 'xlink:href': img}})
       var linkNewFirst = new joint.shapes.devs.Link({
         source: { id: link.getSourceElement().id},
         target: { id: triangle.id, port: 'in'},
-        router: { name: 'manhattan' }
+        router: { name: 'manhattan' },
+        attrs: {'.link-tools': {display: 'none'}, '.marker-arrowheads': {display: 'none'}}
       });
       var linkNewSecond = new joint.shapes.devs.Link({
         source: { id: triangle.id, port: 'out'},
         target: { id: link.getTargetElement().id},
-        router: { name: 'manhattan' }
+        router: { name: 'manhattan' },
+        attrs: {'.link-tools': {display: 'none'}, '.marker-arrowheads': {display: 'none'}}
       });
       graph.addCells([triangle,linkNewFirst, linkNewSecond]);
       newAttributes['.connection'] = { stroke: 'transparent', 'stroke-width': 0, 'stroke-dasharray': "0"};
+      newAttributes['.link-tools'] = {display: 'none'};
+      newAttributes['.marker-arrowheads'] = {display: 'none'};
+      newAttributes['.connection-wrap'] = {display: 'none'};
+      newAttributes['.marker-vertices'] = {display: 'none'};
 
     /*  ftag = btag = null;
       link.set('router', { name: 'manhattan' });
