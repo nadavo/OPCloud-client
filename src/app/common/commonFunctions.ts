@@ -1,6 +1,7 @@
 import { opmStyle } from '../config/opmStyle';
 export const _ = require('lodash');
 export const paddingObject = 10;
+export const paddingProcess = 35;
 export const joint = require('rappid');
 export const width = require('text-width');
 export const height = require('text-height');
@@ -11,10 +12,10 @@ export const CommonFunctions = {
 //Function updateObjectSize Update the size of the object so that no embedded cell will exceed the father border with
 //padding of 10p.
   updateObjectSize(fatherCell){
-    var leftSideX = fatherCell.get('originalPosition').x;
-    var topSideY = fatherCell.get('originalPosition').y;
-    var rightSideX = fatherCell.get('originalPosition').x + fatherCell.get('originalSize').width;
-    var bottomSideY = fatherCell.get('originalPosition').y + fatherCell.get('originalSize').height;
+    var leftSideX = fatherCell.get('position').x;
+    var topSideY = fatherCell.get('position').y;
+    var rightSideX = fatherCell.get('position').x + fatherCell.get('size').width;
+    var bottomSideY = fatherCell.get('position').y + fatherCell.get('size').height;
 
     _.each(fatherCell.getEmbeddedCells(), function(child) {
       var childBbox = child.getBBox();

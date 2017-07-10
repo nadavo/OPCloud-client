@@ -14,9 +14,12 @@ const inzoomed_height=200;
 const inzoomed_width=300;
 const x_margin=70;
 const y_margin=10;//height margin between subprocess
+const childMargin=67;
 
 
 export function processInzooming (evt, x, y,_this,cellRef,links) {
+
+
 
   var options = _this.options;
   var parentObject=cellRef;
@@ -24,7 +27,6 @@ export function processInzooming (evt, x, y,_this,cellRef,links) {
 
   options.graph.addCell(parentObject);
   options.graph.addCells(links);
-
 
   parentObject.attributes.attrs.text = {
     'ref-y': .05,
@@ -47,24 +49,29 @@ export function processInzooming (evt, x, y,_this,cellRef,links) {
   // resize the in-zoomed process
   parentObject.resize(inzoomed_height, inzoomed_width, options);
 
-
   //create the initial subprcoess
+   let dy=y_margin;
 
-   var dy=y_margin;
   for (let i = 0; i < initial_subprocess; i++) {
-    var defaultProcess = new joint.shapes.opm.Process(basicDefinitions.defineShape('ellipse'));
     let yp = y + dy;
-    defaultProcess.set('position', {x: x, y: yp});
+    let xp=x+childMargin;
+    let defaultProcess = new joint.shapes.opm.Process(basicDefinitions.defineShape('ellipse'));
+    defaultProcess.set('position', {x: xp, y: yp});
     parentObject.embed(defaultProcess);     //makes the state stay in the bounds of the object
     options.graph.addCells([parentObject, defaultProcess]);
     dy += x_margin;
-
+    console.log('child object2'+JSON.stringify(defaultProcess));
   }
+
+  common.CommonFunctions.updateObjectSize(parentObject);
+
 
   //parentObject.embeds
   let EmbeddedCells=parentObject.getEmbeddedCells();
   let first_process_id=EmbeddedCells[0].id;
   let last_process_id=EmbeddedCells[(initial_subprocess-1)].id;
+
+
 
 
 

@@ -11,6 +11,8 @@ import { CommandManagerService } from '../services/command-manager.service';
 import { textWrapping } from './textWrapping';
 import { valueHandle } from './valueHandle';
 import {arrangeStates} from '../../config/arrangeStates';
+import * as common from "../../common/commonFunctions";
+
 //treeview imports
 import {TreeViewService} from '../../services/tree-view.service';
 import { processInzooming } from '../../config/process-inzooming';
@@ -40,8 +42,10 @@ const _ = require('lodash');
       <opcloud-rappid-inspector [cell]="cell"></opcloud-rappid-inspector>
       <opcloud-rappid-navigator [paperScroller]="paperScroller"></opcloud-rappid-navigator>
     </div>
-
-    <opcloud-rappid-opl [graph]="graph" [paper]="paper"></opcloud-rappid-opl>
+    <div id="block_container">
+      <opcloud-opd-hierarchy id="opd-block"></opcloud-opd-hierarchy>
+      <opcloud-rappid-opl [graph]="graph" [paper]="paper"></opcloud-rappid-opl>
+    </div>
   `,
   styleUrls: ['./rappid-main.component.css'],
   //add DialogComponent
@@ -105,7 +109,6 @@ export class RappidMainComponent implements OnInit {
 * */
   createDialog(dialogComponent: { new(): DialogComponent},link): ComponentRef<DialogComponent> {
     this.viewContainer.clear();
-
     let dialogComponentFactory =
       this.componentFactoryResolver.resolveComponentFactory(dialogComponent);
 
@@ -210,13 +213,12 @@ export class RappidMainComponent implements OnInit {
   handleAddLink() {
     this.graph.on('add', (cell) => {
       if (cell.attributes.type === 'opm.Link') {
-        cell.attributes.name = '';
         this.paper.on('cell:pointerup ', function (cellView) {
           var cell = cellView.model;
-          if (cell.attributes.type == 'opm.Link') {
-            if (!cell.attributes.target.id) {
+          //If it is a new link and is not connected to any element - deleting it. Otherwise it will be reconnected to
+          //the previous element
+          if (cell.isLink() && !cell.attributes.target.id && !cell.get('previousTargetId')) {
               cell.remove();
-            }
           }
         });
         cell.on('change:target change:source', (link) => {
@@ -276,6 +278,8 @@ export class RappidMainComponent implements OnInit {
           // Prevent recursive embedding.
           if (cellViewBelow && cellViewBelow.model.get('parent') !== cell.id) {
             cellViewBelow.model.embed(cell);
+            cell.toFront();
+            common.CommonFunctions.updateObjectSize(cellViewBelow.model);
           }
         }
       }
@@ -401,7 +405,11 @@ export class RappidMainComponent implements OnInit {
   }
 
   initializeTextEditing () {
+    var lastEnteredText;
+    var currentCellView;
     this.paper.on('cell:pointerdblclick', function (cellView, evt) {
+      lastEnteredText =  cellView.model.attributes.attrs.text.text;
+      currentCellView = cellView.model;
       joint.ui.TextEditor.edit(evt.target, {
         cellView: cellView,
         textProperty: cellView.model.isLink() ? 'labels/attrs/text/text' : 'attrs/text/text'
@@ -463,8 +471,20 @@ export class RappidMainComponent implements OnInit {
     }, this)
 
     this.paper.on('blank:pointerdown', function(cellView, evt) {
-      joint.ui.TextEditor.close();
-    }, this)
+      if(currentCellView && !currentCellView.isLink()){
+        var currentText = currentCellView.attributes.attrs.text.text;
+        if (currentText == '\t') {
+          currentCellView.attr({text: {text: lastEnteredText}});
+        }
+        joint.ui.TextEditor.close();
+      }
+      }, this)
+
+    this.graph.on('change:size', _.bind(function (cell, attrs){
+      if (cell.attributes.attrs.text && !cell.attributes.attrs.wrappingResized) { //resized manually
+        textWrapping.wrapTextAfterSizeChange(cell);
+      }
+    }, this))
   }
 
   initializeAttributesEvents(){
@@ -473,12 +493,6 @@ export class RappidMainComponent implements OnInit {
       if (cell.isElement() && attrs.value){
         // console.log('if - value');
         valueHandle.updateCell(this.graph, cell);
-      }
-    }, this))
-
-    this.graph.on('change:size', _.bind(function (cell, attrs){
-      if (cell.attributes.attrs.text && !cell.attributes.attrs.wrappingResized) { //resized manually
-        textWrapping.wrapTextAfterSizeChange(cell);
       }
     }, this))
 
@@ -596,7 +610,7 @@ export class RappidMainComponent implements OnInit {
           }
            if (cell.attributes.type === 'opm.Process') {
             halo.addHandle({
-              name: 'add_state', position: 's', icon: null, attrs: {
+              name: 'add_state', position: 'sw', icon: null, attrs: {
                 '.handle': {
                   'data-tooltip-class-name': 'small',
                   'data-tooltip': 'Click to In-zoom the process',
@@ -608,7 +622,9 @@ export class RappidMainComponent implements OnInit {
             halo.on('action:add_state:pointerdown', function(evt,x,y){
               let cellModel=this.options.cellView.model;
               let CellClone=cell.clone();
+              var textString = cell.attributes.attrs.text.text;
               CellClone.set('id',cellModel.id);
+              CellClone.attr({text: {text: textString}});
               _this.treeViewService.insertNode(cellModel);
               let elementlinks=_this.graphService.graphLinks;
                processInzooming(evt, x, y,this,CellClone,elementlinks);

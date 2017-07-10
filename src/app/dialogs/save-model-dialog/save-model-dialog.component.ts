@@ -36,7 +36,6 @@ export class SaveModelDialogComponent implements OnInit {
   }
 
   modelExists(modelName) {
-    debugger;
     return (this.models.indexOf(modelName) !== -1);
   }
 

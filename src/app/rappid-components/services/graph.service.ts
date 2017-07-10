@@ -3,6 +3,7 @@ import { ModelObject } from '../../services/storage/model-object.class';
 import { ModelStorageInterface } from '../../services/storage/model-storage.interface';
 const joint = require('rappid');
 const rootId="SD";
+const firebaseKeyEncode = require('firebase-key-encode');
 
 
 @Injectable()
@@ -44,18 +45,16 @@ export class GraphService {
   }
 
   saveGraph(modelName) {
-    debugger;
     console.log('inside saveModel func')
     // TODO: work on this.graph.modelObject - might be JSON
-    this.modelObject.saveModelParam(modelName, this.JSON);
+    this.modelObject.saveModelParam(modelName, firebaseKeyEncode.deepEncode(this.JSON));
     this.modelStorage.save(this.modelObject);
   }
 
   loadGraph(name) {
     this.modelStorage.get(name).then((res) => {
       this.modelObject = res;
-
-      this.graph.fromJSON(this.modelObject.modelData);
+      this.graph.fromJSON(firebaseKeyEncode.deepDecode(this.modelObject.modelData));
     });
   }
 
@@ -68,6 +67,7 @@ export class GraphService {
        // update DB
       console.log('go to FB');
       this.modelStorage.save(this.modelObject);
+      this.saveGraph(this.modelObject.name); //DM
     }
     else {
       localStorage.setItem(this.modelObject.name, this.modelToSync);
@@ -102,7 +102,7 @@ export class GraphService {
    _.bind(this.graph.listen, this.graph);
    this.graph.listen();
    }*/
-  
+
   getGraphById(ElementId: string) {
     this.graph.fromJSON(JSON.parse(localStorage.getItem(ElementId)));
   }

@@ -27,7 +27,6 @@ export function addNewState(fatherObject, graph) {
       }
     });
   }
-  //https://resources.jointjs.com/docs/jointjs/v1.1/joint.html#dia.Element.events
   graph.on('change:position', function (cell) {
     let parentId = cell.get('parent');
     let parent = graph.getCell(parentId);

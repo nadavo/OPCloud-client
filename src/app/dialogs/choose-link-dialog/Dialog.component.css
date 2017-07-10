@@ -41,34 +41,39 @@
 .Exceptions.Overtime_exception { background-position: -2px -0px; width: 73px; height: 24px; }
 .Exceptions.Undertime_exception { background-position: -2px -26px; width: 73px; height: 24px; }
 
-.dialog {
 
-
-  width: 455px;
-  height: 445px;
+#dialog {
+  position: fixed;
   border-radius: 10px;
   background-color: rgb(255, 255, 255);
   opacity:0.87;
-  margin-left: 30%;
-  margin-top: -32.55%;
   box-shadow: 0 0 20px #000;
-
+  cursor:all-scroll;
 }
+.dialog-corner-resize {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+}
+#dialog-top-left-resize { cursor: nwse-resize; top: 0; left: 0; }
+#dialog-top-right-resize { top: 0; right: 0; }
+#dialog-bottom-left-resize { cursor: nesw-resize; bottom: 0; left: 0; }
+#dialog-bottom-right-resize {cursor:nwse-resize ; bottom: 0; right: 0; }
 
-header {
+
+#dialog header {
   font-size:medium;
   background-color: lightslategrey;
   cursor:all-scroll;
   color: white;
-
-padding: 4px;
+  padding: 4px;
   text-align: center;
   max-width: inherit;
   height:auto;
 
 }
 
-.dialog header .exit-button {
+#dialog header .exit-button {
   cursor: pointer;
   text-align: center;
   margin-right: -18px;
@@ -85,13 +90,12 @@ padding: 4px;
 
 }
 
-.dialog header .exit-button:hover {
+#dialog header .exit-button:hover {
   cursor: pointer;
   background: orangered;
 }
 
-
-.dialog header label{
+#dialog header label{
   font-weight: bold;
   white-space: nowrap;
   overflow:hidden;
@@ -104,11 +108,7 @@ padding: 4px;
   max-width:20ch
 }
 
-:host >>> .object { color: #006400; }
-:host >>> .process { color: #00008B; }
-
-
-.dialog header label:hover{
+#dialog header label:hover{
   background:lightcyan;
 }
 
@@ -123,14 +123,14 @@ padding: 4px;
   box-shadow: 0 0 2px #000;
 }
 
-.dialog md-grid-list {
+#dialog md-grid-list {
 
   cursor:pointer;
   border-bottom: inset;
-  padding: 7px;
+  padding: 5px;
 
 }
-.dialog md-grid-list:hover{
+#dialog md-grid-list:hover{
   background:lightgrey;
 
 }
@@ -175,3 +175,4 @@ padding: 4px;
   font-size: 11px;
   word-spacing: 9999999px;
 }
+

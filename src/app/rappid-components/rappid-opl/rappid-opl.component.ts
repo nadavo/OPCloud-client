@@ -36,7 +36,6 @@ export class RappidOplComponent implements OnInit {
   GenerateOPL(){
       this.graph.on('add', (cell) => {
 
-
         if (cell.attributes.type === 'opm.Object') {
           this.updateObjectOPL(cell);
         }
@@ -45,11 +44,13 @@ export class RappidOplComponent implements OnInit {
           this.updateProcessOPL(cell);
         }
 
-/*        if (cell.attributes.type === 'opm.StateNorm') {
-          var parent=this.graph.getCell(cell.attributes.parent).attributes.attrs.text.text;
-          cell.attributes['opl']=`${parent} can be ${cell.attributes.attrs.text.text}`;
-
-        }*/
+        if (cell.attributes.type === 'opm.StateNorm') {
+          var parentId = cell.attributes.parent;
+          if(parentId) {
+            var parent = this.graph.getCell(parentId).attributes.attrs.text.text;
+            cell.attributes['opl'] = `${parent} can be ${cell.attributes.attrs.text.text}`;
+          }
+        }
       });
 
       this.graph.on('change', (cell) => {
@@ -140,12 +141,6 @@ export class RappidOplComponent implements OnInit {
 
   }
 
-
-
-
-
-
-
   highlightObject(cell){
     var cellView = this.paper.findViewByModel(cell);
     cellView.model.attr('rect/fill','#FFA500');
@@ -195,9 +190,13 @@ export class RappidOplComponent implements OnInit {
 
   highlightCell(cell){
     switch(cell.attributes.type) {
-      case 'opm.Object': this.highlightObject(cell);
+      case 'opm.Object':
+        this.highlightObject(cell);
+        break;
       case 'opm.Process': this.highlightProcess(cell);
+        break;
       case 'opm.Link': this.highlightLink(cell);
+        break;
     }
 
   }
@@ -205,8 +204,11 @@ export class RappidOplComponent implements OnInit {
   unhighlightCell(cell){
     switch(cell.attributes.type) {
       case 'opm.Object': this.unhighlightObject(cell);
+        break;
       case 'opm.Process': this.unhighlightProcess(cell);
+        break;
       case 'opm.Link': this.unhighlightLink(cell);
+        break;
     }
 
   }
