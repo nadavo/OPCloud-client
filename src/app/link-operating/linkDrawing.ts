@@ -1,3 +1,5 @@
+const joint = require('rappid');
+
 const DictOfLinksValue = {
   "Unidirectional_Relation": {src: false, dst: true, middle: false, c: false, e: false, value: {fill: 'black', d: 'M 8,34 L -12,25 L 8,16 L -12,25 L 8,34 M -12,25', 'stroke-width': 2}},
   "Uni-direct(tag)": {src: false, dst: true, middle: false, c: false, e: false, value: {fill: 'black', d: 'M 8 34 L -12 25 L 8 16 L-12 25 L 8 34 M -12,25', 'stroke-width': 2}},
@@ -110,7 +112,8 @@ export const linkDrawing = {
   drawLink(link, linkName, ftag: string = null, btag: string = null){
     console.log('in drawlink');
     var linkInfo = DictOfLinksValue[linkName];
-
+    var graph = link.get('graph');
+    link.set('graph', null);
     if(!linkInfo){
       console.log("ERROR, link name does not exist!");
       return;
@@ -142,17 +145,39 @@ export const linkDrawing = {
       newAttributes[".marker-target"] = linkInfo.value;
     }
     else if (linkInfo.middle) {   //structural links
-      ftag = btag = null;
+      var triangle = new joint.shapes.opm.TriangleAgg;
+      var img = "../../assets/OPM_Links/"+linkInfo.value;
+      var newX = (link.getSourceElement().getBBox().center().x+link.getTargetElement().getBBox().center().x)/2-35;
+      var newY = (link.getSourceElement().getBBox().center().y+link.getTargetElement().getBBox().center().y)/2;
+      triangle.set('position', {x: newX, y: newY});
+      triangle.set('size', {width: 40, height: 35});
+      triangle.set('linkId', link.id);
+      triangle.attr({image: { 'xlink:href': img}})
+      var linkNewFirst = new joint.shapes.devs.Link({
+        source: { id: link.getSourceElement().id},
+        target: { id: triangle.id, port: 'in'},
+        router: { name: 'manhattan' }
+      });
+      var linkNewSecond = new joint.shapes.devs.Link({
+        source: { id: triangle.id, port: 'out'},
+        target: { id: link.getTargetElement().id},
+        router: { name: 'manhattan' }
+      });
+      graph.addCells([triangle,linkNewFirst, linkNewSecond]);
+      newAttributes['.connection'] = { stroke: 'transparent', 'stroke-width': 0, 'stroke-dasharray': "0"};
+
+    /*  ftag = btag = null;
       link.set('router', { name: 'manhattan' });
       var img = "../../assets/OPM_Links/"+linkInfo.value;
       //newAttributes[".marker-target"] = linkInfo.value;
       link.set('labels', [ {  position: 0.5, attrs: { text: {text: ''}, rect: {fill: 'transparent'} } } ]);
       link.set('labelMarkup', [
         '<g class="label">',
-        '<image href="'+img+'" x="-14" />',
+        '<image href="'+img+'" x="-14"/>',
         '<text />',
         '</g>'
-      ].join(''))
+      ].join(''))*/
+
     }
     if (ftag && btag) {
       link.set('labels', [ { position: 0.75, attrs: { text: {text: ftag+'\n'}, rect: {fill: 'transparent'} } },

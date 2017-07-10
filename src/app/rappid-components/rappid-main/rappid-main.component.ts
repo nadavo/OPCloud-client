@@ -206,6 +206,9 @@ export class RappidMainComponent implements OnInit {
       if (cell.attributes.type === 'opm.Process') {
         _this.treeViewService.removeNode(cell.id);
       }
+      if(cell.attributes.type === 'app.TriangleAgg'){
+        _this.graph.getCell(cell.attributes.linkId).remove();
+      }
     });
   }
 
@@ -228,6 +231,7 @@ export class RappidMainComponent implements OnInit {
                 var relevantLinks = linkTypeSelection.generateLinkWithOpl(link);
                 if (relevantLinks.length > 0) {
                   link.set('previousTargetId', link.attributes.target.id);
+                  link.set('graph', this.graph);
                   this.createDialog(DialogComponent, link);
                 }
               }

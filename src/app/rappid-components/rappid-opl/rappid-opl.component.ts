@@ -74,11 +74,13 @@ export class RappidOplComponent implements OnInit {
           var pt;
           var outboundLinks = this.graph.getConnectedLinks(cell, {outbound: true});
           for (pt in outboundLinks) {
-            this.updateLinkOPL(outboundLinks[pt]);
+            if(outboundLinks[pt].attributes.type == 'opm.Link')
+              this.updateLinkOPL(outboundLinks[pt]);
           }
           var inboundLinks = this.graph.getConnectedLinks(cell, {inbound: true});
           for (pt in inboundLinks) {
-            this.updateLinkOPL(inboundLinks[pt]);
+            if(inboundLinks[pt].attributes.type == 'opm.Link')
+              this.updateLinkOPL(inboundLinks[pt]);
           }
         }
 
