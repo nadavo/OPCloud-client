@@ -212,11 +212,18 @@ export class RappidMainComponent implements OnInit {
             _this.graph.getCell(linkToRemove).remove();
         });
       }
-      if (cell.attributes.type === 'devs.Link') {
-        if (_this.graph.getCell(cell.get('target').id).attributes.type === 'app.TriangleAgg')
-          _this.graph.getCell(cell.get('target').id).remove();
-        if ((_this.graph.getCell(cell.get('source').id).attributes.type === 'app.TriangleAgg') && (_this.graph.getCell(cell.get('source').id).get('numberOfTargets') == 1))
-          _this.graph.getCell(cell.get('source').id).remove();
+      if(cell.attributes.type === 'devs.Link'){
+          if(_this.graph.getCell(cell.get('target').id).attributes.type === 'app.TriangleAgg')
+            _this.graph.getCell(cell.get('target').id).remove();
+          if(_this.graph.getCell(cell.get('source').id).attributes.type === 'app.TriangleAgg'){
+            var triangle = _this.graph.getCell(cell.get('source').id);
+            var numberOfTargets = triangle.get('numberOfTargets');
+            if(numberOfTargets>1){
+              triangle.set('numberOfTargets', (numberOfTargets-1));
+            }
+            else
+              triangle.remove();
+          }
       }
       if (cell.attributes.type === 'opm.StateNorm') {
         let fatherObject = _this.graph.getCell(cell.get('father'));
