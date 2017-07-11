@@ -421,25 +421,29 @@ export class RappidMainComponent implements OnInit {
           text = view.$("text"),                     // Get shape element
           bboxText = text[0].getClientRects()[0];    // Text box dimensions
         // Give the element padding on the right/bottom while keeping shape's ratio being 5/9 for process\object and 1/2 for state.
-        var aspectRatio = (cell.attributes.type == 'opm.StateNorm') ? (1/2) : ((cell.attributes.type == 'opm.Object') ? (1/3) : (5/9));
+        var aspectRatio = (cell.attributes.type == 'opm.StateNorm') ? (1 / 2) : ((cell.attributes.type == 'opm.Object') ? (1 / 3) : (5 / 9));
         var padding = (cell.attributes.type == 'opm.StateNorm') ? 10 : ((cell.attributes.type == 'opm.Object') ? 15 : 35);
         var minWidth = (cell.attributes.type == 'opm.StateNorm') ? 50 : 90;
         var minHeight = (cell.attributes.type == 'opm.StateNorm') ? 25 : 50;
         var textString = cell.attributes.attrs.text.text;
-        var newShapeWidth = bboxText ? (bboxText.width + padding) : 0,
-          newShapeHeight = bboxText ? (bboxText.height + padding) : 0,
+        let newShapeWidth = bboxText ? (
+              (cell.attributes.attrs.text['ref-x'] == '0.5') ? (bboxText.width + padding) :
+                (bboxText.width / (0.2 + Math.abs(0.5 - cell.attributes.attrs.text['ref-x'])) + padding)) : 0,
+          newShapeHeight = bboxText ? (
+              (cell.attributes.attrs.text['ref-y'] == '0.5') ? (bboxText.height + padding) :
+                (bboxText.height / (0.25 + Math.abs(0.5 - cell.attributes.attrs.text['ref-y'])) + padding)) : 0,
           currentWidth = cell.get('size').width,
           currentHeight = cell.get('size').height,
           manuallyResized = cell.attributes.attrs.manuallyResized;
         // Units have to be bellow the object's name
-        if(newShapeWidth >= currentWidth){
+        if (newShapeWidth >= currentWidth) {
           var lastWhiteSpace = textString.lastIndexOf(' ');
-          if(lastWhiteSpace >-1)
-            textString = textString.slice(0,lastWhiteSpace)+'\n'+textString.slice(lastWhiteSpace+1);
+          if (lastWhiteSpace > -1)
+            textString = textString.slice(0, lastWhiteSpace) + '\n' + textString.slice(lastWhiteSpace + 1);
         }
-        if(textString.includes('[') && !textString.includes('\n[')){
+        if (textString.includes('[') && !textString.includes('\n[')) {
           textString = textString.replace('[', '\n[');
-          if(textString.includes('[\n')){
+          if (textString.includes('[\n')) {
             textString = textString.replace('[\n', '[');
           }
         }

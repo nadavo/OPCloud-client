@@ -96,7 +96,6 @@ export function arrangeStates(side) {
       fatherObject.attributes.attrs.statesArrange = 'left';
       fatherObject.attributes.attrs.text["ref-x"] = '0.25';
       this.options.cellView.render();
-      debugger;
       textBoundBox();
       gridLayout.layout(embeddedStates, {
         columns: 1,
@@ -107,13 +106,11 @@ export function arrangeStates(side) {
         marginX: ((fatherObject.getBBox().x + fatherObject.getBBox().width) - paddingObject) - maxWidth
       });
       common._.each(embeddedStates, function (child) {
-        debugger;
         if (child.getBBox().x <= textBBox.x + textBBox.width)
           overText = true;
       });
       if (overText) {
         common._.each(embeddedStates, function (child) {
-          debugger;
           child.set({
             position: {
               x: textBBox.x + textBBox.width + paddingObject * 0.8,
@@ -159,7 +156,6 @@ export function arrangeStates(side) {
   function textBoundBox() {
     text = options.paper.findViewByModel(fatherObject).$('text')[0];
     textBBox = text.getBBox();
-    debugger;
     textBBox.x = fatherObject.getBBox().x + fatherObject.getBBox().width * fatherObject.attributes.attrs.text["ref-x"] + textBBox.x;
     textBBox.y = fatherObject.getBBox().y + fatherObject.getBBox().height * fatherObject.attributes.attrs.text["ref-y"] + textBBox.y;
   }
