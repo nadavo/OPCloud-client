@@ -40,7 +40,7 @@ export function arrangeStates(side) {
       fatherObject.attributes.attrs.text["ref-y"] = '0.75';
       fatherObject.attributes.attrs.statesArrange = 'top';
       fatherObject.attributes.attrs.text["ref-x"] = '0.5';
-      this.options.cellView.render();
+      options.cellView.render();
       textBoundBox();
       gridLayout.layout(embeddedStates, {
         columns: embeddedStates.length,
@@ -65,7 +65,7 @@ export function arrangeStates(side) {
       fatherObject.attributes.attrs.text["ref-y"] = '0.25';
       fatherObject.attributes.attrs.statesArrange = 'bottom';
       fatherObject.attributes.attrs.text["ref-x"] = '0.5';
-      this.options.cellView.render();
+      options.cellView.render();
       textBoundBox();
       gridLayout.layout(embeddedStates, {
         columns: embeddedStates.length,
@@ -95,7 +95,7 @@ export function arrangeStates(side) {
       fatherObject.attributes.attrs.text["ref-y"] = '0.5';
       fatherObject.attributes.attrs.statesArrange = 'left';
       fatherObject.attributes.attrs.text["ref-x"] = '0.25';
-      this.options.cellView.render();
+      options.cellView.render();
       textBoundBox();
       gridLayout.layout(embeddedStates, {
         columns: 1,
@@ -125,7 +125,7 @@ export function arrangeStates(side) {
       fatherObject.attributes.attrs.text["ref-y"] = '0.5';
       fatherObject.attributes.attrs.statesArrange = 'right';
       fatherObject.attributes.attrs.text["ref-x"] = '0.75';
-      this.options.cellView.render();
+      options.cellView.render();
       textBoundBox();
       gridLayout.layout(embeddedStates, {
         columns: 1,

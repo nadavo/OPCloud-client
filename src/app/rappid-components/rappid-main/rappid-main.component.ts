@@ -200,23 +200,32 @@ export class RappidMainComponent implements OnInit {
     });
   }
 
-  handleRemoveElement(){
-    var _this=this;
+  handleRemoveElement() {
+    var _this = this;
     this.graph.on('remove', (cell) => {
       if (cell.attributes.type === 'opm.Process') {
         _this.treeViewService.removeNode(cell.id);
       }
-      if(cell.attributes.type === 'app.TriangleAgg'){
-        _.each(cell.attributes.linkId, function(linkToRemove) {
-          if(_this.graph.getCell(linkToRemove))
-              _this.graph.getCell(linkToRemove).remove();
+      if (cell.attributes.type === 'app.TriangleAgg') {
+        _.each(cell.attributes.linkId, function (linkToRemove) {
+          if (_this.graph.getCell(linkToRemove))
+            _this.graph.getCell(linkToRemove).remove();
         });
       }
-      if(cell.attributes.type === 'devs.Link'){
-          if(_this.graph.getCell(cell.get('target').id).attributes.type === 'app.TriangleAgg')
-            _this.graph.getCell(cell.get('target').id).remove();
-          if((_this.graph.getCell(cell.get('source').id).attributes.type === 'app.TriangleAgg') && (_this.graph.getCell(cell.get('source').id).get('numberOfTargets')==1))
-            _this.graph.getCell(cell.get('source').id).remove();
+      if (cell.attributes.type === 'devs.Link') {
+        if (_this.graph.getCell(cell.get('target').id).attributes.type === 'app.TriangleAgg')
+          _this.graph.getCell(cell.get('target').id).remove();
+        if ((_this.graph.getCell(cell.get('source').id).attributes.type === 'app.TriangleAgg') && (_this.graph.getCell(cell.get('source').id).get('numberOfTargets') == 1))
+          _this.graph.getCell(cell.get('source').id).remove();
+      }
+      if (cell.attributes.type === 'opm.StateNorm') {
+        let fatherObject = _this.graph.getCell(cell.get('father'));
+        let cellView = _this.paper.findViewByModel(fatherObject);
+        if (fatherObject.get('embeds').length == 0) {
+          fatherObject.attributes.attrs.text["ref-x"] = '0.5';
+          fatherObject.attributes.attrs.text["ref-y"] = '0.5';
+          cellView.render();
+        }
       }
     });
   }
