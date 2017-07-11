@@ -54,7 +54,6 @@ export function arrangeStates(side) {
           overText = true;
       });
       if (overText) {
-        debugger;
         common._.each(embeddedStates, function (child) {
           child.set({position: {x: child.getBBox().x, y: textBBox.y - textBBox.height - maxHeight }});
         });
