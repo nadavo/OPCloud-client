@@ -146,25 +146,26 @@ export const linkDrawing = {
     }
     else if (linkInfo.middle) {   //structural links
       var outboundLinks = graph.getConnectedLinks(link.getSourceElement(), { outbound: true });
-      var triangleId;
+      var targetTriangle;
       for (var pt in outboundLinks) {
         if(outboundLinks[pt].attributes.type == 'devs.Link'){
-          var targetTriangle = outboundLinks[pt].getTargetElement();
-          if(targetTriangle.get('linkName') == linkName) {
-            triangleId = targetTriangle.id;
-            var newIdArray = targetTriangle.get('linkId');
+          var tmpTargetTriangle = outboundLinks[pt].getTargetElement();
+          if(tmpTargetTriangle.get('linkName') == linkName) {
+            var newIdArray = tmpTargetTriangle.get('linkId');
             newIdArray.push(link.id);
-            targetTriangle.set('linkId', newIdArray);
+            tmpTargetTriangle.set('linkId', newIdArray);
+            targetTriangle = tmpTargetTriangle;
           }
         }
       }
-      if(triangleId){
+      if(targetTriangle){
         var linkNewSecond = new joint.shapes.devs.Link({
-          source: { id: triangleId, port: 'out'},
+          source: { id: targetTriangle.id, port: 'out'},
           target: { id: link.getTargetElement().id},
           router: { name: 'manhattan' },
-          attrs: {'.link-tools': {display: 'none'}, '.marker-arrowheads': {display: 'none'}}
+          attrs: {'.link-tools': {display: 'none'}, '.marker-vertices': {display: 'none'}, '.marker-arrowheads': {display: 'none'}}
         });
+        targetTriangle.set('numberOfTargets', targetTriangle.get('numberOfTargets')+1);
         graph.addCell(linkNewSecond);
       }
       else {
@@ -176,6 +177,7 @@ export const linkDrawing = {
         triangle.set('size', {width: 40, height: 35});
         triangle.set('linkId', [link.id]);
         triangle.set('linkName', linkName);
+        triangle.set('numberOfTargets', 1);
         triangle.attr({image: {'xlink:href': img}})
         var linkNewFirst = new joint.shapes.devs.Link({
           source: {id: link.getSourceElement().id},
