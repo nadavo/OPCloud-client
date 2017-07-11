@@ -74,11 +74,12 @@ export const basicDefinitions = {
     return {
       markup: '<g class="rotatable"><g class="scalable"><rect/></g><text/></g>',
       defaults: _.defaultsDeep({
-      type: 'opm.StateNorm',
-        size: { width: this.stateWidth, height: this.stateHeight},
-          attrs: {
+        type: 'opm.StateNorm',
+        size: {width: this.stateWidth, height: this.stateHeight},
+        attrs: {
           rect: this.createShape('state'),
-          text: this.createText('state')
+          text: this.createText('state'),
+          'father': null
         }
       }, joint.shapes.basic.Generic.prototype.defaults)
     };
