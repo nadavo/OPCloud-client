@@ -6,13 +6,57 @@
  */
 
 const joint = require('rappid');
+export const _ = require('lodash');
 import { basicDefinitions } from './basicDefinitions';
+
 export const opmShapes = {
   //OPM Links definitions
   Link: joint.dia.Link.extend(basicDefinitions.defineLink()),
   Object: joint.dia.Element.extend(basicDefinitions.defineShape('rect')),
   Process: joint.dia.Element.extend(basicDefinitions.defineShape('ellipse')),
-  StateNorm: joint.dia.Element.extend(basicDefinitions.defineState())
+  StateNorm: joint.dia.Element.extend(basicDefinitions.defineState()),
+  TriangleAgg: joint.shapes.devs.Model.extend({
+    markup: '<image/>',
+    defaults: _.defaultsDeep({
+      type: 'app.TriangleAgg',
+      size: {width: 40, height: 40},
+      inPorts: ['in'],
+      outPorts: ['out'],
+      ports: {
+        groups: {
+          'in': {
+            position: {
+              name: 'top'
+            },
+            attrs: {
+              '.port-body': {
+                fill: 'black',
+                magnet: 'passive',
+                r: 1
+              }
+            },
+            label: {markup: '<text class="label-text"/>'}
+          },
+          'out': {
+            position: {
+              name: 'bottom'
+            },
+            attrs: {
+              '.port-body': {
+                fill: 'black',
+                magnet: 'passive',
+                r: 1
+              }
+            },
+            label: {markup: '<text class="label-text"/>'}
+          }
+        }
+      },
+      attrs: {
+        image: { 'xlink:href': '../../assets/OPM_Links/StructuralAgg.png', width: 40, height: 40},
+      }
+    }, joint.shapes.devs.Model.prototype.defaults)
+  })
 };
 
 joint.shapes.opm = opmShapes;

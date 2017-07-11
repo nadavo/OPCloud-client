@@ -44,7 +44,7 @@ const _ = require('lodash');
     </div>
     <div id="block_container">
       <opcloud-opd-hierarchy id="opd-block"></opcloud-opd-hierarchy>
-      <opcloud-rappid-opl [graph]="graph" [paper]="paper"></opcloud-rappid-opl>
+      <opcloud-rappid-opl id="opl-block"[graph]="graph" [paper]="paper"></opcloud-rappid-opl>
     </div>
   `,
   styleUrls: ['./rappid-main.component.css'],
@@ -206,6 +206,18 @@ export class RappidMainComponent implements OnInit {
       if (cell.attributes.type === 'opm.Process') {
         _this.treeViewService.removeNode(cell.id);
       }
+      if(cell.attributes.type === 'app.TriangleAgg'){
+        _.each(cell.attributes.linkId, function(linkToRemove) {
+          if(_this.graph.getCell(linkToRemove))
+              _this.graph.getCell(linkToRemove).remove();
+        });
+      }
+      if(cell.attributes.type === 'devs.Link'){
+          if(_this.graph.getCell(cell.get('target').id).attributes.type === 'app.TriangleAgg')
+            _this.graph.getCell(cell.get('target').id).remove();
+          if((_this.graph.getCell(cell.get('source').id).attributes.type === 'app.TriangleAgg') && (_this.graph.getCell(cell.get('source').id).get('numberOfTargets')==1))
+            _this.graph.getCell(cell.get('source').id).remove();
+      }
     });
   }
 
@@ -228,6 +240,7 @@ export class RappidMainComponent implements OnInit {
                 var relevantLinks = linkTypeSelection.generateLinkWithOpl(link);
                 if (relevantLinks.length > 0) {
                   link.set('previousTargetId', link.attributes.target.id);
+                  link.set('graph', this.graph);
                   this.createDialog(DialogComponent, link);
                 }
               }
@@ -500,7 +513,7 @@ export class RappidMainComponent implements OnInit {
       }
     }, this))
 
-    this.graph.on('change.position', _.bind(function(cell){
+    this.graph.on('change:position', _.bind(function(cell){
       if (cell.attributes.type === 'opm.Link') {
         linkDrawing.linkUpdating(cell);
       }

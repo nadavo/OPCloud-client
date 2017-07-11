@@ -1,3 +1,5 @@
+const joint = require('rappid');
+
 const DictOfLinksValue = {
   "Unidirectional_Relation": {src: false, dst: true, middle: false, c: false, e: false, value: {fill: 'black', d: 'M 8,34 L -12,25 L 8,16 L -12,25 L 8,34 M -12,25', 'stroke-width': 2}},
   "Uni-direct(tag)": {src: false, dst: true, middle: false, c: false, e: false, value: {fill: 'black', d: 'M 8 34 L -12 25 L 8 16 L-12 25 L 8 34 M -12,25', 'stroke-width': 2}},
@@ -110,7 +112,8 @@ export const linkDrawing = {
   drawLink(link, linkName, ftag: string = null, btag: string = null){
     console.log('in drawlink');
     var linkInfo = DictOfLinksValue[linkName];
-
+    var graph = link.get('graph');
+    link.set('graph', null);
     if(!linkInfo){
       console.log("ERROR, link name does not exist!");
       return;
@@ -142,17 +145,59 @@ export const linkDrawing = {
       newAttributes[".marker-target"] = linkInfo.value;
     }
     else if (linkInfo.middle) {   //structural links
-      ftag = btag = null;
-      link.set('router', { name: 'manhattan' });
-      var img = "../../assets/OPM_Links/"+linkInfo.value;
-      //newAttributes[".marker-target"] = linkInfo.value;
-      link.set('labels', [ {  position: 0.5, attrs: { text: {text: ''}, rect: {fill: 'transparent'} } } ]);
-      link.set('labelMarkup', [
-        '<g class="label">',
-        '<image href="'+img+'" x="-14" />',
-        '<text />',
-        '</g>'
-      ].join(''))
+      var outboundLinks = graph.getConnectedLinks(link.getSourceElement(), { outbound: true });
+      var targetTriangle;
+      for (var pt in outboundLinks) {
+        if(outboundLinks[pt].attributes.type == 'devs.Link'){
+          var tmpTargetTriangle = outboundLinks[pt].getTargetElement();
+          if(tmpTargetTriangle.get('linkName') == linkName) {
+            var newIdArray = tmpTargetTriangle.get('linkId');
+            newIdArray.push(link.id);
+            tmpTargetTriangle.set('linkId', newIdArray);
+            targetTriangle = tmpTargetTriangle;
+          }
+        }
+      }
+      if(targetTriangle){
+        var linkNewSecond = new joint.shapes.devs.Link({
+          source: { id: targetTriangle.id, port: 'out'},
+          target: { id: link.getTargetElement().id},
+          router: { name: 'manhattan' },
+          attrs: {'.link-tools': {display: 'none'}, '.marker-vertices': {display: 'none'}, '.marker-arrowheads': {display: 'none'}}
+        });
+        targetTriangle.set('numberOfTargets', targetTriangle.get('numberOfTargets')+1);
+        graph.addCell(linkNewSecond);
+      }
+      else {
+        var triangle = new joint.shapes.opm.TriangleAgg;
+        var img = "../../assets/OPM_Links/" + linkInfo.value;
+        var newX = (link.getSourceElement().getBBox().center().x + link.getTargetElement().getBBox().center().x) / 2 - 35;
+        var newY = (link.getSourceElement().getBBox().center().y + link.getTargetElement().getBBox().center().y) / 2;
+        triangle.set('position', {x: newX, y: newY});
+        triangle.set('size', {width: 40, height: 35});
+        triangle.set('linkId', [link.id]);
+        triangle.set('linkName', linkName);
+        triangle.set('numberOfTargets', 1);
+        triangle.attr({image: {'xlink:href': img}})
+        var linkNewFirst = new joint.shapes.devs.Link({
+          source: {id: link.getSourceElement().id},
+          target: {id: triangle.id, port: 'in'},
+          router: {name: 'manhattan'},
+          attrs: {'.link-tools': {display: 'none'}, '.marker-vertices': {display: 'none'}, '.marker-arrowheads': {display: 'none'}}
+        });
+        var linkNewSecond = new joint.shapes.devs.Link({
+          source: {id: triangle.id, port: 'out'},
+          target: {id: link.getTargetElement().id},
+          router: {name: 'manhattan'},
+          attrs: {'.link-tools': {display: 'none'}, '.marker-vertices': {display: 'none'}, '.marker-arrowheads': {display: 'none'}}
+        });
+        graph.addCells([triangle, linkNewFirst, linkNewSecond]);
+      }
+      newAttributes['.connection'] = { stroke: 'black', 'stroke-width': 0, 'stroke-dasharray': "0"};
+      newAttributes['.link-tools'] = {display: 'none'};
+      newAttributes['.marker-arrowheads'] = {display: 'none'};
+      newAttributes['.connection-wrap'] = {display: 'none'};
+      newAttributes['.marker-vertices'] = {display: 'none'};
     }
     if (ftag && btag) {
       link.set('labels', [ { position: 0.75, attrs: { text: {text: ftag+'\n'}, rect: {fill: 'transparent'} } },

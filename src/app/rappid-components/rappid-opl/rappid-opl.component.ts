@@ -11,12 +11,13 @@ import {OplDialogComponent} from "../../dialogs/opl-dialog/opl-dialog.component"
   selector: 'opcloud-rappid-opl',
   template: `
     <div class="opl-container">
-       <div *ngFor="let cell of graph.getCells()">
-          <p [innerHTML]="cell.attributes.opl" 
-             (mouseover)="highlightCell(cell)"
-             (mouseleave)="unhighlightCell(cell)">
-          </p>
-      </div> 
+       <ng-container *ngFor="let cell of graph.getCells()">
+          <p *ngIf = "cell.attributes.opl" 
+            [innerHTML]="cell.attributes.opl" 
+            (mouseover)="highlightCell(cell)"
+            (mouseleave)="unhighlightCell(cell)">
+          </p><br *ngIf = "cell.attributes.opl">
+      </ng-container> 
     </div>
   `,
   styleUrls: ['./rappid-opl.component.css']
@@ -74,11 +75,13 @@ export class RappidOplComponent implements OnInit {
           var pt;
           var outboundLinks = this.graph.getConnectedLinks(cell, {outbound: true});
           for (pt in outboundLinks) {
-            this.updateLinkOPL(outboundLinks[pt]);
+            if(outboundLinks[pt].attributes.type == 'opm.Link')
+              this.updateLinkOPL(outboundLinks[pt]);
           }
           var inboundLinks = this.graph.getConnectedLinks(cell, {inbound: true});
           for (pt in inboundLinks) {
-            this.updateLinkOPL(inboundLinks[pt]);
+            if(inboundLinks[pt].attributes.type == 'opm.Link')
+              this.updateLinkOPL(inboundLinks[pt]);
           }
         }
 

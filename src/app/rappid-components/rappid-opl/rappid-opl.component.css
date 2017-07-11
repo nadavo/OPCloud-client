@@ -1,6 +1,7 @@
 .opl-container {
-  height: 20%;
-  padding: 20px;
+  height: 100px;
+  width: 1000px;
+  padding: 5px;
   overflow: auto;
 }
 

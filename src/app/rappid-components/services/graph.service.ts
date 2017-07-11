@@ -60,7 +60,7 @@ export class GraphService {
 
   updateJSON() {
     this.JSON = this.graph.toJSON();
-    this.JSON_string = JSON.stringify(this.JSON);
+  //  this.JSON_string = JSON.stringify(this.JSON);
     // TODO: should add OPL sync to the DB
     // this.modelToSync = { graph: this.JSON_string };
     if (this.modelObject.name !== null) {
