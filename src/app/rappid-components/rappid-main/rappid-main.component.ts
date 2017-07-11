@@ -44,7 +44,7 @@ const _ = require('lodash');
     </div>
     <div id="block_container">
       <opcloud-opd-hierarchy id="opd-block"></opcloud-opd-hierarchy>
-      <opcloud-rappid-opl [graph]="graph" [paper]="paper"></opcloud-rappid-opl>
+      <opcloud-rappid-opl id="opl-block"[graph]="graph" [paper]="paper"></opcloud-rappid-opl>
     </div>
   `,
   styleUrls: ['./rappid-main.component.css'],
@@ -207,7 +207,10 @@ export class RappidMainComponent implements OnInit {
         _this.treeViewService.removeNode(cell.id);
       }
       if(cell.attributes.type === 'app.TriangleAgg'){
-        _this.graph.getCell(cell.attributes.linkId).remove();
+        _.each(cell.attributes.linkId, function(linkToRemove) {
+          if(_this.graph.getCell(linkToRemove))
+              _this.graph.getCell(linkToRemove).remove();
+        });
       }
     });
   }
@@ -500,7 +503,7 @@ export class RappidMainComponent implements OnInit {
       }
     }, this))
 
-    this.graph.on('change.position', _.bind(function(cell){
+    this.graph.on('change:position', _.bind(function(cell){
       if (cell.attributes.type === 'opm.Link') {
         linkDrawing.linkUpdating(cell);
       }

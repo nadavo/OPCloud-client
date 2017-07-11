@@ -11,12 +11,13 @@ import {OplDialogComponent} from "../../dialogs/opl-dialog/opl-dialog.component"
   selector: 'opcloud-rappid-opl',
   template: `
     <div class="opl-container">
-       <div *ngFor="let cell of graph.getCells()">
-          <p [innerHTML]="cell.attributes.opl" 
-             (mouseover)="highlightCell(cell)"
-             (mouseleave)="unhighlightCell(cell)">
-          </p>
-      </div> 
+       <ng-container *ngFor="let cell of graph.getCells()">
+          <p *ngIf = "cell.attributes.opl" 
+            [innerHTML]="cell.attributes.opl" 
+            (mouseover)="highlightCell(cell)"
+            (mouseleave)="unhighlightCell(cell)">
+          </p><br *ngIf = "cell.attributes.opl">
+      </ng-container> 
     </div>
   `,
   styleUrls: ['./rappid-opl.component.css']
