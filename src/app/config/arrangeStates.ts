@@ -37,9 +37,9 @@ export function arrangeStates(side) {
     });
     if (side == 'top') {
       //Change the attributes of the object - will be applied when rendered
-      fatherObject.attributes.attrs.text["ref-y"] = '85%';
+      fatherObject.attributes.attrs.text["ref-y"] = '0.75';
       fatherObject.attributes.attrs.statesArrange = 'top';
-      // fatherObject.attributes.attrs.text["text-anchor"] = 'middle';
+      fatherObject.attributes.attrs.text["ref-x"] = '0.5';
       this.options.cellView.render();
       textBoundBox();
       gridLayout.layout(embeddedStates, {
@@ -50,21 +50,21 @@ export function arrangeStates(side) {
         marginX: (fatherObject.getBBox().x + fatherObject.getBBox().width * 0.5) - 0.5 * (maxWidth + 5) * embeddedStates.length
       });
       common._.each(embeddedStates, function (child) {
-        if (child.getBBox().y  + child.getBBox().height >= textBBox.y + textBBox.height)
+        if (child.getBBox().y + child.getBBox().height >= textBBox.y)
           overText = true;
       });
       if (overText) {
         common._.each(embeddedStates, function (child) {
-          child.set({position: {x: child.getBBox().x, y: textBBox.y - textBBox.height - maxHeight }});
+          child.set({position: {x: child.getBBox().x, y: textBBox.y - textBBox.height - maxHeight}});
         });
         overText = false;
       }
     }
     else if (side == 'bottom') {
       //Change the attributes of the object - will be applied when rendered
-      fatherObject.attributes.attrs.text["ref-y"] = '15%';
+      fatherObject.attributes.attrs.text["ref-y"] = '0.25';
       fatherObject.attributes.attrs.statesArrange = 'bottom';
-      // fatherObject.attributes.attrs.text["text-anchor"] = 'middle';
+      fatherObject.attributes.attrs.text["ref-x"] = '0.5';
       this.options.cellView.render();
       textBoundBox();
       gridLayout.layout(embeddedStates, {
@@ -75,13 +75,18 @@ export function arrangeStates(side) {
         marginX: (fatherObject.getBBox().x + fatherObject.getBBox().width * 0.5) - 0.5 * (maxWidth + 5) * embeddedStates.length
       });
       common._.each(embeddedStates, function (child) {
-        if (child.getBBox().y <= textBBox.y) {
+        if (child.getBBox().y <= textBBox.y + textBBox.height) {
           overText = true;
         }
       });
       if (overText) {
         common._.each(embeddedStates, function (child) {
-          child.set({position: {x: child.getBBox().x, y: textBBox.y + maxHeight}});
+          child.set({
+            position: {
+              x: child.getBBox().x,
+              y: textBBox.y + textBBox.height + paddingObject / 2
+            }
+          });
         });
         overText = false;
       }
@@ -89,8 +94,9 @@ export function arrangeStates(side) {
     else if (side == 'left') {
       fatherObject.attributes.attrs.text["ref-y"] = '0.5';
       fatherObject.attributes.attrs.statesArrange = 'left';
-      // fatherObject.attributes.attrs.text["text-anchor"] = 'end';
+      fatherObject.attributes.attrs.text["ref-x"] = '0.25';
       this.options.cellView.render();
+      debugger;
       textBoundBox();
       gridLayout.layout(embeddedStates, {
         columns: 1,
@@ -101,14 +107,16 @@ export function arrangeStates(side) {
         marginX: ((fatherObject.getBBox().x + fatherObject.getBBox().width) - paddingObject) - maxWidth
       });
       common._.each(embeddedStates, function (child) {
+        debugger;
         if (child.getBBox().x <= textBBox.x + textBBox.width)
           overText = true;
       });
       if (overText) {
         common._.each(embeddedStates, function (child) {
+          debugger;
           child.set({
             position: {
-              x: textBBox.x + textBBox.width + paddingObject + maxWidth,
+              x: textBBox.x + textBBox.width + paddingObject * 0.8,
               y: child.getBBox().y
             }
           });
@@ -119,7 +127,7 @@ export function arrangeStates(side) {
     else if (side == 'right') {
       fatherObject.attributes.attrs.text["ref-y"] = '0.5';
       fatherObject.attributes.attrs.statesArrange = 'right';
-      // fatherObject.attributes.attrs.text["text-anchor"] = 'start';
+      fatherObject.attributes.attrs.text["ref-x"] = '0.75';
       this.options.cellView.render();
       textBoundBox();
       gridLayout.layout(embeddedStates, {
@@ -136,7 +144,12 @@ export function arrangeStates(side) {
       });
       if (overText) {
         common._.each(embeddedStates, function (child) {
-          child.set({position: {x: textBBox.x - textBBox.width - maxWidth, y: child.getBBox().y}});
+          child.set({
+            position: {
+              x: textBBox.x - textBBox.width - paddingObject * 0.8,
+              y: child.getBBox().y
+            }
+          });
         });
         overText = false;
       }
@@ -146,7 +159,8 @@ export function arrangeStates(side) {
   function textBoundBox() {
     text = options.paper.findViewByModel(fatherObject).$('text')[0];
     textBBox = text.getBBox();
-    textBBox.x = fatherObject.getBBox().x + fatherObject.getBBox().width * 0.5 + textBBox.x;
-    textBBox.y = fatherObject.getBBox().y + fatherObject.getBBox().height * 0.45 + textBBox.y;
+    debugger;
+    textBBox.x = fatherObject.getBBox().x + fatherObject.getBBox().width * fatherObject.attributes.attrs.text["ref-x"] + textBBox.x;
+    textBBox.y = fatherObject.getBBox().y + fatherObject.getBBox().height * fatherObject.attributes.attrs.text["ref-y"] + textBBox.y;
   }
 }
