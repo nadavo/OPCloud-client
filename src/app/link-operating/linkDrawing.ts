@@ -148,7 +148,7 @@ export const linkDrawing = {
       var outboundLinks = graph.getConnectedLinks(link.getSourceElement(), { outbound: true });
       var targetTriangle;
       for (var pt in outboundLinks) {
-        if(outboundLinks[pt].attributes.type == 'devs.Link'){
+        if(outboundLinks[pt].attributes.type == 'opm.StructLink'){
           var tmpTargetTriangle = outboundLinks[pt].getTargetElement();
           if(tmpTargetTriangle.get('linkName') == linkName) {
             var newIdArray = tmpTargetTriangle.get('linkId');
@@ -159,7 +159,7 @@ export const linkDrawing = {
         }
       }
       if(targetTriangle){
-        var linkNewSecond = new joint.shapes.devs.Link({
+        var linkNewSecond = new joint.shapes.opm.StructLink({
           source: { id: targetTriangle.id, port: 'out'},
           target: { id: link.getTargetElement().id},
           router: { name: 'manhattan' },
@@ -179,17 +179,13 @@ export const linkDrawing = {
         triangle.set('linkName', linkName);
         triangle.set('numberOfTargets', 1);
         triangle.attr({image: {'xlink:href': img}})
-        var linkNewFirst = new joint.shapes.devs.Link({
+        var linkNewFirst = new joint.shapes.opm.StructLink({
           source: {id: link.getSourceElement().id},
           target: {id: triangle.id, port: 'in'},
-          router: {name: 'manhattan'},
-          attrs: {'.link-tools': {display: 'none'}, '.marker-vertices': {display: 'none'}, '.marker-arrowheads': {display: 'none'}}
         });
-        var linkNewSecond = new joint.shapes.devs.Link({
+        var linkNewSecond = new joint.shapes.opm.StructLink({
           source: {id: triangle.id, port: 'out'},
           target: {id: link.getTargetElement().id},
-          router: {name: 'manhattan'},
-          attrs: {'.link-tools': {display: 'none'}, '.marker-vertices': {display: 'none'}, '.marker-arrowheads': {display: 'none'}}
         });
         graph.addCells([triangle, linkNewFirst, linkNewSecond]);
       }

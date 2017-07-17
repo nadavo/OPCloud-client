@@ -206,16 +206,16 @@ export class RappidMainComponent implements OnInit {
       if (cell.attributes.type === 'opm.Process') {
         _this.treeViewService.removeNode(cell.id);
       }
-      if (cell.attributes.type === 'app.TriangleAgg') {
+      if (cell.attributes.type === 'opm.TriangleAgg') {
         _.each(cell.attributes.linkId, function (linkToRemove) {
           if (_this.graph.getCell(linkToRemove))
             _this.graph.getCell(linkToRemove).remove();
         });
       }
-      if(cell.attributes.type === 'devs.Link'){
-          if(_this.graph.getCell(cell.get('target').id).attributes.type === 'app.TriangleAgg')
+      if(cell.attributes.type === 'opm.StructLink'){
+          if(_this.graph.getCell(cell.get('target').id).attributes.type === 'opm.TriangleAgg')
             _this.graph.getCell(cell.get('target').id).remove();
-          if(_this.graph.getCell(cell.get('source').id).attributes.type === 'app.TriangleAgg'){
+          if(_this.graph.getCell(cell.get('source').id).attributes.type === 'opm.TriangleAgg'){
             var triangle = _this.graph.getCell(cell.get('source').id);
             var numberOfTargets = triangle.get('numberOfTargets');
             if(numberOfTargets>1){
@@ -515,7 +515,7 @@ export class RappidMainComponent implements OnInit {
 
     this.graph.on('change:size', _.bind(function (cell, attrs){
       if (cell.attributes.attrs.text && !cell.attributes.attrs.wrappingResized) { //resized manually
-        textWrapping.wrapTextAfterSizeChange(cell);
+        //textWrapping.wrapTextAfterSizeChange(cell);
       }
     }, this))
   }

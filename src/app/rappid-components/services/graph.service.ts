@@ -47,14 +47,16 @@ export class GraphService {
   saveGraph(modelName) {
     console.log('inside saveModel func')
     // TODO: work on this.graph.modelObject - might be JSON
-    this.modelObject.saveModelParam(modelName, firebaseKeyEncode.deepEncode(this.JSON));
+    this.modelObject.saveModelParam(modelName, this.JSON);
+    firebaseKeyEncode.deepEncode(this.modelObject.modelData);
     this.modelStorage.save(this.modelObject);
   }
 
   loadGraph(name) {
     this.modelStorage.get(name).then((res) => {
       this.modelObject = res;
-      this.graph.fromJSON(firebaseKeyEncode.deepDecode(this.modelObject.modelData));
+      firebaseKeyEncode.deepDecode(this.modelObject.modelData)
+      this.graph.fromJSON(this.modelObject.modelData);
     });
   }
 
@@ -66,6 +68,7 @@ export class GraphService {
     if (this.modelObject.name !== null) {
        // update DB
       console.log('go to FB');
+      firebaseKeyEncode.deepEncode(this.modelObject.modelData);
       this.modelStorage.save(this.modelObject);
       this.saveGraph(this.modelObject.name); //DM
     }
