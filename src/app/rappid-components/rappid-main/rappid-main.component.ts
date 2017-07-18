@@ -270,7 +270,6 @@ export class RappidMainComponent implements OnInit {
 
 
   initializePaper() {
-
     this.graph.on('add', (cell, collection, opt) => {
       if (opt.stencil) {
         this.cell = cell;
@@ -521,6 +520,16 @@ export class RappidMainComponent implements OnInit {
   }
 
   initializeAttributesEvents(){
+    var _this = this;
+    this.paper.on('cell:pointerup blank:pointerclick ', function (cellView) {
+      _this.graphService.updateJSON();
+    });
+    this.paper.on('cell:pointerdown', function (cellView) {
+      var cell = cellView.model;
+      cell.on('cell:pointerup', function (cellView) {
+        _this.graphService.updateJSON();
+      });
+    });
     this.graph.on('change:attrs', _.bind(function (cell, attrs){
       //If value of an object was changed - add/modify a state according to it
       if (cell.isElement() && attrs.value){
@@ -538,7 +547,7 @@ export class RappidMainComponent implements OnInit {
 
   initializeHaloAndInspector() {
      var _this = this;
-    this.paper.on('element:pointerup link:options', function (cellView) {
+     this.paper.on('element:pointerup link:options', function (cellView) {
 
       var cell = cellView.model;
 

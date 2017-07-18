@@ -28,13 +28,10 @@ export class GraphService {
     this.currentGraphId = rootId;
     // this.initializeDatabase();
     // TODO: change:position emits on mousemove, find a better event - when drag stopped
-    this.graph.on(`add 
-                  remove 
-                  change:position 
-                  change:attrs 
-                  change:size 
-                  change:angle`,
+    this.graph.on(`
+                  remove`,
       () => this.updateJSON());
+
      this.modelObject = new ModelObject(null, null);
   }
 
@@ -53,7 +50,7 @@ export class GraphService {
   }
 
   loadGraph(name) {
-    this.modelStorage.get(name).then((res) => {
+    this.modelStorage.getAndListen(name, this.graph).then((res) => {
       this.modelObject = res;
       firebaseKeyEncode.deepDecode(this.modelObject.modelData)
       this.graph.fromJSON(this.modelObject.modelData);
@@ -63,7 +60,10 @@ export class GraphService {
   updateJSON() {
     if (this.modelObject.name !== null) {
        // update DB
-      this.saveGraph(this.modelObject.name);
+     // console.log('go to FB');
+     // firebaseKeyEncode.deepEncode(this.modelObject.modelData);
+     // this.modelStorage.save(this.modelObject);
+      this.saveGraph(this.modelObject.name); //DM
     }
     else {
       localStorage.setItem(this.modelObject.name, this.modelToSync);

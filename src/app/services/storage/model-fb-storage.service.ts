@@ -2,6 +2,7 @@ import { Injectable, Inject } from '@angular/core';
 import { ModelStorageInterface } from './model-storage.interface';
 import { ModelObject } from './model-object.class';
 import { FirebaseObjectObservable, AngularFire, FirebaseApp } from 'angularfire2';
+const firebaseKeyEncode = require('firebase-key-encode');
 
 @Injectable()
 export class ModelFbStorageService extends ModelStorageInterface {
@@ -20,6 +21,17 @@ export class ModelFbStorageService extends ModelStorageInterface {
       .then((snapshot) => {
         return new ModelObject(modelName, snapshot.val());
       });
+  }
+
+  getAndListen(modelName: string, graph): any {
+    let ref = this.fb.database().ref(`/models/${modelName}`);
+    var newValue = this.get(modelName);
+    ref.on('value', function (snapshot) {
+      var json = snapshot.val();
+      firebaseKeyEncode.deepDecode(json)
+      graph.fromJSON(json);
+    });
+    return newValue;
   }
 
   save(modelObject: ModelObject): any {
