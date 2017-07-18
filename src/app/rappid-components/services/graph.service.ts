@@ -36,7 +36,6 @@ export class GraphService {
                   change:angle`,
       () => this.updateJSON());
      this.modelObject = new ModelObject(null, null);
-
   }
 
   getGraph(name?: string) {
@@ -47,6 +46,7 @@ export class GraphService {
   saveGraph(modelName) {
     console.log('inside saveModel func')
     // TODO: work on this.graph.modelObject - might be JSON
+    this.JSON = this.graph.toJSON();
     this.modelObject.saveModelParam(modelName, this.JSON);
     firebaseKeyEncode.deepEncode(this.modelObject.modelData);
     this.modelStorage.save(this.modelObject);
@@ -61,40 +61,37 @@ export class GraphService {
   }
 
   updateJSON() {
-    this.JSON = this.graph.toJSON();
-  //  this.JSON_string = JSON.stringify(this.JSON);
-    // TODO: should add OPL sync to the DB
-    // this.modelToSync = { graph: this.JSON_string };
     if (this.modelObject.name !== null) {
        // update DB
       console.log('go to FB');
       firebaseKeyEncode.deepEncode(this.modelObject.modelData);
       this.modelStorage.save(this.modelObject);
-      this.saveGraph(this.modelObject.name); //DM
+     // this.saveGraph(this.modelObject.name); //DM
     }
     else {
       localStorage.setItem(this.modelObject.name, this.modelToSync);
     }
   }
 
+
 //   this.fireDB.ref('/models/' + this.modelName).on('value', function (snapshot) {
 //   getModel(snapshot.val());
 // });
 
-   /*
-   _.bind(this.graph.updateModel, this.graph);
+/*
+
    this.graph.listen = function () {
    function getModel(model) {
-   if (app.graph.myChangeLock) {
+   if (this.graph.myChangeLock) {
    //console.log('my change');
-   app.graph.myChangeLock = false;
+   this.graph.myChangeLock = false;
    return;
    }
-   app.graph.JSON_string = model.graph;
-   app.graph.JSON = JSON.parse(app.graph.JSON_string);
-   app.graph.fromJSON(JSON.parse(app.graph.JSON_string));
-   app.graph.OPL = model.opl;
-   document.getElementById("opl").innerHTML = app.graph.OPL;
+   this.graph.JSON_string = model.graph;
+   this.graph.JSON = JSON.parse(this.graph.JSON_string);
+   this.graph.fromJSON(JSON.parse(this.graph.JSON_string));
+   this.graph.OPL = model.opl;
+   document.getElementById("opl").innerHTML = this.graph.OPL;
    };
    if (this.modelName !== 'undefined') {
    this.fireDB.ref('/models/' + this.modelName).on('value', function (snapshot) {
@@ -104,7 +101,8 @@ export class GraphService {
    };
    _.bind(this.graph.listen, this.graph);
    this.graph.listen();
-   }*/
+   }
+*/
 
   getGraphById(ElementId: string) {
     this.graph.fromJSON(JSON.parse(localStorage.getItem(ElementId)));
