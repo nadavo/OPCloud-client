@@ -63,10 +63,7 @@ export class GraphService {
   updateJSON() {
     if (this.modelObject.name !== null) {
        // update DB
-      console.log('go to FB');
-      firebaseKeyEncode.deepEncode(this.modelObject.modelData);
-      this.modelStorage.save(this.modelObject);
-     // this.saveGraph(this.modelObject.name); //DM
+      this.saveGraph(this.modelObject.name);
     }
     else {
       localStorage.setItem(this.modelObject.name, this.modelToSync);
