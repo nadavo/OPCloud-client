@@ -40,30 +40,29 @@ export class GraphService {
     return name ? this.loadGraph(name) : this.graph;
   }
 
-  saveGraph(modelName) {
+  saveGraph(modelName, firstSave) {
     console.log('inside saveModel func')
     // TODO: work on this.graph.modelObject - might be JSON
     this.JSON = this.graph.toJSON();
     this.modelObject.saveModelParam(modelName, this.JSON);
     firebaseKeyEncode.deepEncode(this.modelObject.modelData);
     this.modelStorage.save(this.modelObject);
+    if(firstSave)     //if saveAs and not only save
+      this.modelStorage.listen(modelName, this.graph);
   }
 
   loadGraph(name) {
-    this.modelStorage.getAndListen(name, this.graph).then((res) => {
+    this.modelStorage.get(name).then((res) => {
       this.modelObject = res;
       firebaseKeyEncode.deepDecode(this.modelObject.modelData)
       this.graph.fromJSON(this.modelObject.modelData);
     });
+    this.modelStorage.listen(name, this.graph);
   }
 
   updateJSON() {
     if (this.modelObject.name !== null) {
-       // update DB
-     // console.log('go to FB');
-     // firebaseKeyEncode.deepEncode(this.modelObject.modelData);
-     // this.modelStorage.save(this.modelObject);
-      this.saveGraph(this.modelObject.name); //DM
+      this.saveGraph(this.modelObject.name, false);
     }
     else {
       localStorage.setItem(this.modelObject.name, this.modelToSync);

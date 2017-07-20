@@ -23,14 +23,18 @@ export class ModelFbStorageService extends ModelStorageInterface {
       });
   }
 
-  getAndListen(modelName: string, graph): any {
+  listen(modelName: string, graph): any {
     let ref = this.fb.database().ref(`/models/${modelName}`);
-    var newValue = this.get(modelName);
     ref.on('value', function (snapshot) {
       var json = snapshot.val();
       firebaseKeyEncode.deepDecode(json)
       graph.fromJSON(json);
     });
+  }
+
+  getAndListen(modelName: string, graph): any {
+    var newValue = this.get(modelName);
+    this.listen(modelName, graph);
     return newValue;
   }
 

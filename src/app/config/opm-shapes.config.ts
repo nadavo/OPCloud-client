@@ -11,6 +11,7 @@ import { basicDefinitions } from './basicDefinitions';
 
 export const opmShapes = {
   //OPM Links definitions
+
   Link: joint.dia.Link.extend(basicDefinitions.defineLink()),
   Object: joint.dia.Element.extend(basicDefinitions.defineShape('rect')),
   Process: joint.dia.Element.extend(basicDefinitions.defineShape('ellipse')),

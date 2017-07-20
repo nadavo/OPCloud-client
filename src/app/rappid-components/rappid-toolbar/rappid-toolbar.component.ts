@@ -40,7 +40,7 @@ export class RappidToolbarComponent implements OnInit {
     if (this.graphService.modelObject.name === null) {
       return this.saveModelAs();
     }
-    return this.graphService.saveGraph(this.graphService.modelObject.name);
+    return this.graphService.saveGraph(this.graphService.modelObject.name, false);
   }
 
   saveModelAs() {
@@ -52,7 +52,7 @@ export class RappidToolbarComponent implements OnInit {
       console.log("Model not saved");
       return;
     }
-    this.graphService.saveGraph(result);
+    this.graphService.saveGraph(result, true);
   }
 
   loadModel() {
