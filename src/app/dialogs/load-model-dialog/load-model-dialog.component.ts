@@ -11,13 +11,16 @@ import { ModelStorageInterface } from '../../services/storage/model-storage.inte
         Select a model to load
       </label>
     </p>
+    <md-dialog-content>
     <ul>
       <li *ngFor="let model of models | async" 
-          (click)="select(model)" 
+          (click)="select(model)"
+          (dblclick)="dialogRef.close(model)"
           [ngClass]="model === selected ? 'selected' : ''">
             {{model}}
       </li>
     </ul>
+    </md-dialog-content>
     <hr>
     <p> 
       <button md-button (click)="dialogRef.close(selected)">LOAD</button> 
