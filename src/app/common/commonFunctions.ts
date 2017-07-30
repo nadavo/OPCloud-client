@@ -5,7 +5,6 @@ export const paddingProcess = 35;
 export const joint = require('rappid');
 export const width = require('text-width');
 export const height = require('text-height');
-export const wrapText = require("wrap-text");
 
 export const CommonFunctions = {
 

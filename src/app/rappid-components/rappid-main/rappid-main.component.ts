@@ -9,6 +9,7 @@ import { linkTypeSelection} from '../../link-operating/linkTypeSelection'
 import { addState } from '../../config/add-state';
 import { CommandManagerService } from '../services/command-manager.service';
 import { textWrapping } from './textWrapping';
+import { wrapAndSize } from './textWrapping';
 import { valueHandle } from './valueHandle';
 import {arrangeStates} from '../../config/arrangeStates';
 import * as common from "../../common/commonFunctions";
@@ -66,9 +67,6 @@ export class RappidMainComponent implements OnInit {
   private navigator;
   private toolbar;
   private RuleSet;
-
-
-
 
   @ViewChild('rappidContainer', { read: ViewContainerRef }) rappidContainer;
 
@@ -432,7 +430,7 @@ export class RappidMainComponent implements OnInit {
     }, this);
   }
 
-  initializeTextEditing () {
+    initializeTextEditing () {
     var lastEnteredText;
     var currentCellView;
     this.paper.on('cell:pointerdblclick', function (cellView, evt) {
@@ -444,8 +442,26 @@ export class RappidMainComponent implements OnInit {
       });
     }, this)
     this.graph.on('change:attrs', function (cell) {
-      if(cell.attributes.type != 'opm.Link'){
-        var view = this.paper.findViewByModel(cell),
+      if((cell.get('type') != 'opm.Link') && (cell.attr('text/text') != lastEnteredText) &&
+          !cell.attributes.attrs.wrappingResized){  //if the text was changed
+        var textString = cell.attr('text/text');
+        var newParams = {width: cell.get('minSize').width, height: cell.get('minSize').height, text: '\t'};    //No empty name is allowed
+        if(textString.trim() != '') { //if there is areal text - not spaces
+          newParams = textWrapping.calculateNewTextSize(textString, cell);
+        }
+        cell.attributes.attrs.wrappingResized = true;
+        cell.attr({text: {text: newParams.text}});
+        if( !((newParams.width <= cell.get('size').width) && (newParams.height <= cell.get('size').height) && cell.attributes.attrs.manuallyResized)) {
+          cell.resize(newParams.width, newParams.height);
+          cell.attributes.attrs.manuallyResized = false;
+        }
+        cell.attributes.attrs.wrappingResized = false;
+
+
+
+
+
+        /*var view = this.paper.findViewByModel(cell),
           text = view.$("text"),                     // Get shape element
           bboxText = text[0].getClientRects()[0];    // Text box dimensions
         // Give the element padding on the right/bottom while keeping shape's ratio being 5/9 for process\object and 1/2 for state.
@@ -453,7 +469,6 @@ export class RappidMainComponent implements OnInit {
         var padding = (cell.attributes.type == 'opm.StateNorm') ? 10 : ((cell.attributes.type == 'opm.Object') ? 15 : 35);
         var minWidth = (cell.attributes.type == 'opm.StateNorm') ? 50 : 90;
         var minHeight = (cell.attributes.type == 'opm.StateNorm') ? 25 : 50;
-        var textString = cell.attributes.attrs.text.text;
         let newShapeWidth = bboxText ? (
               (cell.attributes.attrs.text['ref-x'] == '0.5') ? (bboxText.width + padding) :
                 (bboxText.width / (0.2 + Math.abs(0.5 - cell.attributes.attrs.text['ref-x'])) + padding)) : 0,
@@ -463,25 +478,7 @@ export class RappidMainComponent implements OnInit {
           currentWidth = cell.get('size').width,
           currentHeight = cell.get('size').height,
           manuallyResized = cell.attributes.attrs.manuallyResized;
-        // Units have to be bellow the object's name
-        if (newShapeWidth >= currentWidth) {
-          var lastWhiteSpace = textString.lastIndexOf(' ');
-          if (lastWhiteSpace > -1)
-            textString = textString.slice(0, lastWhiteSpace) + '\n' + textString.slice(lastWhiteSpace + 1);
-        }
-        if (textString.includes('[') && !textString.includes('\n[')) {
-          textString = textString.replace('[', '\n[');
-          if (textString.includes('[\n')) {
-            textString = textString.replace('[\n', '[');
-          }
-        }
-        if(textString == ''){
-          textString = '\t';
-        }
-        if(textString != cell.attributes.attrs.text.text){
-          newShapeWidth = textWrapping.getParagraphWidth(textString, cell)+padding;
-          cell.attr({text: {text: textString}});
-        }
+
         // Shape being resized to text size if not being manually resized or if being renamed after manually resize
         if ( !((newShapeWidth < currentWidth) && (newShapeHeight < currentHeight) && manuallyResized) ) {
           var division = newShapeHeight/newShapeWidth;
@@ -498,7 +495,7 @@ export class RappidMainComponent implements OnInit {
           cell.resize(newWidthForUpdate, newHeightForUpdate);
           cell.attributes.attrs.wrappingResized = false;
           cell.attributes.attrs.manuallyResized = false;
-        }
+        }*/
       }
     }, this)
 
@@ -514,7 +511,7 @@ export class RappidMainComponent implements OnInit {
 
     this.graph.on('change:size', _.bind(function (cell, attrs){
       if (cell.attributes.attrs.text && !cell.attributes.attrs.wrappingResized) { //resized manually
-        //textWrapping.wrapTextAfterSizeChange(cell);
+        textWrapping.wrapTextAfterSizeChange(cell);
       }
     }, this))
   }
@@ -558,8 +555,10 @@ export class RappidMainComponent implements OnInit {
           new joint.ui.FreeTransform({
             cellView: cellView,
             allowRotation: false,
-            preserveAspectRatio: !!cell.get('preserveAspectRatio'),
-            allowOrthogonalResize: cell.get('allowOrthogonalResize') !== false
+            preserveAspectRatio: true,
+            allowOrthogonalResize: true,
+            //minWidth: 70,
+            //minHeight: 40
           }).render();
 
           const halo = new joint.ui.Halo({

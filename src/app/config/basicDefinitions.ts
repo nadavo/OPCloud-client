@@ -6,6 +6,8 @@ export const basicDefinitions = {
 
   stateWidth: 50,
   stateHeight: 25,
+  objectProcessWidth: 90,
+  objectProcessHeight: 50,
 
   textWrap(s, textWidth){
     return joint.util.breakText(s, {width: textWidth});
@@ -48,6 +50,8 @@ export const basicDefinitions = {
       defaults: _.defaultsDeep({
         type: (shapeName == 'rect') ? 'opm.Object' : 'opm.Process',
         size: {width: 90, height: 50},
+        minSize: {width: 90, height: 50},
+        padding: (shapeName == 'rect') ? 15 : 35,
         attrs: {
           [shapeName]: this.createShape(shapeName),
           'text': this.createText(shapeName),
@@ -76,9 +80,13 @@ export const basicDefinitions = {
       defaults: _.defaultsDeep({
         type: 'opm.StateNorm',
         size: {width: this.stateWidth, height: this.stateHeight},
+        minSize: {width: 50, height: 25},
+        padding: 10,
         attrs: {
           rect: this.createShape('state'),
           text: this.createText('state'),
+          'wrappingResized' : false,
+          'manuallyResized' : false,
         },
         'father': null
       }, joint.shapes.basic.Generic.prototype.defaults)
