@@ -7,7 +7,6 @@ import { AppComponent } from './app.component';
 import { RappidModule } from './rappid-components/rappid.module';
 import { HeaderComponent } from './header/header.component';
 import { ModelLocalStorageService } from './services/storage/model-local-storage.service';
-import { MaterialModule } from '@angular/material';
 import { SaveModelDialogComponent } from './dialogs/save-model-dialog/save-model-dialog.component';
 import { LoadModelDialogComponent } from './dialogs/load-model-dialog/load-model-dialog.component';
 
@@ -26,6 +25,9 @@ import {Tabs} from "./dialogs/choose-link-dialog/tabs";
 import {TreeViewService} from './services/tree-view.service';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
+import { MaterialModule } from './common/material/material.module';
+
+import 'hammerjs';
 
 @NgModule({
   declarations: [
