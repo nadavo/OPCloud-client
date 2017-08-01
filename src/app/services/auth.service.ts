@@ -1,19 +1,20 @@
 import { Injectable } from '@angular/core';
-import { AngularFire, AngularFireAuth } from 'angularfire2';
+import { AngularFireAuth } from 'angularfire2/auth';
 
 @Injectable()
 export class AuthService {
   user;
   pending = true;
+  auth;
 
-  constructor(private af: AngularFire, public auth: AngularFireAuth) {
-    af.auth.subscribe(user => {
+  constructor(public af: AngularFireAuth) {
+    this.auth = af.authState;
+    af.authState.subscribe(user => {
       this.pending = false;
-      if(user) {
+      if (user) {
         // user logged in
         this.user = user;
-      }
-      else {
+      } else {
         // user not logged in
         this.user = null;
       }
@@ -22,11 +23,11 @@ export class AuthService {
 
 
   login(email, password) {
-    this.af.auth.login({ email, password })
+    this.af.auth.signInWithEmailAndPassword(email, password)
   }
 
   logout() {
-    this.af.auth.logout();
+    this.af.auth.signOut();
   }
 
   isAuthenticated() {
