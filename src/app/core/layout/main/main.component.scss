@@ -1,0 +1,42 @@
+:host {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.sd-tree-menu-icon {
+  position: absolute;
+  top: 74px;
+  z-index: 2;
+  cursor: pointer;
+}
+
+.opcloud-container {
+  height: 100%;
+
+  .sd-tree-menu {
+    padding: 20px;
+    width: 300px;
+    max-width: 100%;
+    height: 100%;
+    overflow: auto;
+
+    // workaround to allow reducing the width beyond the initial value
+    &:active {
+      width: 0;
+    }
+  }
+
+  .sd-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+}
+
+.main-content {
+  overflow: auto;
+  height: 100%;
+}
