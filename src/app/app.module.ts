@@ -12,10 +12,6 @@ import { LoadModelDialogComponent } from './dialogs/load-model-dialog/load-model
 import { AngularFireModule } from 'angularfire2';
 import { ModelStorageInterface } from './services/storage/model-storage.interface';
 import { ModelFbStorageService } from './services/storage/model-fb-storage.service';
-// popup
-import { DialogComponent } from './dialogs/choose-link-dialog/Dialog.component';
-import { Tab } from './dialogs/choose-link-dialog/tab';
-import { Tabs } from './dialogs/choose-link-dialog/tabs';
 
 import { TreeViewService } from './services/tree-view.service';
 import { AngularFireAuthModule } from 'angularfire2/auth';
@@ -29,6 +25,10 @@ import { UserService } from './services/user.service';
 import { AppRoutingModule } from './app-routing.module';
 import { environment } from '../environments/environment';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { Tab } from './dialogs/choose-link-dialog/tab';
+import { Tabs } from './dialogs/choose-link-dialog/tabs';
+import { DialogComponent } from './dialogs/choose-link-dialog/Dialog.component';
+import { OplDialogComponent } from './dialogs/opl-dialog/opl-dialog.component';
 
 @NgModule({
   declarations: [
@@ -36,9 +36,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     HeaderComponent,
     SaveModelDialogComponent,
     LoadModelDialogComponent,
-
-    //popup Links
     DialogComponent,
+    OplDialogComponent,
     Tabs,
     Tab
   ],
@@ -54,7 +53,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     AngularFireDatabaseModule,
     CoreModule,
     SharedModule,
-    AppRoutingModule
+    // AppRoutingModule
   ],
   providers: [
     { provide: ModelStorageInterface, useClass: ModelFbStorageService },
@@ -64,9 +63,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   entryComponents: [
     SaveModelDialogComponent,
     LoadModelDialogComponent,
-
-    //popup Component
     DialogComponent,
+    OplDialogComponent
   ],
   bootstrap: [AppComponent]
 })

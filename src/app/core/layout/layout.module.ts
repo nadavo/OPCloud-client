@@ -8,13 +8,15 @@ import { UserStatusComponent } from './header/user-status/user-status.component'
 import { RouterModule } from '@angular/router';
 import { SignInComponent } from './header/sign-in/sign-in.component';
 import { FormsModule } from '@angular/forms';
+import { RappidModule } from '../../rappid-components/rappid.module';
 
 @NgModule({
   imports: [
     CommonModule,
     SharedModule,
     RouterModule,
-    FormsModule
+    FormsModule,
+    RappidModule
   ],
   declarations: [
     MainComponent,

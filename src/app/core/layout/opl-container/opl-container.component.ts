@@ -9,7 +9,9 @@ import { Component, OnInit } from '@angular/core';
       OPL
       <i class="material-icons app-toolbar-menu-icon">{{ oplOpen ? 'expand_more' : 'expand_less' }}</i>
     </button>
+
     <div class="opl-widget" *ngIf="oplOpen">
+      <ng-content></ng-content>
     </div>
   `,
   styleUrls: ['./opl-container.component.scss']

@@ -1,65 +1,36 @@
-import { Component, OnInit, ViewChild, ViewContainerRef,ComponentFactoryResolver,ComponentRef,Input } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { GraphService } from '../services/graph.service';
 import { haloConfig } from '../../config/halo.config';
 import { toolbarConfig } from '../../config/toolbar.config';
 import { opmShapes } from '../../config/opm-shapes.config';
 import { opmRuleSet } from '../../config/opm-validator';
-import { MdDialog } from '@angular/material';
-import { linkTypeSelection} from '../../link-operating/linkTypeSelection'
+import { linkTypeSelection } from '../../link-operating/linkTypeSelection'
 import { addState } from '../../config/add-state';
 import { CommandManagerService } from '../services/command-manager.service';
-import { textWrapping } from './textWrapping';
-import { wrapAndSize } from './textWrapping';
-import { valueHandle } from './valueHandle';
-import {arrangeStates} from '../../config/arrangeStates';
-import * as common from "../../common/commonFunctions";
-
+import { textWrapping } from '../rappid-main/textWrapping';
+import { valueHandle } from '../rappid-main/valueHandle';
+import { arrangeStates } from '../../config/arrangeStates';
+import * as common from '../../common/commonFunctions';
 //treeview imports
-import {TreeViewService} from '../../services/tree-view.service';
+import { TreeViewService } from '../../services/tree-view.service';
 import { processInzooming } from '../../config/process-inzooming';
-
 // popup imports
-// import {DialogComponent} from "../../dialogs/choose-link-dialog/Dialog.component";
-import {OplDialogComponent} from "../../dialogs/opl-dialog/opl-dialog.component";
-import {linkDrawing} from "../../link-operating/linkDrawing";
-import { DialogComponent } from '../../core/layout/dialogs/choose-link-dialog/Dialog.component';
+import { linkDrawing } from '../../link-operating/linkDrawing';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 const joint = require('rappid');
 
-const $ = require('jquery');
-// window.jQuery = $;
+// TODO: import specific lodash methods
 const _ = require('lodash');
 
-
-
-
-
-@Component({
-  selector: 'opcloud-rappid-main',
-  template: `
-    <div class="rappid-main rappid" #rappidContainer>
-      <!--<opcloud-rappid-toolbar></opcloud-rappid-toolbar>-->
-      <opcloud-rappid-stencil [graph]="graph" [paper]="paper" [paperScroller]="paperScroller"></opcloud-rappid-stencil>
-      <opcloud-rappid-paper [paper]="paper" [paperScroller]="paperScroller"></opcloud-rappid-paper>
-      <opcloud-rappid-inspector [cell]="cell"></opcloud-rappid-inspector>
-      <opcloud-rappid-navigator [paperScroller]="paperScroller"></opcloud-rappid-navigator>
-    </div>
-    <div id="block_container">
-      <opcloud-opd-hierarchy id="opd-block"></opcloud-opd-hierarchy>
-      <opcloud-rappid-opl id="opl-block"[graph]="graph" [paper]="paper"></opcloud-rappid-opl>
-    </div>
-  `,
-  styleUrls: ['./rappid-main.component.css'],
-  //add DialogComponent
-})
-
-export class RappidMainComponent implements OnInit {
+@Injectable()
+export class InitRappidService {
+  cell$ = new BehaviorSubject(null);
+  dialog$ = new BehaviorSubject(null);
   graph = null;
   paper;
-  cell;
   commandManager;
-  private snaplines;
-  private paperScroller;
+  paperScroller;
   private keyboard;
   private clipboard;
   private selection;
@@ -68,19 +39,14 @@ export class RappidMainComponent implements OnInit {
   private toolbar;
   private RuleSet;
 
-  @ViewChild('rappidContainer', { read: ViewContainerRef }) rappidContainer;
-
-  constructor(private graphService:GraphService,
-              commandManagerService: CommandManagerService,
-              private _dialog: MdDialog,private viewContainer: ViewContainerRef,
-              private componentFactoryResolver: ComponentFactoryResolver,private treeViewService:TreeViewService) {
+  constructor(
+    private graphService: GraphService,
+    commandManagerService: CommandManagerService,
+    private treeViewService: TreeViewService) {
     this.graph = graphService.getGraph();
     this.commandManager = commandManagerService.commandManager;
-  }
 
-  ngOnInit() {
     joint.setTheme('modern');
-    // this.initializeDatabase();
     this.initializePaper();
     this.initializeSelection();
     this.initializeHaloAndInspector();
@@ -93,107 +59,96 @@ export class RappidMainComponent implements OnInit {
     this.initializeTextEditing();
     this.initializeAttributesEvents();
     this.handleRemoveElement();
- //   this.linkHoverEvent();
+    // This doesn't work (the event is not caught)
+    this.linkHoverEvent();
   }
 
+  createDialog(link) {
+    const dialogComponentRef = {
+      type: 'choose-link',
+      instance: {
+        newLink: link,
+        linkSource: link.getSourceElement(),
+        linkTarget: link.getTargetElement(),
+        opmLinks: linkTypeSelection.generateLinkWithOpl(link),
+        Structural_Links: [],
+        Agent_Links: [],
+        Instrument_Links: [],
+        Effect_links: [],
+        Consumption_links: [],
+        Result_Link: [],
+        Invocation_links: [],
+        Exception_links: [],
+      }
+    };
 
-
- /*
-* popup Links Dialog
-* Input (DialogComponent , link)
-* set linkSource/Target data from link object
-* Return Dialog Component View
-*
-* */
-  createDialog(dialogComponent: { new(): DialogComponent},link): ComponentRef<DialogComponent> {
-    this.viewContainer.clear();
-    let dialogComponentFactory =
-      this.componentFactoryResolver.resolveComponentFactory(dialogComponent);
-
-
-    let dialogComponentRef = this.viewContainer.createComponent(dialogComponentFactory);
-    dialogComponentRef.instance.newLink = link;
-    dialogComponentRef.instance.linkSource=link.getSourceElement();
-    dialogComponentRef.instance.linkTarget=link.getTargetElement();
-    dialogComponentRef.instance.opmLinks=linkTypeSelection.generateLinkWithOpl(link);
-    for(let link of dialogComponentRef.instance.opmLinks){
+    for (let link of dialogComponentRef.instance.opmLinks) {
       //Structrial Links
-      if(link.name =="Aggregation-Participation"
-        || link.name =="Generalization-Specialization"
-        || link.name =="Exhibition-Characterization"
-        || link.name =="Classification-Instantiation"
-        || link.name =="Unidirectional_Relation"
-        || link.name =="Bidirectional_Relation") {
+      if (link.name == "Aggregation-Participation"
+        || link.name == "Generalization-Specialization"
+        || link.name == "Exhibition-Characterization"
+        || link.name == "Classification-Instantiation"
+        || link.name == "Unidirectional_Relation"
+        || link.name == "Bidirectional_Relation") {
 
-          dialogComponentRef.instance.Structural_Links.push(link);
-        }
-        //Agent Links
-       else if(link.name =="Agent" || link.name =="Event_Agent" || link.name =="Condition_Agent")
-        {
-          dialogComponentRef.instance.Agent_Links.push(link);
-        }
-        //Instrument links
-       else if(link.name == "Instrument" || link.name =="Condition_Instrument" || link.name == "Event_Instrument")
-        {
-          dialogComponentRef.instance.Instrument_Links.push(link);
-        }
-        //Effect links
-       else if( link.name=="Condition_Effect" || link.name =="Event_Effect" || link.name == "Effect")
-        {
-          dialogComponentRef.instance.Effect_links.push(link);
-          dialogComponentRef.instance.Effect_links.reverse()
-        }
-        //Consumption links
-      else if(link.name == "Consumption" || link.name=="Condition_Consumption" || link.name =="Event_Consumption")
-      {
+        dialogComponentRef.instance.Structural_Links.push(link);
+      }
+      //Agent Links
+      else if (link.name == "Agent" || link.name == "Event_Agent" || link.name == "Condition_Agent") {
+        dialogComponentRef.instance.Agent_Links.push(link);
+      }
+      //Instrument links
+      else if (link.name == "Instrument" || link.name == "Condition_Instrument" || link.name == "Event_Instrument") {
+        dialogComponentRef.instance.Instrument_Links.push(link);
+      }
+      //Effect links
+      else if (link.name == "Condition_Effect" || link.name == "Event_Effect" || link.name == "Effect") {
+        dialogComponentRef.instance.Effect_links.push(link);
+        dialogComponentRef.instance.Effect_links.reverse()
+      }
+      //Consumption links
+      else if (link.name == "Consumption" || link.name == "Condition_Consumption" || link.name == "Event_Consumption") {
         dialogComponentRef.instance.Consumption_links.push(link);
       }
       //Result
-     else if(link.name == "Result")
-      {
+      else if (link.name == "Result") {
         dialogComponentRef.instance.Result_Link.push(link);
       }
       //Invocation
-     else if(link.name=="Invocation")
-      {
+      else if (link.name == "Invocation") {
         dialogComponentRef.instance.Invocation_links.push(link);
       }
       //Exception Links
-     else if(link.name == "Overtime_exception" || link.name=="Undertime_exception")
-      {
+      else if (link.name == "Overtime_exception" || link.name == "Undertime_exception") {
         dialogComponentRef.instance.Exception_links.push(link);
       }
     }
-    dialogComponentRef.instance.close.subscribe((result) => {
-      dialogComponentRef.destroy();
-      link.attributes.opl=result.opl;
-    });
 
+    this.dialog$.next(dialogComponentRef);
     return dialogComponentRef;
   }
 
   //Opl popup dialog when user hovers on a link
-  /*createOplDialog(OplDialogComponent: { new(): OplDialogComponent},linkView): ComponentRef<OplDialogComponent> {
+  createOplDialog(linkView) {
+    const oplDialogComponentRef = {
+      type: 'opl',
+      instance: {
+        link: linkView.model
+      }
+    };
+    this.dialog$.next(oplDialogComponentRef);
+  }
 
-    this.viewContainer.clear();
-
-    let OplDialogComponentFactory =
-      this.componentFactoryResolver.resolveComponentFactory(OplDialogComponent);
-
-    let OplDialogComponentRef = this.viewContainer.createComponent(OplDialogComponentFactory);
-    OplDialogComponentRef.instance.link = linkView.model;
-    return OplDialogComponentRef;
-  }*/
-
-  linkHoverEvent(){
+  linkHoverEvent() {
     var oplDialog;
-    this.paper.on('link:mouseover', (cellView,evt)=>{
-      // this.createOplDialog(OplDialogComponent, cellView);
+    this.paper.on('link:mouseover', (cellView, evt) => {
+      this.createOplDialog(cellView);
       console.log("mouse over link");
       cellView.highlight();
     });
-    this.paper.on('link:mouseleave', (cellView,evt)=>{
+    this.paper.on('link:mouseleave', (cellView, evt) => {
       oplDialog.close();
+      this.dialog$.next('close-opl');
       console.log("mouse leave link");
     });
   }
@@ -210,18 +165,18 @@ export class RappidMainComponent implements OnInit {
             _this.graph.getCell(linkToRemove).remove();
         });
       }
-      if(cell.attributes.type === 'opm.StructLink'){
-          if(_this.graph.getCell(cell.get('target').id).attributes.type === 'opm.TriangleAgg')
-            _this.graph.getCell(cell.get('target').id).remove();
-          if(_this.graph.getCell(cell.get('source').id).attributes.type === 'opm.TriangleAgg'){
-            var triangle = _this.graph.getCell(cell.get('source').id);
-            var numberOfTargets = triangle.get('numberOfTargets');
-            if(numberOfTargets>1){
-              triangle.set('numberOfTargets', (numberOfTargets-1));
-            }
-            else
-              triangle.remove();
+      if (cell.attributes.type === 'opm.StructLink') {
+        if (_this.graph.getCell(cell.get('target').id).attributes.type === 'opm.TriangleAgg')
+          _this.graph.getCell(cell.get('target').id).remove();
+        if (_this.graph.getCell(cell.get('source').id).attributes.type === 'opm.TriangleAgg') {
+          var triangle = _this.graph.getCell(cell.get('source').id);
+          var numberOfTargets = triangle.get('numberOfTargets');
+          if (numberOfTargets > 1) {
+            triangle.set('numberOfTargets', (numberOfTargets - 1));
           }
+          else
+            triangle.remove();
+        }
       }
       if (cell.attributes.type === 'opm.StateNorm') {
         let fatherObject = _this.graph.getCell(cell.get('father'));
@@ -235,7 +190,7 @@ export class RappidMainComponent implements OnInit {
     });
   }
 
-//Check Changes. This function has been modified to update opl for each cell once graph is changed
+  //Check Changes. This function has been modified to update opl for each cell once graph is changed
   handleAddLink() {
     this.graph.on('add', (cell) => {
       if (cell.attributes.type === 'opm.Link') {
@@ -244,18 +199,18 @@ export class RappidMainComponent implements OnInit {
           //If it is a new link and is not connected to any element - deleting it. Otherwise it will be reconnected to
           //the previous element
           if (cell.isLink() && !cell.attributes.target.id && !cell.get('previousTargetId')) {
-              cell.remove();
+            cell.remove();
           }
         });
         cell.on('change:target change:source', (link) => {
           if (link.attributes.source.id && link.attributes.target.id) {
             if (link.attributes.source.id != link.attributes.target.id) {
-              if(!link.get('previousTargetId') || (link.get('previousTargetId')!=link.attributes.target.id)) {
+              if (!link.get('previousTargetId') || (link.get('previousTargetId') != link.attributes.target.id)) {
                 var relevantLinks = linkTypeSelection.generateLinkWithOpl(link);
                 if (relevantLinks.length > 0) {
                   link.set('previousTargetId', link.attributes.target.id);
                   link.set('graph', this.graph);
-                  this.createDialog(DialogComponent, link);
+                  this.createDialog(link);
                 }
               }
             }
@@ -266,11 +221,10 @@ export class RappidMainComponent implements OnInit {
   }
 
 
-
   initializePaper() {
     this.graph.on('add', (cell, collection, opt) => {
       if (opt.stencil) {
-        this.cell = cell;
+        this.cell$.next(cell);
       }
     });
 
@@ -291,9 +245,9 @@ export class RappidMainComponent implements OnInit {
     paper.on('cell:mousewheel', this.onMousewheel, this);
     // When the dragged cell is dropped over another cell, let it become a child of the
     // element below.
-    paper.on('cell:pointerup', function(cellView, evt, x, y) {
-        var cell = cellView.model;
-      if(cell.attributes.type == 'opm.Process'){
+    paper.on('cell:pointerup', function (cellView, evt, x, y) {
+      var cell = cellView.model;
+      if (cell.attributes.type == 'opm.Process') {
         var cellViewsBelow = paper.findViewsFromPoint(cell.getBBox().center());
         if (cellViewsBelow.length) {
           // Note that the findViewsFromPoint() returns the view for the `cell` itself.
@@ -430,11 +384,11 @@ export class RappidMainComponent implements OnInit {
     }, this);
   }
 
-    initializeTextEditing () {
+  initializeTextEditing() {
     var lastEnteredText;
     var currentCellView;
     this.paper.on('cell:pointerdblclick', function (cellView, evt) {
-      lastEnteredText =  cellView.model.attributes.attrs.text.text;
+      lastEnteredText = cellView.model.attributes.attrs.text.text;
       currentCellView = cellView.model;
       joint.ui.TextEditor.edit(evt.target, {
         cellView: cellView,
@@ -442,81 +396,47 @@ export class RappidMainComponent implements OnInit {
       });
     }, this)
     this.graph.on('change:attrs', function (cell) {
-      if((cell.get('type') != 'opm.Link') && (cell.attr('text/text') != lastEnteredText) &&
-          !cell.attributes.attrs.wrappingResized){  //if the text was changed
+      if ((cell.get('type') != 'opm.Link') && (cell.attr('text/text') != lastEnteredText) &&
+        !cell.attributes.attrs.wrappingResized) {  //if the text was changed
         var textString = cell.attr('text/text');
-        var newParams = {width: cell.get('minSize').width, height: cell.get('minSize').height, text: '\t'};    //No empty name is allowed
-        if(textString.trim() != '') { //if there is areal text - not spaces
+        var newParams = { width: cell.get('minSize').width, height: cell.get('minSize').height, text: '\t' };    //No
+                                                                                                                 // empty
+                                                                                                                 // name
+                                                                                                                 // is
+                                                                                                                 // allowed
+        if (textString.trim() != '') { //if there is areal text - not spaces
           newParams = textWrapping.calculateNewTextSize(textString, cell);
         }
         cell.attributes.attrs.wrappingResized = true;
-        cell.attr({text: {text: newParams.text}});
-        if( !((newParams.width <= cell.get('size').width) && (newParams.height <= cell.get('size').height) && cell.attributes.attrs.manuallyResized)) {
+        cell.attr({ text: { text: newParams.text } });
+        if (!((newParams.width <= cell.get('size').width) && (newParams.height <= cell.get('size').height) && cell.attributes.attrs.manuallyResized)) {
           cell.resize(newParams.width, newParams.height);
           cell.attributes.attrs.manuallyResized = false;
         }
         cell.attributes.attrs.wrappingResized = false;
 
 
-
-
-
-        /*var view = this.paper.findViewByModel(cell),
-          text = view.$("text"),                     // Get shape element
-          bboxText = text[0].getClientRects()[0];    // Text box dimensions
-        // Give the element padding on the right/bottom while keeping shape's ratio being 5/9 for process\object and 1/2 for state.
-        var aspectRatio = (cell.attributes.type == 'opm.StateNorm') ? (1 / 2) : ((cell.attributes.type == 'opm.Object') ? (1 / 3) : (5 / 9));
-        var padding = (cell.attributes.type == 'opm.StateNorm') ? 10 : ((cell.attributes.type == 'opm.Object') ? 15 : 35);
-        var minWidth = (cell.attributes.type == 'opm.StateNorm') ? 50 : 90;
-        var minHeight = (cell.attributes.type == 'opm.StateNorm') ? 25 : 50;
-        let newShapeWidth = bboxText ? (
-              (cell.attributes.attrs.text['ref-x'] == '0.5') ? (bboxText.width + padding) :
-                (bboxText.width / (0.2 + Math.abs(0.5 - cell.attributes.attrs.text['ref-x'])) + padding)) : 0,
-          newShapeHeight = bboxText ? (
-              (cell.attributes.attrs.text['ref-y'] == '0.5') ? (bboxText.height + padding) :
-                (bboxText.height / (0.25 + Math.abs(0.5 - cell.attributes.attrs.text['ref-y'])) + padding)) : 0,
-          currentWidth = cell.get('size').width,
-          currentHeight = cell.get('size').height,
-          manuallyResized = cell.attributes.attrs.manuallyResized;
-
-        // Shape being resized to text size if not being manually resized or if being renamed after manually resize
-        if ( !((newShapeWidth < currentWidth) && (newShapeHeight < currentHeight) && manuallyResized) ) {
-          var division = newShapeHeight/newShapeWidth;
-          var editionToWidth = 0, editionToHeight = 0;
-          // Calculating the edition needed for the denominator to keep the ratio.
-          if (division > aspectRatio) { editionToWidth = (1 / aspectRatio) * newShapeHeight - newShapeWidth; }
-          // Calculating the edition needed for the numerator to keep the ratio.
-          else if (division < aspectRatio) { editionToHeight = aspectRatio * newShapeWidth - newShapeHeight; }
-          // Flag signals the wrapper that auto-resizing is being performed
-
-          var newWidthForUpdate = Math.max(newShapeWidth + editionToWidth, minWidth);
-          var newHeightForUpdate = Math.max(newShapeHeight + editionToHeight ,minHeight);
-          cell.attributes.attrs.wrappingResized = true;
-          cell.resize(newWidthForUpdate, newHeightForUpdate);
-          cell.attributes.attrs.wrappingResized = false;
-          cell.attributes.attrs.manuallyResized = false;
-        }*/
       }
     }, this)
 
-    this.paper.on('blank:pointerdown', function(cellView, evt) {
-      if(currentCellView && !currentCellView.isLink()){
+    this.paper.on('blank:pointerdown', function (cellView, evt) {
+      if (currentCellView && !currentCellView.isLink()) {
         var currentText = currentCellView.attributes.attrs.text.text;
         if (currentText == '\t') {
-          currentCellView.attr({text: {text: lastEnteredText}});
+          currentCellView.attr({ text: { text: lastEnteredText } });
         }
         joint.ui.TextEditor.close();
       }
-      }, this)
+    }, this)
 
-    this.graph.on('change:size', _.bind(function (cell, attrs){
+    this.graph.on('change:size', _.bind(function (cell, attrs) {
       if (cell.attributes.attrs.text && !cell.attributes.attrs.wrappingResized) { //resized manually
         textWrapping.wrapTextAfterSizeChange(cell);
       }
     }, this))
   }
 
-  initializeAttributesEvents(){
+  initializeAttributesEvents() {
     var _this = this;
     this.paper.on('cell:pointerup blank:pointerclick ', function (cellView) {
       _this.graphService.updateJSON();
@@ -527,15 +447,15 @@ export class RappidMainComponent implements OnInit {
         _this.graphService.updateJSON();
       });
     });
-    this.graph.on('change:attrs', _.bind(function (cell, attrs){
+    this.graph.on('change:attrs', _.bind(function (cell, attrs) {
       //If value of an object was changed - add/modify a state according to it
-      if (cell.isElement() && attrs.value){
+      if (cell.isElement() && attrs.value) {
         // console.log('if - value');
         valueHandle.updateCell(this.graph, cell);
       }
     }, this))
 
-    this.graph.on('change:position', _.bind(function(cell){
+    this.graph.on('change:position', _.bind(function (cell) {
       if (cell.attributes.type === 'opm.Link') {
         linkDrawing.linkUpdating(cell);
       }
@@ -543,8 +463,8 @@ export class RappidMainComponent implements OnInit {
   }
 
   initializeHaloAndInspector() {
-     var _this = this;
-     this.paper.on('element:pointerup link:options', function (cellView) {
+    var _this = this;
+    this.paper.on('element:pointerup link:options', function (cellView) {
 
       var cell = cellView.model;
 
@@ -649,7 +569,7 @@ export class RappidMainComponent implements OnInit {
             halo.$handles.children('.arrange_left').toggleClass('hidden', !hasStates);
             halo.$handles.children('.arrange_right').toggleClass('hidden', !hasStates);
           }
-           if (cell.attributes.type === 'opm.Process') {
+          if (cell.attributes.type === 'opm.Process') {
             halo.addHandle({
               name: 'add_state', position: 'sw', icon: null, attrs: {
                 '.handle': {
@@ -660,29 +580,29 @@ export class RappidMainComponent implements OnInit {
                 }
               }
             });
-            halo.on('action:add_state:pointerdown', function(evt,x,y){
-              let cellModel=this.options.cellView.model;
-              let CellClone=cell.clone();
+            halo.on('action:add_state:pointerdown', function (evt, x, y) {
+              let cellModel = this.options.cellView.model;
+              let CellClone = cell.clone();
               var textString = cell.attributes.attrs.text.text;
-              CellClone.set('id',cellModel.id);
-              CellClone.attr({text: {text: textString}});
+              CellClone.set('id', cellModel.id);
+              CellClone.attr({ text: { text: textString } });
               _this.treeViewService.insertNode(cellModel);
-              let elementlinks=_this.graphService.graphLinks;
-               processInzooming(evt, x, y,this,CellClone,elementlinks);
+              let elementlinks = _this.graphService.graphLinks;
+              processInzooming(evt, x, y, this, CellClone, elementlinks);
             });
           }
 
           this.selection.collection.reset([]);
           this.selection.collection.add(cell, { silent: true });
         }
-        this.cell = cell;
+        this.cell$.next(cell);
       }
     }, this);
   }
 
   initializeValidator() {
 
-    this.validator = new joint.dia.Validator({commandManager: this.commandManager});
+    this.validator = new joint.dia.Validator({ commandManager: this.commandManager });
     this.RuleSet = opmRuleSet;
     this.RuleSet(this.validator, this.graph);
   }
@@ -793,8 +713,5 @@ export class RappidMainComponent implements OnInit {
 
     this.paperScroller.centerContent();
   }
-
-
-
 
 }

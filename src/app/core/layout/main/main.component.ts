@@ -1,4 +1,11 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { MdDialog } from '@angular/material';
+import { InitRappidService } from '../../../rappid-components/services/init-rappid.service';
+import { GraphService } from '../../../rappid-components/services/graph.service';
+import { CommandManagerService } from '../../../rappid-components/services/command-manager.service';
+import { DialogComponent } from '../../../dialogs/choose-link-dialog/Dialog.component';
+import { OplDialogComponent } from '../../../dialogs/opl-dialog/opl-dialog.component';
 
 @Component({
   selector: 'opc-main',
@@ -16,17 +23,25 @@ import { Component, OnInit, ViewChild } from '@angular/core';
                   mode="side"
                   [opcResizable]="'horizontal'"
                   (opcResize)="onResize($event)">
-        <md-list>
-          <md-list-item>
-            <h4 md-line>SD</h4>
-          </md-list-item>
-        </md-list>
+        <opcloud-opd-hierarchy id="opd-block"></opcloud-opd-hierarchy>
+
       </md-sidenav>
 
       <div class="sd-content">
-        <!--<opc-paper></opc-paper>-->
-        <div class="main-content"></div>
-        <opc-opl-container></opc-opl-container>
+
+        <div class="rappid-main rappid main-content" #rappidContainer>
+          <opcloud-rappid-stencil [graph]="graph"
+                                  [paper]="paper"
+                                  [paperScroller]="paperScroller">
+          </opcloud-rappid-stencil>
+          <opcloud-rappid-paper [paper]="paper" [paperScroller]="paperScroller"></opcloud-rappid-paper>
+          <opcloud-rappid-inspector [cell]="cell$ | async"></opcloud-rappid-inspector>
+          <opcloud-rappid-navigator [paperScroller]="paperScroller"></opcloud-rappid-navigator>
+        </div>
+
+        <opc-opl-container>
+          <opcloud-rappid-opl id="opl-block" [graph]="graph" [paper]="paper"></opcloud-rappid-opl>
+        </opc-opl-container>
 
       </div>
 
@@ -36,12 +51,73 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 })
 export class MainComponent implements OnInit {
   @ViewChild('sidenav') sidenav;
+  @ViewChild('rappidContainer', { read: ViewContainerRef }) rappidContainer;
+  dialog$: BehaviorSubject<any>;
+  commandManager;
+  graph;
+  paper;
+  paperScroller;
+  cell$;
+  private DialogType;
   sdTreeOpen = true;
 
-  constructor() {
+  constructor(
+    initRappid: InitRappidService,
+    graphService: GraphService,
+    commandManagerService: CommandManagerService,
+    private mdDialog: MdDialog,
+    private viewContainer: ViewContainerRef) {
+    this.graph = graphService.getGraph();
+    this.commandManager = commandManagerService.commandManager;
+    this.paper = initRappid.paper;
+    this.paperScroller = initRappid.paperScroller;
+    this.cell$ = initRappid.cell$;
+    this.dialog$ = initRappid.dialog$;
   }
 
   ngOnInit() {
+    this.sunscribeToDialog();
+  }
+
+  sunscribeToDialog() {
+    this.dialog$.subscribe((data) => {
+      if (!data) {
+        return;
+      }
+
+      if (this.mdDialog._openDialogs.length > 0) {
+        console.log('dialogs open!', this.mdDialog._openDialogs);
+      }
+
+      switch (data.type) {
+        case 'choose-link': {
+          this.DialogType = DialogComponent;
+          break;
+        }
+        case 'opl': {
+          this.DialogType = OplDialogComponent;
+          break;
+        }
+        case 'close-opl': {
+          if (this.DialogType === OplDialogComponent) {
+            this.mdDialog.closeAll();
+            return;
+          }
+          break;
+        }
+        default: {
+          return;
+        }
+      }
+
+      this.mdDialog.open(this.DialogType, {
+        viewContainerRef: this.viewContainer,
+        panelClass: 'choose-link-dialog',
+        hasBackdrop: false,
+        data: data.instance
+      });
+    });
+
   }
 
   toggleSidenav() {

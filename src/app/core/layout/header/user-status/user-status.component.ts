@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewContainerRef } from '@angular/core';
 import { MdDialog } from '@angular/material';
 import { SignInComponent } from '../sign-in/sign-in.component';
 import { AuthActionTypes, UserService } from '../../../../services/user.service';
@@ -48,8 +48,11 @@ export class UserStatusComponent implements OnInit {
   pending$;
   user$;
 
-  constructor(private userService: UserService,
-              public dialog: MdDialog) {}
+  constructor(
+    private userService: UserService,
+    public dialog: MdDialog,
+    private viewContainer: ViewContainerRef) {
+  }
 
   ngOnInit() {
     this.pending$ = this.userService.authPending$;
@@ -61,6 +64,8 @@ export class UserStatusComponent implements OnInit {
   }
 
   signIn() {
-    this.dialog.open(SignInComponent, {});
+    this.dialog.open(SignInComponent, {
+      viewContainerRef: this.viewContainer,
+    });
   }
 }

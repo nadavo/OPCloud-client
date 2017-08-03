@@ -10,9 +10,9 @@ import { RappidInspectorComponent } from './rappid-inspector/rappid-inspector.co
 import { RappidNavigatorComponent } from './rappid-navigator/rappid-navigator.component';
 import { CommandManagerService } from './services/command-manager.service';
 import { RappidOplComponent } from './rappid-opl/rappid-opl.component';
-//treeView
 import { TreeModule } from 'angular-tree-component';
 import { OPDHierarchyComponent } from '../opd-hierarchy/opd-hierarchy.component';
+import { InitRappidService } from './services/init-rappid.service';
 
 
 @NgModule({
@@ -33,11 +33,20 @@ import { OPDHierarchyComponent } from '../opd-hierarchy/opd-hierarchy.component'
   ],
   providers: [
     GraphService,
-    CommandManagerService
+    CommandManagerService,
+    InitRappidService
   ],
   exports: [
     RappidComponent,
-    RappidToolbarComponent
+    RappidToolbarComponent,
+    RappidMainComponent,
+    RappidToolbarComponent,
+    RappidStencilComponent,
+    RappidPaperComponent,
+    RappidInspectorComponent,
+    RappidNavigatorComponent,
+    RappidOplComponent,
+    OPDHierarchyComponent
   ]
 })
 export class RappidModule { }
