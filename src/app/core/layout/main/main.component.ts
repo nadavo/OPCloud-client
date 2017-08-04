@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { MdDialog } from '@angular/material';
 import { InitRappidService } from '../../../rappid-components/services/init-rappid.service';
@@ -6,6 +6,7 @@ import { GraphService } from '../../../rappid-components/services/graph.service'
 import { CommandManagerService } from '../../../rappid-components/services/command-manager.service';
 import { DialogComponent } from '../../../dialogs/choose-link-dialog/Dialog.component';
 import { OplDialogComponent } from '../../../dialogs/opl-dialog/opl-dialog.component';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
   selector: 'opc-main',
@@ -49,7 +50,8 @@ import { OplDialogComponent } from '../../../dialogs/opl-dialog/opl-dialog.compo
   `,
   styleUrls: ['./main.component.scss']
 })
-export class MainComponent implements OnInit {
+export class MainComponent implements OnInit, OnDestroy {
+  dialogSubscription: Subscription;
   @ViewChild('sidenav') sidenav;
   @ViewChild('rappidContainer', { read: ViewContainerRef }) rappidContainer;
   dialog$: BehaviorSubject<any>;
@@ -80,7 +82,7 @@ export class MainComponent implements OnInit {
   }
 
   sunscribeToDialog() {
-    this.dialog$.subscribe((data) => {
+    this.dialogSubscription = this.dialog$.subscribe((data) => {
       if (!data) {
         return;
       }
@@ -136,5 +138,9 @@ export class MainComponent implements OnInit {
   // TODO: replace with onResize method
   onResize(e) {
     console.log(e);
+  }
+
+  ngOnDestroy() {
+    this.dialogSubscription.unsubscribe();
   }
 }
