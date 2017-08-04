@@ -26,18 +26,22 @@ import { Subscription } from 'rxjs/Subscription';
                   (opcResize)="onResize($event)">
         <opcloud-opd-hierarchy id="opd-block"></opcloud-opd-hierarchy>
 
+        <opcloud-rappid-navigator [paperScroller]="paperScroller"></opcloud-rappid-navigator>
       </md-sidenav>
 
       <div class="sd-content">
 
         <div class="rappid-main rappid main-content">
-          <opcloud-rappid-stencil [graph]="graph"
-                                  [paper]="paper"
-                                  [paperScroller]="paperScroller">
-          </opcloud-rappid-stencil>
           <opcloud-rappid-paper [paper]="paper" [paperScroller]="paperScroller"></opcloud-rappid-paper>
-          <opcloud-rappid-inspector [cell]="cell$ | async"></opcloud-rappid-inspector>
-          <opcloud-rappid-navigator [paperScroller]="paperScroller"></opcloud-rappid-navigator>
+
+          <button class="inspector-button"
+                  (click)="toggleInspector()"
+                  *ngIf="cell$ | async"
+                  md-mini-fab>
+            <md-icon>{{ inspectorOpen ? 'close' : 'assignment' }}</md-icon>
+          </button>
+          <opcloud-rappid-inspector [style.visibility]="inspectorOpen ? 'visible' : 'hidden'"
+                                    [cell]="cell$ | async"></opcloud-rappid-inspector>
         </div>
 
         <opc-opl-container>
@@ -61,6 +65,7 @@ export class MainComponent implements OnInit, OnDestroy {
   cell$;
   private DialogType;
   sdTreeOpen = true;
+  inspectorOpen = true;
 
   constructor(
     initRappid: InitRappidService,
@@ -137,6 +142,10 @@ export class MainComponent implements OnInit, OnDestroy {
   // TODO: replace with onResize method
   onResize(e) {
     console.log(e);
+  }
+
+  toggleInspector() {
+    this.inspectorOpen = !this.inspectorOpen;
   }
 
   ngOnDestroy() {
