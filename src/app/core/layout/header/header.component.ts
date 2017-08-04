@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { GraphService } from '../../../rappid-components/services/graph.service';
+import { InitRappidService } from '../../../rappid-components/services/init-rappid.service';
 
 @Component({
   selector: 'opc-header',
@@ -11,7 +13,10 @@ import { Component, OnInit } from '@angular/core';
           <span class="app-toolbar-title">{{ title }}</span>
         </a>
 
-        <!--<opc-stencil></opc-stencil>-->
+        <opcloud-rappid-stencil [graph]="graph"
+                                [paper]="paper"
+                                [paperScroller]="paperScroller">
+        </opcloud-rappid-stencil>
 
         <span class="app-toolbar-filler"></span>
 
@@ -23,9 +28,16 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent implements OnInit {
+  paperScroller;
+  graph;
+  paper;
   title = 'OPCloud';
 
-  constructor() {
+  constructor(graphService: GraphService,
+              initRappid: InitRappidService) {
+    this.graph = graphService.graph;
+    this.paper = initRappid.paper;
+    this.paperScroller = initRappid.paperScroller;
   }
 
   ngOnInit() {

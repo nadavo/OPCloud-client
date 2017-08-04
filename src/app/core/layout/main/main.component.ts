@@ -30,7 +30,7 @@ import { Subscription } from 'rxjs/Subscription';
 
       <div class="sd-content">
 
-        <div class="rappid-main rappid main-content" #rappidContainer>
+        <div class="rappid-main rappid main-content">
           <opcloud-rappid-stencil [graph]="graph"
                                   [paper]="paper"
                                   [paperScroller]="paperScroller">
@@ -53,7 +53,6 @@ import { Subscription } from 'rxjs/Subscription';
 export class MainComponent implements OnInit, OnDestroy {
   dialogSubscription: Subscription;
   @ViewChild('sidenav') sidenav;
-  @ViewChild('rappidContainer', { read: ViewContainerRef }) rappidContainer;
   dialog$: BehaviorSubject<any>;
   commandManager;
   graph;

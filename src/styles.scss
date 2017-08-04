@@ -95,3 +95,20 @@ body {
     max-width: 15ch
   }
 }
+
+.app-toolbar .stencil-container {
+  position: relative;
+
+  .joint-stencil {
+    background: transparent;
+    position: relative;
+
+    > .content {
+      position: relative;
+    }
+  }
+
+  .joint-paper {
+    transform: scale(0.6);
+  }
+}
