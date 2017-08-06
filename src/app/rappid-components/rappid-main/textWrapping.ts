@@ -58,7 +58,7 @@ export const textWrapping = {
     if (textString != cell.attributes.attrs.text.text)  cell.attr({text: {text: textString}});
     if((this.getParagraphHeight(textString, cell)> cell.get('size').height) ||
       (this.getParagraphWidth(textString, cell)> cell.get('size').width)){
-      cell.resize(this.getParagraphWidth(textString, cell)+common.paddingObject, this.getParagraphHeight(textString, cell)+common.paddingObject);
+      cell.resize(this.getParagraphWidth(textString, cell)+cell.get('padding'), this.getParagraphHeight(textString, cell)+cell.get('padding'));
     }
   },
 
@@ -104,27 +104,35 @@ export const textWrapping = {
 
   calculateNewTextSize(textString, cell){
     var addition = 1, increase = false;
+    var stateWidth = cell.get('statesWidthPadding');
+    var stateHeight = cell.get('statesHeightPadding');
     var result = wrapAndSize;
-    textString = this.refactorText(textString, cell, cell.get('size').width-cell.get('padding'));
-    var textWidth = this.getParagraphWidth(textString, cell);
-    var textHeight = this.getParagraphHeight(textString, cell);
+    textString = this.refactorText(textString, cell, cell.get('size').width - stateWidth - cell.get('padding'));
+    var textWidth = this.getParagraphWidth(textString, cell) + stateWidth;
+    var textHeight = this.getParagraphHeight(textString, cell) + stateHeight;
     while ((textHeight > (cell.get('size').height * addition - cell.get('padding'))) || (textWidth > (cell.get('size').width * addition - cell.get('padding')))) {
       increase = true;
       addition = addition * 1.1;
-      textString = this.refactorText(textString, cell, cell.get('size').width * addition-cell.get('padding'));
-      textWidth = this.getParagraphWidth(textString, cell);
-      textHeight = this.getParagraphHeight(textString, cell);
+      textString = this.refactorText(textString, cell, cell.get('size').width * addition - stateWidth - cell.get('padding'));
+      textWidth = this.getParagraphWidth(textString, cell) + stateWidth;
+      textHeight = this.getParagraphHeight(textString, cell) + stateHeight;
     }
     while ((textHeight < (cell.get('size').height * addition/1.1 - cell.get('padding'))) && (textWidth < (cell.get('size').width * addition/1.1 - cell.get('padding'))) &&
     (cell.get('size').height * addition/1.1 > cell.get('minSize').height) && (cell.get('size').width * addition/1.1 > cell.get('minSize').width) && !increase) {
       addition = addition / 1.1;
-      textString = this.refactorText(textString, cell, cell.get('size').width * addition-cell.get('padding'));
-      textWidth = this.getParagraphWidth(textString, cell);
-      textHeight = this.getParagraphHeight(textString, cell);
+      textString = this.refactorText(textString, cell, cell.get('size').width * addition - stateWidth - cell.get('padding'));
+      textWidth = this.getParagraphWidth(textString, cell) + stateWidth;
+      textHeight = this.getParagraphHeight(textString, cell) + stateHeight;
     }
     result.width = cell.get('size').width * addition;
     result.height = cell.get('size').height * addition;
     result.text = textString;
     return result;
+  },
+
+  updateTextAndSize(cell){
+    var newParams = this.calculateNewTextSize(cell.attr('text/text'), cell);
+    cell.attr({text: {text: newParams.text}});
+    cell.resize(newParams.width, newParams.height);
   }
 };
