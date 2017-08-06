@@ -11,12 +11,16 @@ import { RappidOplComponent } from './rappid-opl/rappid-opl.component';
 import { TreeModule } from 'angular-tree-component';
 import { OPDHierarchyComponent } from '../opd-hierarchy/opd-hierarchy.component';
 import { InitRappidService } from './services/init-rappid.service';
+import { MdButtonModule, MdIconModule, MdTooltipModule } from '@angular/material';
 
 
 @NgModule({
   imports: [
     CommonModule,
-    TreeModule
+    TreeModule,
+    MdIconModule,
+    MdButtonModule,
+    MdTooltipModule
   ],
   declarations: [
     RappidToolbarComponent,

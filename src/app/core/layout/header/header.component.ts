@@ -8,16 +8,16 @@ import { InitRappidService } from '../../../rappid-components/services/init-rapp
     <div class="app-toolbar-container">
       <md-toolbar class="app-toolbar mat-elevation-z6" color="primary">
 
-        <a>
-          <img src="../../../../assets/OPCloud.jpg" class="logo">
-          <span class="app-toolbar-title">{{ title }}</span>
-        </a>
+        <img src="../../../../assets/OPCloud.jpg" class="logo">
+
+        <div class="model-name">{{ modelName }}</div>
 
         <opcloud-rappid-stencil [graph]="graph"
                                 [paper]="paper"
                                 [paperScroller]="paperScroller">
         </opcloud-rappid-stencil>
 
+        <opcloud-rappid-toolbar></opcloud-rappid-toolbar>
         <span class="app-toolbar-filler"></span>
 
         <opc-user-status></opc-user-status>
@@ -31,10 +31,11 @@ export class HeaderComponent implements OnInit {
   paperScroller;
   graph;
   paper;
-  title = 'OPCloud';
+  modelName: string;
 
-  constructor(graphService: GraphService,
-              initRappid: InitRappidService) {
+  constructor(
+    graphService: GraphService,
+    initRappid: InitRappidService) {
     this.graph = graphService.graph;
     this.paper = initRappid.paper;
     this.paperScroller = initRappid.paperScroller;
