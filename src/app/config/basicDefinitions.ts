@@ -9,10 +9,6 @@ export const basicDefinitions = {
   objectProcessWidth: 90,
   objectProcessHeight: 50,
 
-  textWrap(s, textWidth){
-    return joint.util.breakText(s, {width: textWidth});
-  },
-
   createShape(shapeName){
     return {
       fill: '#DCDCDC',
@@ -30,14 +26,13 @@ export const basicDefinitions = {
   },
 
   createText(shapeName){
-    var textOnShape = (shapeName == 'rect') ? 'Object' : (shapeName == 'ellipse') ? 'Process' : 'state';
     return {
-      text: this.textWrap(textOnShape, 112),
+      text: (shapeName == 'rect') ? 'Object' : (shapeName == 'ellipse') ? 'Process' : 'state',
       fill: 'black',
       'font-size': 14,
       'ref-x': .5,
       'ref-y': .5,
-      'text-anchor': 'middle',
+      'x-alignment': 'middle',
       'y-alignment': 'middle',
       'font-family': 'Arial, helvetica, sans-serif',
       'font-weight': (shapeName == 'state') ? 300 : 600
@@ -52,13 +47,15 @@ export const basicDefinitions = {
         size: {width: 90, height: 50},
         minSize: {width: 90, height: 50},
         padding: (shapeName == 'rect') ? 15 : 35,
+        statesWidthPadding : 0,
+        statesHeightPadding : 0,
         attrs: {
           [shapeName]: this.createShape(shapeName),
           'text': this.createText(shapeName),
           'value' : {'value' : 'None', 'valueType' : 'None', 'units' : ''},
           'wrappingResized' : false,
           'manuallyResized' : false,
-          'statesArrange' : 'bottom'
+          'statesArrange' : 'bottom',
         }
       }, joint.shapes.basic.Generic.prototype.defaults)
     };

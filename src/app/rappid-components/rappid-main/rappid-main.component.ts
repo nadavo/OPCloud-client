@@ -9,7 +9,6 @@ import { linkTypeSelection} from '../../link-operating/linkTypeSelection'
 import { addState } from '../../config/add-state';
 import { CommandManagerService } from '../services/command-manager.service';
 import { textWrapping } from './textWrapping';
-import { wrapAndSize } from './textWrapping';
 import { valueHandle } from './valueHandle';
 import {arrangeStates} from '../../config/arrangeStates';
 import * as common from "../../common/commonFunctions";
@@ -225,11 +224,9 @@ export class RappidMainComponent implements OnInit {
       }
       if (cell.attributes.type === 'opm.StateNorm') {
         let fatherObject = _this.graph.getCell(cell.get('father'));
-        let cellView = _this.paper.findViewByModel(fatherObject);
         if (fatherObject.get('embeds').length == 0) {
-          fatherObject.attributes.attrs.text["ref-x"] = '0.5';
-          fatherObject.attributes.attrs.text["ref-y"] = '0.5';
-          cellView.render();
+          common.CommonFunctions.arrangeStatesParams(fatherObject, 0.5, 0.5, 'middle', 'middle', 'bottom', 0, 0);
+          textWrapping.updateTextAndSize(fatherObject);
         }
       }
     });
@@ -456,46 +453,6 @@ export class RappidMainComponent implements OnInit {
           cell.attributes.attrs.manuallyResized = false;
         }
         cell.attributes.attrs.wrappingResized = false;
-
-
-
-
-
-        /*var view = this.paper.findViewByModel(cell),
-          text = view.$("text"),                     // Get shape element
-          bboxText = text[0].getClientRects()[0];    // Text box dimensions
-        // Give the element padding on the right/bottom while keeping shape's ratio being 5/9 for process\object and 1/2 for state.
-        var aspectRatio = (cell.attributes.type == 'opm.StateNorm') ? (1 / 2) : ((cell.attributes.type == 'opm.Object') ? (1 / 3) : (5 / 9));
-        var padding = (cell.attributes.type == 'opm.StateNorm') ? 10 : ((cell.attributes.type == 'opm.Object') ? 15 : 35);
-        var minWidth = (cell.attributes.type == 'opm.StateNorm') ? 50 : 90;
-        var minHeight = (cell.attributes.type == 'opm.StateNorm') ? 25 : 50;
-        let newShapeWidth = bboxText ? (
-              (cell.attributes.attrs.text['ref-x'] == '0.5') ? (bboxText.width + padding) :
-                (bboxText.width / (0.2 + Math.abs(0.5 - cell.attributes.attrs.text['ref-x'])) + padding)) : 0,
-          newShapeHeight = bboxText ? (
-              (cell.attributes.attrs.text['ref-y'] == '0.5') ? (bboxText.height + padding) :
-                (bboxText.height / (0.25 + Math.abs(0.5 - cell.attributes.attrs.text['ref-y'])) + padding)) : 0,
-          currentWidth = cell.get('size').width,
-          currentHeight = cell.get('size').height,
-          manuallyResized = cell.attributes.attrs.manuallyResized;
-
-        // Shape being resized to text size if not being manually resized or if being renamed after manually resize
-        if ( !((newShapeWidth < currentWidth) && (newShapeHeight < currentHeight) && manuallyResized) ) {
-          var division = newShapeHeight/newShapeWidth;
-          var editionToWidth = 0, editionToHeight = 0;
-          // Calculating the edition needed for the denominator to keep the ratio.
-          if (division > aspectRatio) { editionToWidth = (1 / aspectRatio) * newShapeHeight - newShapeWidth; }
-          // Calculating the edition needed for the numerator to keep the ratio.
-          else if (division < aspectRatio) { editionToHeight = aspectRatio * newShapeWidth - newShapeHeight; }
-          // Flag signals the wrapper that auto-resizing is being performed
-
-          var newWidthForUpdate = Math.max(newShapeWidth + editionToWidth, minWidth);
-          var newHeightForUpdate = Math.max(newShapeHeight + editionToHeight ,minHeight);
-          cell.attributes.attrs.wrappingResized = true;
-          cell.resize(newWidthForUpdate, newHeightForUpdate);
-          cell.attributes.attrs.wrappingResized = false;
-          cell.attributes.attrs.manuallyResized = false;
-        }*/
       }
     }, this)
 
@@ -555,10 +512,8 @@ export class RappidMainComponent implements OnInit {
           new joint.ui.FreeTransform({
             cellView: cellView,
             allowRotation: false,
-            preserveAspectRatio: true,
+            preserveAspectRatio: false,
             allowOrthogonalResize: true,
-            //minWidth: 70,
-            //minHeight: 40
           }).render();
 
           const halo = new joint.ui.Halo({
@@ -587,51 +542,34 @@ export class RappidMainComponent implements OnInit {
               halo.$handles.children('.arrange_right').toggleClass('hidden', !hasStates);
               addState.call(this);
             });
-            let side = 'top';
             halo.addHandle({
               name: 'arrange_up', position: 'n', icon: null, attrs: {
                 '.handle': {
                   'data-tooltip-class-name': 'small',
                   'data-tooltip': 'Arrange the states at the top inside the object',
-                  'data-tooltip-position': 'bottom',
+                  'data-tooltip-position': 'top',
                   'data-tooltip-padding': 15
                 }
               }
             });
             halo.on('action:arrange_up:pointerup', function () {
-              side = 'top';
-              arrangeStates.call(this, side);
+              arrangeStates.call(this, 'top');
             });
             halo.addHandle({
               name: 'arrange_down', position: 's', icon: null, attrs: {
                 '.handle': {
                   'data-tooltip-class-name': 'small',
                   'data-tooltip': 'Arrange the states at the bottom inside the object',
-                  'data-tooltip-position': 'top',
+                  'data-tooltip-position': 'bottom',
                   'data-tooltip-padding': 15
                 }
               }
             });
             halo.on('action:arrange_down:pointerup', function () {
-              side = 'bottom';
-              arrangeStates.call(this, side);
+              arrangeStates.call(this, 'bottom');
             });
             halo.addHandle({
               name: 'arrange_right', position: 'w', icon: null, attrs: {
-                '.handle': {
-                  'data-tooltip-class-name': 'small',
-                  'data-tooltip': 'Arrange the states to the right inside the object',
-                  'data-tooltip-position': 'right',
-                  'data-tooltip-padding': 15
-                }
-              }
-            });
-            halo.on('action:arrange_right:pointerup', function () {
-              side = 'right';
-              arrangeStates.call(this, side);
-            });
-            halo.addHandle({
-              name: 'arrange_left', position: 'e', icon: null, attrs: {
                 '.handle': {
                   'data-tooltip-class-name': 'small',
                   'data-tooltip': 'Arrange the states to the left inside the object',
@@ -640,9 +578,21 @@ export class RappidMainComponent implements OnInit {
                 }
               }
             });
+            halo.on('action:arrange_right:pointerup', function () {
+              arrangeStates.call(this, 'left');
+            });
+            halo.addHandle({
+              name: 'arrange_left', position: 'e', icon: null, attrs: {
+                '.handle': {
+                  'data-tooltip-class-name': 'small',
+                  'data-tooltip': 'Arrange the states to the right inside the object',
+                  'data-tooltip-position': 'right',
+                  'data-tooltip-padding': 15
+                }
+              }
+            });
             halo.on('action:arrange_left:pointerup', function () {
-              side = 'left';
-              arrangeStates.call(this, side);
+              arrangeStates.call(this, 'right');
             });
             halo.$handles.children('.arrange_up').toggleClass('hidden', !hasStates);
             halo.$handles.children('.arrange_down').toggleClass('hidden', !hasStates);

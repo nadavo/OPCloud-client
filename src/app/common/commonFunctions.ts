@@ -1,12 +1,24 @@
 import { opmStyle } from '../config/opmStyle';
 export const _ = require('lodash');
 export const paddingObject = 10;
-export const paddingProcess = 35;
 export const joint = require('rappid');
 export const width = require('text-width');
 export const height = require('text-height');
 
 export const CommonFunctions = {
+
+  //Function gets cell and restore default configuration in all field that states arrangement use.
+  arrangeStatesParams(cell, refX, refY, alignX, alignY, arrangeState, stateWidthPadding, statesHeightPadding){
+    cell.attr({text: {'ref-x': refX}});
+    cell.attr({text: {'ref-y': refY}});
+    cell.attr({text: {'x-alignment': alignX}});
+    cell.attr({text: {'y-alignment': alignY}});
+    cell.attr({'statesArrange': arrangeState});
+    cell.set('statesWidthPadding', stateWidthPadding);
+    cell.set('statesHeightPadding', statesHeightPadding);
+  },
+
+
 
 //Function updateObjectSize Update the size of the object so that no embedded cell will exceed the father border with
 //padding of 10p.
