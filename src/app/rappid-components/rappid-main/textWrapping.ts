@@ -53,12 +53,12 @@ export const textWrapping = {
     var textString = cell.attributes.attrs.text.text;
     if (!textString) return;
     cell.attributes.attrs.manuallyResized = true;
-    textString = this.wrapText(cell, cell.get('size').width);
-    textString = this.unitsNewLine(textString);
+    textString = this.refactorText(cell, cell.get('size').width);
     if (textString != cell.attributes.attrs.text.text)  cell.attr({text: {text: textString}});
-    if((this.getParagraphHeight(textString, cell)> cell.get('size').height) ||
-      (this.getParagraphWidth(textString, cell)> cell.get('size').width)){
-      cell.resize(this.getParagraphWidth(textString, cell)+cell.get('padding'), this.getParagraphHeight(textString, cell)+cell.get('padding'));
+    var heightTextAndStates = this.getParagraphHeight(textString, cell) + cell.get('statesHeightPadding') + cell.get('padding');
+    var widthTextAndStates = this.getParagraphWidth(textString, cell) + cell.get('statesWidthPadding') + cell.get('padding');
+    if((heightTextAndStates > cell.get('size').height) || (widthTextAndStates> cell.get('size').width)){
+      cell.resize(widthTextAndStates, heightTextAndStates);
     }
   },
 
@@ -76,7 +76,7 @@ export const textWrapping = {
   wrapText(cell, width){
     var textString = cell.attr('text/text');
     if (!textString) return;
-    var textString = textString.replace('\n', ' ')
+    var textString = textString.replace(/\n/g, ' ')
     var wordsArr = textString.split(' ');
     var newStr = '';
     var i = 0;
@@ -94,8 +94,8 @@ export const textWrapping = {
     return newStr;
   },
 
-  refactorText(textString, cell, width){
-    textString = this.wrapText(cell, width);
+  refactorText(cell, width){
+    var textString = this.wrapText(cell, width);
     //wrapText remove spaces from the end
     textString = (cell.attr('text/text').charAt(cell.attr('text/text').length - 1) == ' ') ? (textString + ' ') : textString;
     textString = this.unitsNewLine(textString);
@@ -107,20 +107,20 @@ export const textWrapping = {
     var stateWidth = cell.get('statesWidthPadding');
     var stateHeight = cell.get('statesHeightPadding');
     var result = wrapAndSize;
-    textString = this.refactorText(textString, cell, cell.get('size').width - stateWidth - cell.get('padding'));
+    textString = this.refactorText(cell, cell.get('size').width - stateWidth - cell.get('padding'));
     var textWidth = this.getParagraphWidth(textString, cell) + stateWidth;
     var textHeight = this.getParagraphHeight(textString, cell) + stateHeight;
     while ((textHeight > (cell.get('size').height * addition - cell.get('padding'))) || (textWidth > (cell.get('size').width * addition - cell.get('padding')))) {
       increase = true;
       addition = addition * 1.1;
-      textString = this.refactorText(textString, cell, cell.get('size').width * addition - stateWidth - cell.get('padding'));
+      textString = this.refactorText(cell, cell.get('size').width * addition - stateWidth - cell.get('padding'));
       textWidth = this.getParagraphWidth(textString, cell) + stateWidth;
       textHeight = this.getParagraphHeight(textString, cell) + stateHeight;
     }
     while ((textHeight < (cell.get('size').height * addition/1.1 - cell.get('padding'))) && (textWidth < (cell.get('size').width * addition/1.1 - cell.get('padding'))) &&
     (cell.get('size').height * addition/1.1 > cell.get('minSize').height) && (cell.get('size').width * addition/1.1 > cell.get('minSize').width) && !increase) {
       addition = addition / 1.1;
-      textString = this.refactorText(textString, cell, cell.get('size').width * addition - stateWidth - cell.get('padding'));
+      textString = this.refactorText(cell, cell.get('size').width * addition - stateWidth - cell.get('padding'));
       textWidth = this.getParagraphWidth(textString, cell) + stateWidth;
       textHeight = this.getParagraphHeight(textString, cell) + stateHeight;
     }

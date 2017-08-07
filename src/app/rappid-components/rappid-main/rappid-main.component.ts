@@ -281,6 +281,7 @@ export class RappidMainComponent implements OnInit {
       drawGrid: true,
       model: this.graph,
       defaultLink: new opmShapes.Link,
+      multiLinks: false
     });
 
 
