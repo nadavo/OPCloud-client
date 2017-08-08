@@ -5,7 +5,6 @@ import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
 import { RappidModule } from './rappid-components/rappid.module';
-import { HeaderComponent } from './header/header.component';
 import { SaveModelDialogComponent } from './dialogs/save-model-dialog/save-model-dialog.component';
 import { LoadModelDialogComponent } from './dialogs/load-model-dialog/load-model-dialog.component';
 
@@ -33,7 +32,6 @@ import { OplDialogComponent } from './dialogs/opl-dialog/opl-dialog.component';
 @NgModule({
   declarations: [
     AppComponent,
-    HeaderComponent,
     SaveModelDialogComponent,
     LoadModelDialogComponent,
     DialogComponent,
