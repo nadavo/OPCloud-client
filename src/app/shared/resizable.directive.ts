@@ -1,9 +1,9 @@
 import { AfterContentInit, Directive, ElementRef, EventEmitter, HostListener, Input, Output } from '@angular/core';
 
 enum Resizable {
-  horizontal = 'horizontal',
-  vertical = 'vertical',
-  both = 'both'
+  horizontal,
+  vertical,
+  both
 }
 
 interface Size {

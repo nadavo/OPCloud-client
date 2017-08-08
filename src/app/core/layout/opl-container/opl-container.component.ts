@@ -17,7 +17,7 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./opl-container.component.scss']
 })
 export class OplContainerComponent implements OnInit {
-  private oplOpen = true;
+  oplOpen = true;
 
   constructor() {
   }
