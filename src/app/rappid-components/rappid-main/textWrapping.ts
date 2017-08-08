@@ -76,28 +76,27 @@ export const textWrapping = {
   wrapText(cell, width){
     var textString = cell.attr('text/text');
     if (!textString) return;
-    var textString = textString.replace(/\n/g, ' ')
+    var textString = textString.replace(/\n/g, ' ');
     var wordsArr = textString.split(' ');
-    var newStr = '';
-    var i = 0;
+    var newStr = wordsArr[0];
+    var i = 1;
     while (i < wordsArr.length) {
-      if (this.getParagraphWidth((newStr + wordsArr[i]), cell) < width) {
-        newStr = newStr + wordsArr[i] + ' ';
+      if (this.getParagraphWidth((newStr + ' ' + wordsArr[i]), cell) < width) {
+        newStr = newStr + ' ' + wordsArr[i];
       }
       else {
-        newStr = newStr.trim();       //remove last space in the previous line
-        newStr = newStr + '\n' + wordsArr[i] + ' ';
+        newStr = newStr + '\n' + wordsArr[i];
       }
       i++;
     }
-    newStr = newStr.trim();
     return newStr;
   },
 
   refactorText(cell, width){
     var textString = this.wrapText(cell, width);
     //wrapText remove spaces from the end
-    textString = (cell.attr('text/text').charAt(cell.attr('text/text').length - 1) == ' ') ? (textString + ' ') : textString;
+    var lastChar = cell.attr('text/text').charAt(cell.attr('text/text').length - 1);
+    textString = ((lastChar == ' ') || (lastChar == '\u00A0')) ? (textString + ' ') : textString;
     textString = this.unitsNewLine(textString);
     return textString;
   },
