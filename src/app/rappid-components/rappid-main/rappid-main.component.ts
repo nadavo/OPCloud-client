@@ -436,14 +436,15 @@ export class RappidMainComponent implements OnInit {
       currentCellView = cellView.model;
       joint.ui.TextEditor.edit(evt.target, {
         cellView: cellView,
-        textProperty: cellView.model.isLink() ? 'labels/attrs/text/text' : 'attrs/text/text'
+        textProperty: cellView.model.isLink() ? 'labels/attrs/text/text' : 'attrs/text/text',
+        placeholder: true
       });
     }, this)
     this.graph.on('change:attrs', function (cell) {
       if((cell.get('type') != 'opm.Link') && (cell.attr('text/text') != lastEnteredText) &&
           !cell.attributes.attrs.wrappingResized){  //if the text was changed
         var textString = cell.attr('text/text');
-        var newParams = {width: cell.get('minSize').width, height: cell.get('minSize').height, text: '\t'};    //No empty name is allowed
+        var newParams = {width: cell.get('minSize').width, height: cell.get('minSize').height, text: ''};    //No empty name is allowed
         if(textString.trim() != '') { //if there is areal text - not spaces
           newParams = textWrapping.calculateNewTextSize(textString, cell);
         }
@@ -460,7 +461,7 @@ export class RappidMainComponent implements OnInit {
     this.paper.on('blank:pointerdown', function(cellView, evt) {
       if(currentCellView && !currentCellView.isLink()){
         var currentText = currentCellView.attributes.attrs.text.text;
-        if (currentText == '\t') {
+        if (currentText == '') {
           currentCellView.attr({text: {text: lastEnteredText}});
         }
         joint.ui.TextEditor.close();
