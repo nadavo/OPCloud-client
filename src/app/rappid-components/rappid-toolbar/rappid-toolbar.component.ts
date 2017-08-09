@@ -25,7 +25,8 @@ const commandGroups = [
     commands: [
       { name: 'zoomin', tooltip: 'zoom in', icon: 'zoom_in' },
       { name: 'zoomout', tooltip: 'zoom out', icon: 'zoom_out' },
-      { name: 'zoomtofit', tooltip: 'zoom to fit', icon: 'zoom_out_map' }
+      { name: 'zoomtofit', tooltip: 'zoom to fit', icon: 'zoom_out_map' },
+      { name: 'zoomtodefault', tooltip: 'default zoom', icon: 'youtube_searched_for' }
     ]
   }
 ];
@@ -120,5 +121,9 @@ export class RappidToolbarComponent implements OnInit {
 
   zoomtofit() {
     this.initRappidService.paperScroller.zoomToFit();
+  }
+
+  zoomtodefault() {
+    this.initRappidService.paperScroller.zoom(1, { absolute: true });
   }
 }
