@@ -121,6 +121,7 @@ export class DialogComponent {
   DefaultExit(link) {
     this.close.emit('event');
     link.remove();
+    this.dialogRef.close();
   }
 
   area() {
