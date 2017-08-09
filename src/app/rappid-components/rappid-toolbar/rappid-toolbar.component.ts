@@ -3,6 +3,7 @@ import { GraphService } from '../services/graph.service';
 import { MdDialog } from '@angular/material';
 import { LoadModelDialogComponent } from '../../dialogs/load-model-dialog/load-model-dialog.component';
 import { CommandManagerService } from '../services/command-manager.service';
+import { InitRappidService } from '../services/init-rappid.service';
 
 const commandGroups = [
   {
@@ -23,7 +24,8 @@ const commandGroups = [
     group: 'zoom',
     commands: [
       { name: 'zoomin', tooltip: 'zoom in', icon: 'zoom_in' },
-      { name: 'zoomout', tooltip: 'zoom out', icon: 'zoom_out' }
+      { name: 'zoomout', tooltip: 'zoom out', icon: 'zoom_out' },
+      { name: 'zoomtofit', tooltip: 'zoom to fit', icon: 'zoom_out_map' }
     ]
   }
 ];
@@ -55,6 +57,7 @@ export class RappidToolbarComponent implements OnInit {
   constructor(
     private graphService: GraphService,
     commandManagerService: CommandManagerService,
+    private initRappidService: InitRappidService,
     private _dialog: MdDialog) {
     this.commandManager = commandManagerService.commandManager;
   }
@@ -107,4 +110,15 @@ export class RappidToolbarComponent implements OnInit {
     });
   }
 
+  zoomin() {
+    this.initRappidService.paperScroller.zoom(0.2, { max: 4 });
+  }
+
+  zoomout() {
+    this.initRappidService.paperScroller.zoom(-0.2, { min: 0.2 });
+  }
+
+  zoomtofit() {
+    this.initRappidService.paperScroller.zoomToFit();
+  }
 }
