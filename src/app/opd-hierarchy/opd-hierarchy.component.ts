@@ -32,8 +32,8 @@ const actionMapping:IActionMapping = {
 
 @Component({
   selector: 'opcloud-opd-hierarchy',
-  template: `<div>Tree placeholder</div>`,
-  styleUrls: ['./opd-hierarchy.component.css']
+  templateUrl: './opd-hierarchy.component.html',
+  styleUrls: ['./opd-hierarchy.component.scss']
 })
 export class OPDHierarchyComponent implements OnInit {
   subscription: Subscription;
@@ -52,7 +52,7 @@ export class OPDHierarchyComponent implements OnInit {
   ngOnInit() {
     this.subscription = this._treeViewService.getNodes().subscribe( nodes => {
       this.nodes = nodes;
-      // this.treeView.treeModel.update();
+      this.treeView.treeModel.update();
     });
 
 

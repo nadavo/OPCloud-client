@@ -20,7 +20,8 @@ import { MdButtonModule, MdIconModule, MdTooltipModule } from '@angular/material
     TreeModule,
     MdIconModule,
     MdButtonModule,
-    MdTooltipModule
+    MdTooltipModule,
+    MdIconModule
   ],
   declarations: [
     RappidToolbarComponent,
