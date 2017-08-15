@@ -162,8 +162,6 @@ export const linkDrawing = {
         var linkNewSecond = new joint.shapes.opm.StructLink({
           source: { id: targetTriangle.id, port: 'out'},
           target: { id: link.getTargetElement().id},
-          router: { name: 'manhattan' },
-          attrs: {'.link-tools': {display: 'none'}, '.marker-vertices': {display: 'none'}, '.marker-arrowheads': {display: 'none'}}
         });
         targetTriangle.set('numberOfTargets', targetTriangle.get('numberOfTargets')+1);
         graph.addCell(linkNewSecond);
@@ -171,10 +169,10 @@ export const linkDrawing = {
       else {
         var triangle = new joint.shapes.opm.TriangleAgg;
         var img = "../../assets/OPM_Links/" + linkInfo.value;
-        var newX = (link.getSourceElement().getBBox().center().x + link.getTargetElement().getBBox().center().x) / 2 - 35;
+        var newX = (link.getSourceElement().getBBox().center().x + link.getTargetElement().getBBox().center().x) / 2 - 15;
         var newY = (link.getSourceElement().getBBox().center().y + link.getTargetElement().getBBox().center().y) / 2;
         triangle.set('position', {x: newX, y: newY});
-        triangle.set('size', {width: 40, height: 35});
+        triangle.set('size', {width: 30, height: 25});
         triangle.set('linkId', [link.id]);
         triangle.set('linkName', linkName);
         triangle.set('numberOfTargets', 1);

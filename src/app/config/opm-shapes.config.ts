@@ -20,7 +20,7 @@ export const opmShapes = {
     markup: '<image/>',
     defaults: _.defaultsDeep({
       type: 'opm.TriangleAgg',
-      size: {width: 40, height: 40},
+      size: {width: 30, height: 30},
       inPorts: ['in'],
       outPorts: ['out'],
       ports: {
@@ -54,15 +54,16 @@ export const opmShapes = {
         }
       },
       attrs: {
-        image: { 'xlink:href': '../../assets/OPM_Links/StructuralAgg.png', width: 40, height: 40},
+        image: { 'xlink:href': '../../assets/OPM_Links/StructuralAgg.png', width: 30, height: 30},
       }
     }, joint.shapes.devs.Model.prototype.defaults)
   }),
   StructLink: joint.shapes.devs.Link.extend({
     defaults: _.defaultsDeep({
       type: 'opm.StructLink',
-      router: {name: 'manhattan'},
-      attrs: {'.link-tools': {display: 'none'}, '.marker-vertices': {display: 'none'}, '.marker-arrowheads': {display: 'none'}}
+      router: {name: 'manhattan', args: { step: 5}},
+//      connection: { name: 'orthogonal' },
+      attrs: {'.link-tools': {display: 'none'}, '.marker-arrowheads': {display: 'none'}}
     }, joint.shapes.devs.Link.prototype.defaults)
   })
 };

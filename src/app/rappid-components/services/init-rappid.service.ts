@@ -232,7 +232,7 @@ export class InitRappidService {
       linkConnectionPoint: joint.util.shapePerimeterConnectionPoint,
       width: 1000,
       height: 1000,
-      gridSize: 10,
+      gridSize: 5,
       drawGrid: true,
       model: this.graph,
       defaultLink: new opmShapes.Link,
