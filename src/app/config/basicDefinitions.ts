@@ -75,7 +75,7 @@ export const basicDefinitions = {
     return {
       markup: '<g class="rotatable"><g class="scalable"><rect/></g><text/></g>',
       defaults: _.defaultsDeep({
-        type: 'opm.StateNorm',
+        type: 'opm.State',
         size: {width: this.stateWidth, height: this.stateHeight},
         minSize: {width: 50, height: 25},
         padding: 10,

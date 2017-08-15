@@ -178,7 +178,7 @@ export class InitRappidService {
             triangle.remove();
         }
       }
-      if (cell.attributes.type === 'opm.StateNorm') {
+      if (cell.attributes.type === 'opm.State') {
         let fatherObject = _this.graph.getCell(cell.get('father'));
         if (fatherObject.get('embeds').length == 0) {
           common.CommonFunctions.arrangeStatesParams(fatherObject, 0.5, 0.5, 'middle', 'middle', 'bottom', 0, 0);

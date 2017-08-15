@@ -15,7 +15,7 @@ export const opmShapes = {
   Link: joint.dia.Link.extend(basicDefinitions.defineLink()),
   Object: joint.dia.Element.extend(basicDefinitions.defineShape('rect')),
   Process: joint.dia.Element.extend(basicDefinitions.defineShape('ellipse')),
-  StateNorm: joint.dia.Element.extend(basicDefinitions.defineState()),
+  State: joint.dia.Element.extend(basicDefinitions.defineState()),
   TriangleAgg: joint.shapes.devs.Model.extend({
     markup: '<image/>',
     defaults: _.defaultsDeep({
