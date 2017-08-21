@@ -17,7 +17,7 @@ const y_margin=10;//height margin between subprocess
 const childMargin=67;
 
 
-export function processInzooming (evt, x, y,_this,cellRef,links) {
+export function processInzooming (evt, x, y, _this, cellRef, links, that) {
 
 
 
@@ -26,6 +26,7 @@ export function processInzooming (evt, x, y,_this,cellRef,links) {
 
 
   options.graph.addCell(parentObject);
+
   options.graph.addCells(links);
 
   parentObject.attributes.attrs.text = {
@@ -40,8 +41,10 @@ export function processInzooming (evt, x, y,_this,cellRef,links) {
   var cells = options.graph.getElements();
   for (var cellIndex = 0; cellIndex < cells.length; cellIndex++) {
     var cell = cells[cellIndex];
-    var cellSize = cell.get('size');
-    cell.resize(cellSize.width * Facotr, cellSize.height * Facotr);
+    if (!(cell instanceof joint.shapes.opm.State)) {
+      var cellSize = cell.get('size');
+      cell.resize(cellSize.width * Facotr, cellSize.height * Facotr);
+    }
   }
 
   //end of zoom out
@@ -63,7 +66,8 @@ export function processInzooming (evt, x, y,_this,cellRef,links) {
     console.log('child object2'+JSON.stringify(defaultProcess));
   }
 
-  common.CommonFunctions.updateObjectSize(parentObject);
+  common.CommonFunctions.updateProcessSize(parentObject);
+
 
 
   //parentObject.embeds
@@ -72,20 +76,24 @@ export function processInzooming (evt, x, y,_this,cellRef,links) {
   let last_process_id=EmbeddedCells[(initial_subprocess-1)].id;
 
 
-
-
-
    options.graph.getConnectedLinks(parentObject, { inbound: true }).forEach(function(link) {
-   link.set('target', {id:first_process_id});
+     if (link.attributes.name === 'Consumption') {
+       link.set('target', {id: first_process_id},{cameFromInZooming:true});
+       //Ahmad: I don't like this solution. For now it solves the problem of navigating
+       // between OPDs when there is a consumption link. Need to find where is a circular pointer created in the code.
+       link.attributes.graph = null;
+     }
    });
 
    options.graph.getConnectedLinks(parentObject, { outbound: true}).forEach(function(link) {
-   link.set('source', {id:last_process_id});
+     if (link.attributes.name === 'Result') {
+       link.set('source', {id: last_process_id});
+     }
    });
 
-
-
-  options.graph.on('change:position change:size', function (cell) {
+  options.graph.on('change:position change:size', function (cell, value, opt) {
+    if (opt.skipExtraCall)
+      return;
     cell.set('originalSize', cell.get('size'));
     cell.set('originalPosition', cell.get('position'));
     var parentId = cell.get('parent');
@@ -93,10 +101,10 @@ export function processInzooming (evt, x, y,_this,cellRef,links) {
       var parent = options.graph.getCell(parentId);
       if (!parent.get('originalPosition')) parent.set('originalPosition', parent.get('position'));
       if (!parent.get('originalSize')) parent.set('originalSize', parent.get('size'));
-      common.CommonFunctions.updateObjectSize(parent);
+       common.CommonFunctions.updateProcessSize(parent);
     }
     else if (cell.get('embeds') && cell.get('embeds').length) {
-      common.CommonFunctions.updateObjectSize(cell);
+      common.CommonFunctions.updateProcessSize(cell);
     }
 
   });

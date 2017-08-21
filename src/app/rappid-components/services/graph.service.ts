@@ -6,6 +6,7 @@ const rootId="SD";
 const firebaseKeyEncode = require('firebase-key-encode');
 
 
+
 @Injectable()
 export class GraphService {
   graph;
@@ -121,11 +122,18 @@ export class GraphService {
 
   //star
 
-  private copyConntectedGraphElements(newGraph,elementId)
-  {
+  private copyConntectedGraphElements(newGraph, elementId) {
     let gCell=this.graph.getCell(elementId);
     let connctedCells=this.graph.getNeighbors(gCell);
     newGraph.addCells(connctedCells);
+    let graphServiceThis = this;
+    connctedCells.forEach(function(elm){
+      let parentId = elm.get('parent');
+      if (parentId) {
+        newGraph.addCells(graphServiceThis.graph.getCell(parentId).getEmbeddedCells());
+        newGraph.addCell(graphServiceThis.graph.getCell(parentId));
+      }
+  });
     this.graphLinks = this.graph.getConnectedLinks(gCell);
   }
 
@@ -136,6 +144,4 @@ export class GraphService {
     this.graph.fromJSON(JSON.parse(localStorage.getItem(elementId)));
     this.currentGraphId = elementId;
   }
-
-
 }
