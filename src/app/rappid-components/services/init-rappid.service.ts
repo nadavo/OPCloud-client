@@ -4,7 +4,7 @@ import { haloConfig } from '../../config/halo.config';
 import { toolbarConfig } from '../../config/toolbar.config';
 import { opmShapes } from '../../config/opm-shapes.config';
 import { opmRuleSet } from '../../config/opm-validator';
-import { linkTypeSelection } from '../../link-operating/linkTypeSelection'
+import { linkTypeSelection } from '../../link-operating/linkTypeSelection';
 import { addState } from '../../config/add-state';
 import { CommandManagerService } from '../services/command-manager.service';
 import { textWrapping } from '../rappid-main/textWrapping';
@@ -38,6 +38,7 @@ export class InitRappidService {
   private navigator;
   private toolbar;
   private RuleSet;
+
 
   constructor(
     private graphService: GraphService,
@@ -82,44 +83,44 @@ export class InitRappidService {
       }
     };
 
-    for (let link of dialogComponentRef.instance.opmLinks) {
+    for (const link of dialogComponentRef.instance.opmLinks) {
       //Structrial Links
-      if (link.name == "Aggregation-Participation"
-        || link.name == "Generalization-Specialization"
-        || link.name == "Exhibition-Characterization"
-        || link.name == "Classification-Instantiation"
-        || link.name == "Unidirectional_Relation"
-        || link.name == "Bidirectional_Relation") {
+      if (link.name == 'Aggregation-Participation'
+        || link.name == 'Generalization-Specialization'
+        || link.name == 'Exhibition-Characterization'
+        || link.name == 'Classification-Instantiation'
+        || link.name == 'Unidirectional_Relation'
+        || link.name == 'Bidirectional_Relation') {
 
         dialogComponentRef.instance.Structural_Links.push(link);
       }
       //Agent Links
-      else if (link.name == "Agent" || link.name == "Event_Agent" || link.name == "Condition_Agent") {
+      else if (link.name == 'Agent' || link.name == 'Event_Agent' || link.name == 'Condition_Agent') {
         dialogComponentRef.instance.Agent_Links.push(link);
       }
       //Instrument links
-      else if (link.name == "Instrument" || link.name == "Condition_Instrument" || link.name == "Event_Instrument") {
+      else if (link.name == 'Instrument' || link.name == 'Condition_Instrument' || link.name == 'Event_Instrument') {
         dialogComponentRef.instance.Instrument_Links.push(link);
       }
       //Effect links
-      else if (link.name == "Condition_Effect" || link.name == "Event_Effect" || link.name == "Effect") {
+      else if (link.name == 'Condition_Effect' || link.name == 'Event_Effect' || link.name == 'Effect') {
         dialogComponentRef.instance.Effect_links.push(link);
-        dialogComponentRef.instance.Effect_links.reverse()
+        dialogComponentRef.instance.Effect_links.reverse();
       }
       //Consumption links
-      else if (link.name == "Consumption" || link.name == "Condition_Consumption" || link.name == "Event_Consumption") {
+      else if (link.name == 'Consumption' || link.name == 'Condition_Consumption' || link.name == 'Event_Consumption') {
         dialogComponentRef.instance.Consumption_links.push(link);
       }
       //Result
-      else if (link.name == "Result") {
+      else if (link.name == 'Result') {
         dialogComponentRef.instance.Result_Link.push(link);
       }
       //Invocation
-      else if (link.name == "Invocation") {
+      else if (link.name == 'Invocation') {
         dialogComponentRef.instance.Invocation_links.push(link);
       }
       //Exception Links
-      else if (link.name == "Overtime_exception" || link.name == "Undertime_exception") {
+      else if (link.name == 'Overtime_exception' || link.name == 'Undertime_exception') {
         dialogComponentRef.instance.Exception_links.push(link);
       }
     }
@@ -140,21 +141,21 @@ export class InitRappidService {
   }
 
   linkHoverEvent() {
-    var oplDialog;
+    let oplDialog;
     this.paper.on('link:mouseover', (cellView, evt) => {
       this.createOplDialog(cellView);
-      console.log("mouse over link");
+      console.log('mouse over link');
       cellView.highlight();
     });
     this.paper.on('link:mouseleave', (cellView, evt) => {
       oplDialog.close();
       this.dialog$.next('close-opl');
-      console.log("mouse leave link");
+      console.log('mouse leave link');
     });
   }
 
   handleRemoveElement() {
-    var _this = this;
+    const _this = this;
     this.graph.on('remove', (cell) => {
       if (cell.attributes.type === 'opm.Process') {
         _this.treeViewService.removeNode(cell.id);
@@ -169,8 +170,8 @@ export class InitRappidService {
         if (_this.graph.getCell(cell.get('target').id).attributes.type === 'opm.TriangleAgg')
           _this.graph.getCell(cell.get('target').id).remove();
         if (_this.graph.getCell(cell.get('source').id).attributes.type === 'opm.TriangleAgg') {
-          var triangle = _this.graph.getCell(cell.get('source').id);
-          var numberOfTargets = triangle.get('numberOfTargets');
+          const triangle = _this.graph.getCell(cell.get('source').id);
+          const numberOfTargets = triangle.get('numberOfTargets');
           if (numberOfTargets > 1) {
             triangle.set('numberOfTargets', (numberOfTargets - 1));
           }
@@ -179,7 +180,7 @@ export class InitRappidService {
         }
       }
       if (cell.attributes.type === 'opm.State') {
-        let fatherObject = _this.graph.getCell(cell.get('father'));
+        const fatherObject = _this.graph.getCell(cell.get('father'));
         if (fatherObject.get('embeds').length == 0) {
           common.CommonFunctions.arrangeStatesParams(fatherObject, 0.5, 0.5, 'middle', 'middle', 'bottom', 0, 0);
           textWrapping.updateTextAndSize(fatherObject);
@@ -190,24 +191,26 @@ export class InitRappidService {
 
   //Check Changes. This function has been modified to update opl for each cell once graph is changed
   handleAddLink() {
+    let _thisObj=this;
     this.graph.on('add', (cell) => {
       if (cell.attributes.type === 'opm.Link') {
         this.paper.on('cell:pointerup ', function (cellView) {
-          var cell = cellView.model;
+          const cell = cellView.model;
           //If it is a new link and is not connected to any element - deleting it. Otherwise it will be reconnected to
           //the previous element
           if (cell.isLink() && !cell.attributes.target.id && !cell.get('previousTargetId')) {
             cell.remove();
           }
         });
-        cell.on('change:target change:source', (link) => {
+        cell.on('change:target change:source', (link,a, b) => {
           if (link.attributes.source.id && link.attributes.target.id) {
             if (link.attributes.source.id != link.attributes.target.id) {
               if (!link.get('previousTargetId') || (link.get('previousTargetId') != link.attributes.target.id)) {
-                var relevantLinks = linkTypeSelection.generateLinkWithOpl(link);
+                const relevantLinks = linkTypeSelection.generateLinkWithOpl(link);
                 if (relevantLinks.length > 0) {
                   link.set('previousTargetId', link.attributes.target.id);
                   link.set('graph', this.graph);
+                  if (!b.cameFromInZooming)
                   this.createDialog(link);
                 }
               }
@@ -215,7 +218,7 @@ export class InitRappidService {
           }
         });
       }
-    })
+    });
   }
 
 
@@ -228,7 +231,7 @@ export class InitRappidService {
 
     this.commandManager = new joint.dia.CommandManager({ graph: this.graph });
 
-    var paper = this.paper = new joint.dia.Paper({
+    const paper = this.paper = new joint.dia.Paper({
       linkConnectionPoint: joint.util.shapePerimeterConnectionPoint,
       width: 1000,
       height: 1000,
@@ -245,26 +248,30 @@ export class InitRappidService {
     // When the dragged cell is dropped over another cell, let it become a child of the
     // element below.
     paper.on('cell:pointerup', function (cellView, evt, x, y) {
-      var cell = cellView.model;
+      const cell = cellView.model;
       if (cell.attributes.type == 'opm.Process') {
-        var cellViewsBelow = paper.findViewsFromPoint(cell.getBBox().center());
+        const cellViewsBelow = paper.findViewsFromPoint(cell.getBBox().center());
         if (cellViewsBelow.length) {
           // Note that the findViewsFromPoint() returns the view for the `cell` itself.
-          var cellViewBelow = _.find(cellViewsBelow, function (c) {
-            return c.model.id !== cell.id
+          const cellViewBelow = _.find(cellViewsBelow, function (c) {
+            return c.model.id !== cell.id;
           });
-
           // Prevent recursive embedding.
           if (cellViewBelow && cellViewBelow.model.get('parent') !== cell.id) {
             cellViewBelow.model.embed(cell);
-            cell.toFront();
+            /* Ahmad commented this line because it blocks the pointerdblclick event
+               for the subprocesses of in-zoomed process. It was replaced by
+               another line that roughly does the same functionality as toFront.
+            */
+            // cell.toFront();
+            cell.set('z', cellViewBelow.model.attributes.z  + 1);
             common.CommonFunctions.updateObjectSize(cellViewBelow.model);
           }
         }
       }
     });
 
-    var paperScroller = this.paperScroller = new joint.ui.PaperScroller({
+    const paperScroller = this.paperScroller = new joint.ui.PaperScroller({
       paper: paper,
       autoResizePaper: true,
       cursor: 'grab'
@@ -288,12 +295,12 @@ export class InitRappidService {
 
       'ctrl+v': function () {
 
-        var pastedCells = this.clipboard.pasteCells(this.graph, {
+        const pastedCells = this.clipboard.pasteCells(this.graph, {
           translate: { dx: 20, dy: 20 },
           useLocalStorage: true
         });
 
-        var elements = _.filter(pastedCells, function (cell) {
+        const elements = _.filter(pastedCells, function (cell) {
           return cell.isElement();
         });
 
@@ -389,8 +396,8 @@ export class InitRappidService {
   }
 
   initializeTextEditing() {
-    var lastEnteredText;
-    var currentCellView;
+    let lastEnteredText;
+    let currentCellView;
     this.paper.on('cell:pointerdblclick', function (cellView, evt) {
       lastEnteredText = cellView.model.attributes.attrs.text.text;
       currentCellView = cellView.model;
@@ -399,12 +406,12 @@ export class InitRappidService {
         textProperty: cellView.model.isLink() ? 'labels/attrs/text/text' : 'attrs/text/text',
         placeholder: true
       });
-    }, this)
+    }, this);
     this.graph.on('change:attrs', function (cell) {
       if ((cell.get('type') != 'opm.Link') && (cell.attr('text/text') != lastEnteredText) &&
         !cell.attributes.attrs.wrappingResized) {  //if the text was changed
-        var textString = cell.attr('text/text');
-        var newParams = { width: cell.get('minSize').width, height: cell.get('minSize').height, text: '' };    //No
+        const textString = cell.attr('text/text');
+        let newParams = { width: cell.get('minSize').width, height: cell.get('minSize').height, text: '' };    //No
                                                                                                                  // empty
                                                                                                                  // name
                                                                                                                  // is
@@ -420,32 +427,32 @@ export class InitRappidService {
         }
         cell.attributes.attrs.wrappingResized = false;
       }
-    }, this)
+    }, this);
 
     this.paper.on('blank:pointerdown', function (cellView, evt) {
       if (currentCellView && !currentCellView.isLink()) {
-        var currentText = currentCellView.attributes.attrs.text.text;
+        const currentText = currentCellView.attributes.attrs.text.text;
         if (currentText == '') {
           currentCellView.attr({ text: { text: lastEnteredText } });
         }
         joint.ui.TextEditor.close();
       }
-    }, this)
+    }, this);
 
     this.graph.on('change:size', _.bind(function (cell, attrs) {
       if (cell.attributes.attrs.text && !cell.attributes.attrs.wrappingResized) { //resized manually
         textWrapping.wrapTextAfterSizeChange(cell);
       }
-    }, this))
+    }, this));
   }
 
   initializeAttributesEvents() {
-    var _this = this;
+    const _this = this;
     this.paper.on('cell:pointerup blank:pointerclick ', function (cellView) {
       _this.graphService.updateJSON();
     });
     this.paper.on('cell:pointerdown', function (cellView) {
-      var cell = cellView.model;
+      const cell = cellView.model;
       cell.on('cell:pointerup', function (cellView) {
         _this.graphService.updateJSON();
       });
@@ -466,10 +473,10 @@ export class InitRappidService {
   }
 
   initializeHaloAndInspector() {
-    var _this = this;
+    const _this = this;
     this.paper.on('element:pointerup link:options', function (cellView) {
 
-      var cell = cellView.model;
+      const cell = cellView.model;
 
       if (!this.selection.collection.contains(cell)) {
 
@@ -577,14 +584,19 @@ export class InitRappidService {
               }
             });
             halo.on('action:add_state:pointerdown', function (evt, x, y) {
-              let cellModel = this.options.cellView.model;
-              let CellClone = cell.clone();
-              var textString = cell.attributes.attrs.text.text;
+              const cellModel = this.options.cellView.model;
+              if (cellModel.attributes.attrs.ellipse['stroke-width'] === 4) {
+              _this.graphService.changeGraphModel(cellModel.id);
+                return;
+             }
+              cellModel.attributes.attrs.ellipse['stroke-width']=4;
+              const CellClone = cell.clone();
+              const textString = cell.attributes.attrs.text.text;
               CellClone.set('id', cellModel.id);
               CellClone.attr({ text: { text: textString } });
               _this.treeViewService.insertNode(cellModel);
-              let elementlinks = _this.graphService.graphLinks;
-              processInzooming(evt, x, y, this, CellClone, elementlinks);
+              const elementlinks = _this.graphService.graphLinks;
+              processInzooming(evt, x, y, this, CellClone, elementlinks, _this);
             });
           }
 
@@ -605,7 +617,7 @@ export class InitRappidService {
 
   initializeNavigator() {
 
-    var navigator = this.navigator = new joint.ui.Navigator({
+    const navigator = this.navigator = new joint.ui.Navigator({
       width: 240,
       height: 115,
       paperScroller: this.paperScroller,
@@ -619,7 +631,7 @@ export class InitRappidService {
 
   initializeToolbar() {
 
-    var toolbar = this.toolbar = new joint.ui.Toolbar({
+    const toolbar = this.toolbar = new joint.ui.Toolbar({
       groups: toolbarConfig.groups,
       tools: toolbarConfig.tools,
       references: {
