@@ -349,7 +349,7 @@ export class InitRappidService {
   initializeSelection() {
 
     this.clipboard = new joint.ui.Clipboard();
-    this.selection = new joint.ui.Selection({ paper: this.paper });
+    this.selection = new joint.ui.Selection({paper: this.paper});
 
     // Initiate selecting when the user grabs the blank area of the paper while the Shift key is pressed.
     // Otherwise, initiate paper pan.
@@ -374,13 +374,18 @@ export class InitRappidService {
     }, this);
 
     this.selection.on('selection-box:pointerdown', function (elementView, evt) {
-
       // Unselect an element if the CTRL/Meta key is pressed while a selected element is clicked.
       if (this.keyboard.isActive('ctrl meta', evt)) {
         this.selection.collection.remove(elementView.model);
       }
-
     }, this);
+
+    this.selection.removeHandle('rotate');
+    this.selection.addHandle({ name: 'link', position: 'n', icon: '../../assets/OPM_Links/StructuralAgg.png' });
+ //   this.selection.on('action:link:pointerdown', function(evt) {
+ //     evt.stopPropagation()
+ //     alert('My custom action.');
+ //   });
   }
 
   initializeTextEditing() {
@@ -446,12 +451,12 @@ export class InitRappidService {
       });
     });
     this.graph.on('change:attrs', _.bind(function (cell, attrs) {
-      //If value of an object was changed - add/modify a state according to it
+      // If value of an object was changed - add/modify a state according to it
       if (cell.isElement() && attrs.value) {
         // console.log('if - value');
         valueHandle.updateCell(this.graph, cell);
       }
-    }, this))
+    }, this));
 
     this.graph.on('change:position', _.bind(function (cell) {
       if (cell.attributes.type === 'opm.Link') {

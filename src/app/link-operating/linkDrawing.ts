@@ -29,7 +29,7 @@ const DictOfLinksValue = {
   "Event_Agent": {src: false, dst: true, middle: false, c: false, e: true, value: {fill: 'black', d: 'M 0 0 a 5 5 0 1 0 10 0 a 5 5 0 1 0 -10 0 M 10,0', 'stroke-width': 2}},
 };
 
-function invocation(link){
+function invocation(link) {
   var source = link.getSourceElement();
   var target = link.getTargetElement();
   var src_x = source.attributes.position.x;
