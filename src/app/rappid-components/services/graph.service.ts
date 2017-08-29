@@ -62,10 +62,10 @@ export class GraphService {
   }
 
   updateJSON() {
-    if (this.modelObject.name !== null) {
+    const modelInDb = this.modelStorage.models.includes(this.modelObject.name);
+    if ((this.modelObject.name !== null) && modelInDb) {
       this.saveGraph(this.modelObject.name, false);
-    }
-    else {
+    } else {
       localStorage.setItem(this.modelObject.name, this.modelToSync);
     }
   }

@@ -82,7 +82,8 @@ export class RappidToolbarComponent implements OnInit {
   }
 
   saveModel() {
-    if (this.graphService.modelObject.name === null) {
+    const modelInDb = this.graphService.modelStorage.models.includes(this.graphService.modelObject.name);
+    if ((this.graphService.modelObject.name === null) || !modelInDb) {
       return this.saveModelAs();
     }
     return this.graphService.saveGraph(this.graphService.modelObject.name, false);

@@ -26,9 +26,11 @@ export class ModelFbStorageService extends ModelStorageInterface {
   listen(modelName: string, graph): any {
     let ref = this.af.database.ref(`/models/${modelName}`);
     ref.on('value', function (snapshot) {
-      var json = snapshot.val();
-      firebaseKeyEncode.deepDecode(json)
-      graph.fromJSON(json);
+      let json = snapshot.val();
+      if (json) {
+        firebaseKeyEncode.deepDecode(json);
+        graph.fromJSON(json);
+      }
     });
   }
 
@@ -50,5 +52,10 @@ export class ModelFbStorageService extends ModelStorageInterface {
       .then((snapshot) => {
         return this.models = Object.keys(snapshot.val());
       });
+  }
+
+  deleteModel(modelName) : any {
+    this.af.database.ref(`/models/${modelName}`).remove();
+    this.af.database.ref(`/modelnames/${modelName}`).remove();
   }
 }

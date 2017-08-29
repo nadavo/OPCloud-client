@@ -228,9 +228,6 @@ export class InitRappidService {
         this.cell$.next(cell);
       }
     });
-
-    this.commandManager = new joint.dia.CommandManager({ graph: this.graph });
-
     const paper = this.paper = new joint.dia.Paper({
       linkConnectionPoint: joint.util.shapePerimeterConnectionPoint,
       width: 1000,
@@ -239,7 +236,8 @@ export class InitRappidService {
       drawGrid: true,
       model: this.graph,
       defaultLink: new opmShapes.Link,
-      multiLinks: false
+      multiLinks: false,
+      selectionCollection: null
     });
 
 
@@ -361,7 +359,6 @@ export class InitRappidService {
     // Initiate selecting when the user grabs the blank area of the paper while the Shift key is pressed.
     // Otherwise, initiate paper pan.
     this.paper.on('blank:pointerdown', function (evt, x, y) {
-
       if (this.keyboard.isActive('shift', evt)) {
         this.selection.startSelecting(evt);
       } else {
@@ -376,6 +373,7 @@ export class InitRappidService {
       // Select an element if CTRL/Meta key is pressed while the element is clicked.
       if (this.keyboard.isActive('ctrl meta', evt)) {
         this.selection.collection.add(elementView.model);
+        this.paper.selectionCollection = this.selection.collection;
       }
 
     }, this);
@@ -384,6 +382,7 @@ export class InitRappidService {
       // Unselect an element if the CTRL/Meta key is pressed while a selected element is clicked.
       if (this.keyboard.isActive('ctrl meta', evt)) {
         this.selection.collection.remove(elementView.model);
+        this.paper.selectionCollection = this.selection.collection;
       }
     }, this);
 

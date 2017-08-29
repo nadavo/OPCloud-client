@@ -113,19 +113,19 @@ export const linkDrawing = {
     console.log('in drawlink');
     var linkInfo = DictOfLinksValue[linkName];
     var graph = link.get('graph');
-    link.set('graph', null);
-    if(!linkInfo){
-      console.log("ERROR, link name does not exist!");
+    link.set({'graph': null}, { ignoreCommandManager: true });
+    if (!linkInfo){
+      console.log('ERROR, link name does not exist!');
       return;
     }
 
-    if(link.attributes.router){
+    if (link.attributes.router) {
       link.unset('router');
     }
-    if(link.attributes.labels){
+    if (link.attributes.labels) {
       link.unset('labels');
     }
-    if(link.attributes.labelMarkup){
+    if (link.attributes.labelMarkup) {
       link.unset('labelMarkup');
     }
     var newAttributes = {
@@ -208,7 +208,7 @@ export const linkDrawing = {
     if (linkName == "Invocation") {
       invocation(link);
     }
-    link.set('attrs', newAttributes);
+    link.set({'attrs': newAttributes}, { ignoreCommandManager: true });
 
   },
 

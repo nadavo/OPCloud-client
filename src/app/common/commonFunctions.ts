@@ -7,7 +7,7 @@ export const height = require('text-height');
 
 export const CommonFunctions = {
 
-  //Function gets cell and restore default configuration in all field that states arrangement use.
+  // Function gets cell and restore default configuration in all field that states arrangement use.
   arrangeStatesParams(cell, refX, refY, alignX, alignY, arrangeState, stateWidthPadding, statesHeightPadding){
     cell.attr({text: {'ref-x': refX}});
     cell.attr({text: {'ref-y': refY}});
@@ -17,9 +17,6 @@ export const CommonFunctions = {
     cell.set('statesWidthPadding', stateWidthPadding);
     cell.set('statesHeightPadding', statesHeightPadding);
   },
-
-
-
 // Function updateObjectSize Update the size of the object so that no embedded cell will exceed the father border with
 // padding of 10p.
   updateObjectSize(fatherCell) {
