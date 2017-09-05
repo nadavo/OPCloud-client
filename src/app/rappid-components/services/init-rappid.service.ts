@@ -465,9 +465,14 @@ export class InitRappidService {
     }, this));
 
     this.graph.on('change:position', _.bind(function (cell) {
-      if (cell.attributes.type === 'opm.Link') {
-        linkDrawing.linkUpdating(cell);
-      }
+      const outboundLinks = this.graph.getConnectedLinks(cell, { outbound: true });
+      const inboundLinks = this.graph.getConnectedLinks(cell, { inbound: true });
+      common._.each(outboundLinks, function (linkToUpdate) {
+        linkDrawing.linkUpdating(linkToUpdate);
+      });
+      common._.each(inboundLinks, function (linkToUpdate) {
+        linkDrawing.linkUpdating(linkToUpdate);
+      });
     }, this));
   }
 
