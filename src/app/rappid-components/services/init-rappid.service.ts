@@ -123,7 +123,9 @@ export class InitRappidService {
         dialogComponentRef.instance.Invocation_links.push(link);
       }
       //Exception Links
-      else if (link.name == 'Overtime_exception' || link.name == 'Undertime_exception') {
+      else if (link.name == 'Overtime_exception'
+        || link.name == 'Undertime_exception'
+        || link.name == 'Undertime_and_overtime_exception') {
         dialogComponentRef.instance.Exception_links.push(link);
       }
     }
