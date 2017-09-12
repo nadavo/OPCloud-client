@@ -36,7 +36,7 @@ export const basicDefinitions = {
       'y-alignment': 'middle',
       'font-family': 'Arial, helvetica, sans-serif',
       'font-weight': (shapeName == 'state') ? 300 : 600
-    }
+    };
   },
 
   defineShape(shapeName){
