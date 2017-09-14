@@ -3,6 +3,7 @@
  */
 import {basicDefinitions} from "./basicDefinitions";
 import * as common from "../common/commonFunctions";
+import {OpmProcess} from "../models/OpmProcess";
 
 
 
@@ -58,7 +59,7 @@ export function processInzooming (evt, x, y, _this, cellRef, links, that) {
   for (let i = 0; i < initial_subprocess; i++) {
     let yp = y + dy;
     let xp=x+childMargin;
-    let defaultProcess = new joint.shapes.opm.Process(basicDefinitions.defineShape('ellipse'));
+    let defaultProcess = new OpmProcess();
     defaultProcess.set('position', {x: xp, y: yp});
     parentObject.embed(defaultProcess);     //makes the state stay in the bounds of the object
     options.graph.addCells([parentObject, defaultProcess]);

@@ -9,25 +9,26 @@ export const basicDefinitions = {
   objectProcessWidth: 90,
   objectProcessHeight: 50,
 
-  createShape(shapeName){
+  createShape() {
     return {
       fill: '#DCDCDC',
       magnet : true,
-      stroke: (shapeName == 'rect') ? '#006400' : ((shapeName == 'ellipse') ? '#00008B' : '#808000'),
+     // stroke: (shapeName == 'rect') ? '#006400' : ((shapeName == 'ellipse') ? '#00008B' : '#808000'),
       'stroke-width': 2,
-      filter: (shapeName == 'state') ? null : {name: 'dropShadow', args: {dx: 3, dy: 3, blur: 0, color: 'grey'}},
+      // filter: (shapeName == 'state') ? null : {name: 'dropShadow', args: {dx: 3, dy: 3, blur: 0, color: 'grey'}, attrs: { width:5, height:5 }},
+      filter: {name: 'dropShadow', args: {dx: 3, dy: 3, blur: 0, color: 'grey'}, attrs: { width:5, height:5 }},
       width: 90,
       height: 50,
-      rx: (shapeName == 'ellipse') ? 40 : (shapeName == 'state') ? 20 : null,
-      ry: (shapeName == 'ellipse') ? 40 : (shapeName == 'state') ? 20 : null,
-      cx: (shapeName == 'ellipse') ? 40 : null,
-      cy: (shapeName == 'ellipse') ? 40 : null
+  //    rx: (shapeName == 'ellipse') ? 40 : (shapeName == 'state') ? 20 : null,
+  //    ry: (shapeName == 'ellipse') ? 40 : (shapeName == 'state') ? 20 : null,
+  //    cx: (shapeName == 'ellipse') ? 40 : null,
+  //    cy: (shapeName == 'ellipse') ? 40 : null
     };
   },
 
-  createText(shapeName){
+  createText() {
     return {
-      text: (shapeName == 'rect') ? 'Object' : (shapeName == 'ellipse') ? 'Process' : 'state',
+    //  text: (shapeName == 'rect') ? 'Object' : (shapeName == 'ellipse') ? 'Process' : 'state',
       fill: 'black',
       'font-size': 14,
       'ref-x': .5,
@@ -35,29 +36,30 @@ export const basicDefinitions = {
       'x-alignment': 'middle',
       'y-alignment': 'middle',
       'font-family': 'Arial, helvetica, sans-serif',
-      'font-weight': (shapeName == 'state') ? 300 : 600
+     // 'font-weight': (shapeName == 'state') ? 300 : 600
+      'font-weight': 600
     };
   },
 
-  defineShape(shapeName){
+  defineShape() {
     return {
-      markup: `<g class="rotatable"><g class="scalable"><${shapeName}/></g><text/></g>`,
+     // markup: `<g class="rotatable"><g class="scalable"><${shapeName}/></g><text/></g>`,
       defaults: _.defaultsDeep({
-        type: (shapeName == 'rect') ? 'opm.Object' : 'opm.Process',
+       // type: (shapeName == 'rect') ? 'opm.Object' : 'opm.Process',
         size: {width: 90, height: 50},
         minSize: {width: 90, height: 50},
-        padding: (shapeName == 'rect') ? 15 : 35,
+      //  padding: (shapeName == 'rect') ? 15 : 35,
         statesWidthPadding : 0,
         statesHeightPadding : 0,
         attrs: {
-          [shapeName]: this.createShape(shapeName),
-          'text': this.createText(shapeName),
+         // [shapeName]: this.createShape(shapeName),
+          'text': this.createText(),
           'value' : {'value' : 'None', 'valueType' : 'None', 'units' : ''},
           'wrappingResized' : false,
           'manuallyResized' : false,
-          'statesArrange' : 'bottom',
+       //   'statesArrange' : 'bottom',
         }
-      }, joint.shapes.basic.Generic.prototype.defaults)
+      }, joint.shapes.basic.Generic.prototype.defaults),
     };
   },
 

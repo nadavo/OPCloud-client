@@ -1,8 +1,10 @@
 import { opmShapes } from './opm-shapes.config';
+import {OpmProcess} from '../models/OpmProcess';
+import {OpmObject} from '../models/OpmObject';
 
 export const stencilConfig = {
   shapes: [
-    new opmShapes.Process,
-    new opmShapes.Object
+    new OpmProcess(),
+    new OpmObject()
   ]
 };
