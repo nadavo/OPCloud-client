@@ -3,8 +3,6 @@
  */
 import {basicDefinitions} from "./basicDefinitions";
 import * as common from "../common/commonFunctions";
-import {OpmProcess} from "../models/OpmProcess";
-import {OpmState} from "../models/OpmState";
 
 
 
@@ -43,7 +41,7 @@ export function processInzooming (evt, x, y, _this, cellRef, links, that) {
   var cells = options.graph.getElements();
   for (var cellIndex = 0; cellIndex < cells.length; cellIndex++) {
     var cell = cells[cellIndex];
-    if (!(cell instanceof OpmState)) {
+    if (!(cell instanceof joint.shapes.opm.State)) {
       var cellSize = cell.get('size');
       cell.resize(cellSize.width * Facotr, cellSize.height * Facotr);
     }
@@ -55,12 +53,12 @@ export function processInzooming (evt, x, y, _this, cellRef, links, that) {
   parentObject.resize(inzoomed_height, inzoomed_width, options);
 
   //create the initial subprcoess
-   let dy=y_margin;
+  let dy=y_margin;
 
   for (let i = 0; i < initial_subprocess; i++) {
     let yp = y + dy;
     let xp=x+childMargin;
-    let defaultProcess = new OpmProcess();
+    let defaultProcess = new joint.shapes.opm.Process(basicDefinitions.defineShape('ellipse'));
     defaultProcess.set('position', {x: xp, y: yp});
     parentObject.embed(defaultProcess);     //makes the state stay in the bounds of the object
     options.graph.addCells([parentObject, defaultProcess]);
@@ -78,20 +76,20 @@ export function processInzooming (evt, x, y, _this, cellRef, links, that) {
   let last_process_id=EmbeddedCells[(initial_subprocess-1)].id;
 
 
-   options.graph.getConnectedLinks(parentObject, { inbound: true }).forEach(function(link) {
-     if (link.attributes.name === 'Consumption') {
-       link.set('target', {id: first_process_id},{cameFromInZooming:true});
-       //Ahmad: I don't like this solution. For now it solves the problem of navigating
-       // between OPDs when there is a consumption link. Need to find where is a circular pointer created in the code.
-       link.attributes.graph = null;
-     }
-   });
+  options.graph.getConnectedLinks(parentObject, { inbound: true }).forEach(function(link) {
+    if (link.attributes.name === 'Consumption') {
+      link.set('target', {id: first_process_id},{cameFromInZooming:true});
+      //Ahmad: I don't like this solution. For now it solves the problem of navigating
+      // between OPDs when there is a consumption link. Need to find where is a circular pointer created in the code.
+      link.attributes.graph = null;
+    }
+  });
 
-   options.graph.getConnectedLinks(parentObject, { outbound: true}).forEach(function(link) {
-     if (link.attributes.name === 'Result') {
-       link.set('source', {id: last_process_id});
-     }
-   });
+  options.graph.getConnectedLinks(parentObject, { outbound: true}).forEach(function(link) {
+    if (link.attributes.name === 'Result') {
+      link.set('source', {id: last_process_id});
+    }
+  });
 
   options.graph.on('change:position change:size', function (cell, value, opt) {
     if (opt.skipExtraCall)
@@ -103,7 +101,7 @@ export function processInzooming (evt, x, y, _this, cellRef, links, that) {
       var parent = options.graph.getCell(parentId);
       if (!parent.get('originalPosition')) parent.set('originalPosition', parent.get('position'));
       if (!parent.get('originalSize')) parent.set('originalSize', parent.get('size'));
-       common.CommonFunctions.updateProcessSize(parent);
+      common.CommonFunctions.updateProcessSize(parent);
     }
     else if (cell.get('embeds') && cell.get('embeds').length) {
       common.CommonFunctions.updateProcessSize(cell);
