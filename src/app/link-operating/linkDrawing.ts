@@ -205,7 +205,7 @@ export const linkDrawing = {
    // link.set({'attrs': newAttributes}, { ignoreCommandManager: true });
     link.attr({'.connection': {'stroke-dasharray': '0'}, '.marker-source': newAttributes['.marker-source'],
       '.marker-target': newAttributes['.marker-target']});
-
+    link.set('attrs', newAttributes);
   },
 
   linkUpdating(link) {
@@ -214,7 +214,7 @@ export const linkDrawing = {
       invocation(link);
     } else {
       var linkInfo = DictOfLinksValue[link.attributes.name];
-      if (linkInfo.c || linkInfo.e) {
+      if (linkInfo && (linkInfo.c || linkInfo.e) ) {
         var s: string = (linkInfo.c) ? 'c' : 'e';
         conditionOrEvent(link, s);
       }
