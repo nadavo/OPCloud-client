@@ -6,10 +6,8 @@ export const basicDefinitions = {
 
   stateWidth: 50,
   stateHeight: 25,
-
-  textWrap(s, textWidth){
-    return joint.util.breakText(s, {width: textWidth});
-  },
+  objectProcessWidth: 90,
+  objectProcessHeight: 50,
 
   createShape(shapeName){
     return {
@@ -28,18 +26,17 @@ export const basicDefinitions = {
   },
 
   createText(shapeName){
-    var textOnShape = (shapeName == 'rect') ? 'Object' : (shapeName == 'ellipse') ? 'Process' : 'state';
     return {
-      text: this.textWrap(textOnShape, 112),
+      text: (shapeName == 'rect') ? 'Object' : (shapeName == 'ellipse') ? 'Process' : 'state',
       fill: 'black',
       'font-size': 14,
       'ref-x': .5,
       'ref-y': .5,
-      'text-anchor': 'middle',
+      'x-alignment': 'middle',
       'y-alignment': 'middle',
       'font-family': 'Arial, helvetica, sans-serif',
       'font-weight': (shapeName == 'state') ? 300 : 600
-    }
+    };
   },
 
   defineShape(shapeName){
@@ -48,13 +45,17 @@ export const basicDefinitions = {
       defaults: _.defaultsDeep({
         type: (shapeName == 'rect') ? 'opm.Object' : 'opm.Process',
         size: {width: 90, height: 50},
+        minSize: {width: 90, height: 50},
+        padding: (shapeName == 'rect') ? 15 : 35,
+        statesWidthPadding : 0,
+        statesHeightPadding : 0,
         attrs: {
           [shapeName]: this.createShape(shapeName),
           'text': this.createText(shapeName),
           'value' : {'value' : 'None', 'valueType' : 'None', 'units' : ''},
           'wrappingResized' : false,
           'manuallyResized' : false,
-          'statesArrange' : 'bottom'
+          'statesArrange' : 'bottom',
         }
       }, joint.shapes.basic.Generic.prototype.defaults)
     };
@@ -74,11 +75,15 @@ export const basicDefinitions = {
     return {
       markup: '<g class="rotatable"><g class="scalable"><rect/></g><text/></g>',
       defaults: _.defaultsDeep({
-        type: 'opm.StateNorm',
+        type: 'opm.State',
         size: {width: this.stateWidth, height: this.stateHeight},
+        minSize: {width: 50, height: 25},
+        padding: 10,
         attrs: {
           rect: this.createShape('state'),
           text: this.createText('state'),
+          'wrappingResized' : false,
+          'manuallyResized' : false,
         },
         'father': null
       }, joint.shapes.basic.Generic.prototype.defaults)
