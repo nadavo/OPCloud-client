@@ -515,12 +515,22 @@ export class InitRappidService {
               }
             });
             halo.on('action:add_state:pointerup', function () {
-              hasStates = true;
-              halo.$handles.children('.arrange_up').toggleClass('hidden', !hasStates);
-              halo.$handles.children('.arrange_down').toggleClass('hidden', !hasStates);
-              halo.$handles.children('.arrange_left').toggleClass('hidden', !hasStates);
-              halo.$handles.children('.arrange_right').toggleClass('hidden', !hasStates);
-              addState.call(this);
+              let mx;
+              (this.options.cellView.model.getEmbeddedCells().length === 0) ? mx = 3 : mx = 1;
+                hasStates = true;
+                halo.$handles.children('.arrange_up').toggleClass('hidden', !hasStates);
+                halo.$handles.children('.arrange_down').toggleClass('hidden', !hasStates);
+                halo.$handles.children('.arrange_left').toggleClass('hidden', !hasStates);
+                halo.$handles.children('.arrange_right').toggleClass('hidden', !hasStates);
+              for (let t = 0; t < mx ; t++) {
+                addState.call(this);
+              }
+              if (mx === 3) {
+                const states = this.options.cellView.model.getEmbeddedCells();
+                for (let t = 0; t < states.length; t++) {
+                  states[t].attr('text/text', 'state' + (t + 1));
+                }
+              }
             });
             halo.addHandle({
               name: 'arrange_up', position: 'n', icon: null, attrs: {
